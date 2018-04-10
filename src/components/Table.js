@@ -32,8 +32,8 @@ const Table = ({ text, onPress, isEmpty }) => {
                     alignItems: 'center',
                 }}
             >
-                <Text style={{ color: '#fff' }}>{text}</Text>
-                <Icon name="ios-cafe-outline" size={35} color='#fff' />
+                <Text style={{ color: '#fff', fontSize: 16 }}>Bàn {text}</Text>
+                <Icon name="ios-cafe-outline" size={50} color='#fff' />
                 <View
                     style={{
                         width: 6,

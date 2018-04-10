@@ -3,12 +3,13 @@ import {
     View,
     Text,
     Dimensions,
-    TouchableHighlight
+    // TouchableHighlight
 } from 'react-native';
-import { COLOR } from '../ultils/constants/color';
-import Icon from 'react-native-vector-icons/Ionicons';
+// import Icon from 'react-native-vector-icons/Ionicons';
 
-const { width, height } = Dimensions.get('window');
+import { COLOR } from '../ultils/constants/color';
+
+const { width } = Dimensions.get('window');
 
 const Header = ({ title }) => {
     console.log();

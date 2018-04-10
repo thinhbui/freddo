@@ -13,6 +13,7 @@ import { NavigationActions } from 'react-navigation';
 import styles from './styles';
 import { BillItem, Header } from '../../components';
 import { data } from '../../ultils/constants/data';
+import { COLOR } from '../../ultils/constants/color';
 
 const { height, width } = Dimensions.get('window');
 
@@ -37,12 +38,29 @@ export default class Detail extends Component {
         this.props.navigation.dispatch(NavigationActions.back());
         return true;
     }
-    renderItem = ({ item, index }) => (
-        <BillItem name='Cà phê đen' price={20} index={index} onSwipeRight={() => this.onSwipeRight(index)} />
-    );
+    navigationToMenu = () => {
+        const { orderId } = this.props.navigation.state.params;
+        const navigate = NavigationActions.navigate({ routeName: 'Menu', params: { orderId } });
+        this.props.navigation.dispatch(navigate);
+    }
+    renderItem = ({ item, index }) =>
+        <View>
+            {
+                index === 0 &&
+                <TouchableOpacity style={{ width }} onPress={this.navigationToMenu}>
+                    <Text> Thêm đồ </Text>
+                </TouchableOpacity>
+            }
+            <BillItem
+                name='Cà phê đen'
+                price={20}
+                index={index}
+                onSwipeRight={() => this.onSwipeRight(index)}
+            />
+        </View>
 
     renderColumn = () => (
-        <View style={{ width, height: 25, flexDirection: 'row', backgroundColor: '#8e9baf' }}>
+        <View style={{ width, height: 25, flexDirection: 'row', backgroundColor: COLOR.light_theme }}>
             <View style={{ flex: 1, alignItems: 'center' }}>
                 <Text style={{}}>Tên</Text>
 
@@ -71,11 +89,11 @@ export default class Detail extends Component {
                     renderItem={this.renderItem}
                 />
                 <View style={{ position: 'absolute', bottom: 0, left: 0, width, flexDirection: 'row', height: 40, justifyContent: 'center', alignItems: 'center' }}>
-                    <TouchableOpacity style={{ flex: 1, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: 'brown' }}>
+                    <TouchableOpacity style={{ flex: 1, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: COLOR.theme }}>
                         <Text style={{ color: '#fff' }}>Lưu</Text>
                     </TouchableOpacity>
                     <View style={{ width: 1, height: '100%', backgroundColor: '#fff' }} />
-                    <TouchableOpacity style={{ flex: 1, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: 'brown' }}>
+                    <TouchableOpacity style={{ flex: 1, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: COLOR.theme }}>
                         <Text style={{ color: '#fff' }}>Thanh toán</Text>
                     </TouchableOpacity>
                 </View>

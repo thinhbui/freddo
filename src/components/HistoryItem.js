@@ -5,8 +5,8 @@ import {
     Dimensions,
     TouchableOpacity
 } from 'react-native';
-import { COLOR } from '../ultils/constants/color';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { COLOR } from '../ultils/constants/color';
 
 const { width, height } = Dimensions.get('window');
 

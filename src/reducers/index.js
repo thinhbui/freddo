@@ -1,7 +1,7 @@
-import { combineReducers } from 'redux';
+// import { combineReducers } from 'redux';
 
 import RootNavigator from '../RootNavigator';
-// import StatusReducer from './StatusReducer';
+import LoginReducer from './LoginReducer';
 
 const nav = (state, action) => {
     const newState = RootNavigator.router.getStateForAction(action, state);
@@ -9,5 +9,5 @@ const nav = (state, action) => {
 };
 export default ({
     nav,
-    // StatusReducer
+    LoginReducer
 });

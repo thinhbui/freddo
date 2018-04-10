@@ -1,3 +1,4 @@
 export const COLOR = {
-    theme: 'brown'
+    theme: '#38220f',
+    light_theme: '#967259'
 };

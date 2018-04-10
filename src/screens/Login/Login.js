@@ -7,18 +7,19 @@ import {
     Image,
     Animated,
     Platform,
-    AsyncStorage,
-    Alert,
-    Dimensions
+    
 } from 'react-native';
+import { NavigationActions } from 'react-navigation';
+import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { CONSTANST } from '../../ultils/constants/String';
+import { login, checkAlive } from '../../actions';
+// import { CONSTANST } from '../../ultils/constants/String';
 import styles from './styles';
+import { CustomTextInput } from '../../components';
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
-const { width, height } = Dimensions.get('window');
 
-export default class Login extends PureComponent {
+class Login extends PureComponent {
     constructor(props) {
         super(props);
         this.arr = ['F', 'r', 'e', 'd', 'd', 'o'];
@@ -28,22 +29,16 @@ export default class Login extends PureComponent {
             username: '',
             password: '',
             userId: '',
-            error: ''
+            error: '',
+            // isLogin: this.props.isLogin,
         };
     }
     componentWillMount() {
-        AsyncStorage.getItem(CONSTANST.USER_ID, (error, result) => {
-            if (error) {
-                console.log('error');
-                console.log(error);
-            } else if (result !== '' && result !== null) {
-                console.log(result);
-                this.setState({ userId: result });
-                setTimeout(() => {
-                    this.props.navigation.navigate('Main');
-                }, 500);
-            }
-        });
+        const { user } = this.props;
+        console.log('componentWillMount isLogin', this.props.user.isLogin);
+        // if (user.isLogin) {
+        //     this.checkAliveAccount(user.userId);
+        // }
         const arrAnimated = [];
         for (let i = 0; i < this.arr.length; i++) {
             arrAnimated.push(new Animated.Value(0));
@@ -51,41 +46,28 @@ export default class Login extends PureComponent {
         this.setState({ animations: [...arrAnimated] });
     }
     componentDidMount() {
-        this.startAnimation();
+        const { user } = this.props;
+        this.startAnimation(user);
+    }
+    componentWillReceiveProps(newProps) {
+        console.log('componentWillReceiveProps', newProps);
+        // this.setState({ isLogin: newProps.LoginReducer.isLogin });
+        // if (newProps.StatusReducer === undefined) {
+        //     console.log('1');
+        // } else if (newProps.StatusReducer === null || newProps.StatusReducer.length === 0) {
+        //     console.log('2');
+        // } else {
+        //     console.log('newProps.StatusReducer', newProps.LoginReducer.isLogin);
+        //     // this.setState({ isLogin:  });
+        // }
     }
 
     onLogin = () => {
         const { username, password } = this.state;
-        // fetch('https://freddocf-cyberjunky.c9users.io/api/accounts/login', {
-        //     method: 'POST',
-        //     headers: {
-        //         Accept: 'application/json',
-        //         'Content-Type': 'application/json',
-        //     },
-        //     body: JSON.stringify({ username, password })
-        // }).then((response) => response.json())
-        //     .then((resposeJson) => {
-        //         console.log(resposeJson);
-        //         console.log(resposeJson.userId);
-        //         if (resposeJson.userId !== undefined) {
-        //             AsyncStorage.setItem(CONSTANST.USER_ID, JSON.stringify(resposeJson.userId), (error) => {
-        //                 console.log(error);
-        //             });
-        //             this.props.navigation.navigate('Main');
-        //         } else {
-        //             this.setState({ error: 'Tài khoản hoặc mật khẩu không đúng' });
-        //             AsyncStorage.setItem(CONSTANST.USER_ID, JSON.stringify(''), (error) => {
-        //                 console.log(error);
-        //             });
-        //             alert('Sai tài khoản hoặc mật khẩu');
-        //         }
-        //     })
-        //     .catch((error) => {
-        //         this.setState({ error: error.message });
-        //         alert(error.message);
-        //     });
-        // console.log(JSON.stringify({ username, password }));
-        this.props.navigation.navigate('Main');
+        // console.log(this.props);
+        const loginResult = this.props.login(username, password);
+        this.navigationToMain();
+        console.log(loginResult);
     }
     onChangePassword = (password) => {
         this.setState({ password });
@@ -93,8 +75,8 @@ export default class Login extends PureComponent {
     onChangeUsername = (username) => {
         this.setState({ username });
     }
-    startAnimation = () => {
-        const { iconAnimations, animations, userId } = this.state;
+    startAnimation = (user) => {
+        const { iconAnimations, animations } = this.state;
         const animationsArr = this.arr.map((item, i) =>
             Animated.timing(
                 animations[i],
@@ -115,7 +97,26 @@ export default class Login extends PureComponent {
         Animated.stagger(
             50,
             [...animationsArr]
-        ).start();
+        ).start(() => {
+
+        });
+    }
+    checkAliveAccount = (userId) => {
+        // const { user } = this.props;
+        console.log(userId);
+        const isAlive = this.props.checkAlive(userId);
+        console.log(isAlive);
+    }
+    navigationToMain = (userId) => {
+        const resetAction = NavigationActions.reset({
+            index: 0,
+            actions: [
+                //the userMain who is loging in app
+                NavigationActions.navigate({ routeName: 'Main', params: { userId } })
+            ],
+
+        });
+        this.props.navigation.dispatch(resetAction);
     }
     render() {
         const { animations, iconAnimations, username, error } = this.state;
@@ -149,21 +150,13 @@ export default class Login extends PureComponent {
                         }
                     </View>
                     <View style={{ flex: 2, width: '100%', alignItems: 'center', justifyContent: 'space-around' }}>
-                        <TextInput
-                            underlineColorAndroid='transparent'
-                            placeholderTextColor='#fff'
-                            placeholder='username'
-                            onChangeText={this.onChangeUsername}
-                            style={{ paddingLeft: 10, color: '#fff', width: '80%', backgroundColor: 'transparent', borderColor: '#FFf', borderWidth: 3, borderRadius: 5 }}
+                        <CustomTextInput
+                            label='Tài khoản'
+                            placeholder='Tài khoản'
                         />
-
-                        <TextInput
-                            underlineColorAndroid='transparent'
-                            placeholderTextColor='#fff'
-                            placeholder='password'
-                            onChangeText={this.onChangePassword}
-                            style={{ paddingLeft: 10, color: '#fff', width: '80%', backgroundColor: 'transparent', borderColor: '#FFf', borderWidth: 3, borderRadius: 5 }}
-                            secureTextEntry={true}
+                        <CustomTextInput
+                            label='Mật khẩu'
+                            type='pass'
                         />
                         <TouchableOpacity style={{ width: '60%', backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', height: 40, borderRadius: 20 }} onPress={this.onLogin}>
                             <Text style={{ color: '#000000', fontWeight: 'bold' }}>Đăng nhập</Text>
@@ -177,3 +170,16 @@ export default class Login extends PureComponent {
         );
     }
 }
+
+const mapDispatchToProps = (dispatch) => ({
+    login: (username, password) => { dispatch(login(username, password)); },
+    checkAlive: (userId) => { dispatch(checkAlive(userId)); }
+});
+
+const mapStateToProps = (state) => {
+    console.log(state);
+    return {
+        user: state.LoginReducer
+    };
+};
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
