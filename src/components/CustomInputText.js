@@ -5,14 +5,12 @@ const { height, width } = Dimensions.get('window');
 
 class CustomTextInput extends PureComponent {
     state = {
-        text: '',
         animation: new Animated.Value(0),
         isForcus: false
     }
     componentDidUpdate() {
         const { isForcus } = this.state;
-        console.log(isForcus);
-        if (this.state.text === '') {
+        if (this.props.text === '') {
             Animated.timing(
                 this.state.animation,
                 {
@@ -24,8 +22,8 @@ class CustomTextInput extends PureComponent {
         }
     }
     render() {
-        const { label, type, textInputStyle, style } = this.props;
-        const { animation, text } = this.state;
+        const { label, type, textInputStyle, style, onTextChange, text } = this.props;
+        const { animation } = this.state;
         const textStyle = {
             position: 'absolute',
             left: 3,
@@ -50,7 +48,7 @@ class CustomTextInput extends PureComponent {
                     underlineColorAndroid='transparent'
                     // placeholder={isForcus ? '' : placeholder}
                     placeholderTextColor='#fff'
-                    onChangeText={(textChange) => this.setState({ text: textChange })}
+                    onChangeText={onTextChange}
                     onFocus={() => this.setState({ isForcus: true })}
                     onBlur={() => this.setState({ isForcus: false })}
                     value={text}

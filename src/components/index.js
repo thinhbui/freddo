@@ -5,3 +5,4 @@ export * from './BillItems';
 export * from './HistoryItem';
 export * from './QueueItem';
 export * from './CustomInputText';
+export * from './ModalAddOrderItem';

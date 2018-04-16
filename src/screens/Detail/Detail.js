@@ -24,6 +24,9 @@ export default class Detail extends Component {
             deleteKey: -1
         };
     }
+    componentWillMount() {
+        const { orderId } = this.props.navigation.state.params;
+    }
     componentDidMount() {
         BackHandler.addEventListener('backHome', this.backHandler);
     }
@@ -40,15 +43,16 @@ export default class Detail extends Component {
     }
     navigationToMenu = () => {
         const { orderId } = this.props.navigation.state.params;
-        const navigate = NavigationActions.navigate({ routeName: 'Menu', params: { orderId } });
+        const navigate = NavigationActions.navigate({ routeName: 'MenuOrder', params: { orderId } });
         this.props.navigation.dispatch(navigate);
+        BackHandler.removeEventListener('backHome', this.backHandler);
     }
     renderItem = ({ item, index }) =>
         <View>
             {
                 index === 0 &&
-                <TouchableOpacity style={{ width }} onPress={this.navigationToMenu}>
-                    <Text> Thêm đồ </Text>
+                <TouchableOpacity style={{ width, justifyContent: 'center', alignItems: 'center' }} onPress={this.navigationToMenu}>
+                    <Text style={{}}> Thêm đồ </Text>
                 </TouchableOpacity>
             }
             <BillItem
@@ -61,9 +65,8 @@ export default class Detail extends Component {
 
     renderColumn = () => (
         <View style={{ width, height: 25, flexDirection: 'row', backgroundColor: COLOR.light_theme }}>
-            <View style={{ flex: 1, alignItems: 'center' }}>
+            <View style={{ flex: 2, alignItems: 'center' }}>
                 <Text style={{}}>Tên</Text>
-
             </View>
             <View style={{ flex: 1, alignItems: 'center' }}>
                 <Text style={{}}>Số lượng</Text>
@@ -77,17 +80,22 @@ export default class Detail extends Component {
         </View>
     )
     render() {
-        const { deleteKey } = this.state;
-        console.log(data, deleteKey);
+        // const { deleteKey } = this.state;
+        const { orderId } = this.props.navigation.state.params;
+        // console.log('Detail', this.props);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                 <Header title='Chi tiết bàn' />
                 {this.renderColumn()}
-                <FlatList
-                    data={data}
-                    keyExtractor={(item, index) => index.toString()}
-                    renderItem={this.renderItem}
-                />
+                {orderId === '' ?
+                    <TouchableOpacity style={{ height: 40, width, justifyContent: 'center', alignItems: 'center', backgroundColor: 'green', borderRadius: 20 }} onPress={this.navigationToMenu}>
+                        <Text style={{ color: '#fff' }}> Thêm đồ </Text>
+                    </TouchableOpacity>
+                    : <FlatList
+                        data={data}
+                        keyExtractor={(item, index) => index.toString()}
+                        renderItem={this.renderItem}
+                    />}
                 <View style={{ position: 'absolute', bottom: 0, left: 0, width, flexDirection: 'row', height: 40, justifyContent: 'center', alignItems: 'center' }}>
                     <TouchableOpacity style={{ flex: 1, height: 40, justifyContent: 'center', alignItems: 'center', backgroundColor: COLOR.theme }}>
                         <Text style={{ color: '#fff' }}>Lưu</Text>

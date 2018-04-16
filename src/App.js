@@ -7,7 +7,14 @@ import { Provider } from 'react-redux';
 import AppNavigatorState from './AppNavigatorState';
 import store from './store';
 
-const persistor = persistStore(store);
+const persistor = persistStore(
+    store,
+    { timeout: 1000 },
+    (err) => {
+        if (err) {
+            console.log('error persist:', err);
+        }
+    });
 
 class App extends Component {
     render() {

@@ -84,7 +84,7 @@ const orderPatern = [
         id: 'string'
     }
 ];
-const menuItemPatern = [
+const arrMenuItemPatern = [
     {
         code: 'string',
         name: 'string',
@@ -98,4 +98,4 @@ const menuItemPatern = [
 ];
 // let dataSplice = data.slice(5, 1);
 // module.export(sesstionListData, data);
-export { sectionListData, data, orderPatern, menuItemPatern };
+export { sectionListData, data, orderPatern, arrMenuItemPatern };

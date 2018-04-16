@@ -10,16 +10,14 @@ import { COLOR } from './ultils/constants/color';
 
 const MainNavigator = TabNavigator({
     Home: { screen: Home },
-    Menu: { 
-        screen: Menu,
-        path: '/Menu/:orderId'
-    },
+    Menu: { screen: Menu },
     Queue: { screen: Queue },
     History: { screen: Historys },
 }, {
         headerMode: 'none',
         tabBarPosition: 'bottom',
         lazy: false,
+        swipeEnabled: false,
         tabBarOptions: {
             showLabel: false,
             showIcon: true,
@@ -36,12 +34,15 @@ const RootNavigator = StackNavigator({
     Detail: {
         screen: Detail,
         path: 'Detail/:orderId'
-    }
+    },
+    MenuOrder: {
+        screen: Menu,
+        path: '/Menu/:orderId'
+    },
 },
     {
         // initialRouteName: 'Main',
         headerMode: 'none',
-
     }
 );
 export default RootNavigator;

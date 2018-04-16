@@ -1,25 +1,38 @@
-import { LOGIN, LOGIN_EXPIRE, LOGOUT } from '../ultils/constants/actionType';
+import { LOGIN, LOGOUT, LOGIN_ERROR, TOKEN } from '../ultils/constants/actionType';
 // import { initialState } from '../store';
 
 const initialState = {
     isLogin: false,
     userId: '',
     isAlive: false,
+    token: '',
+    id: ''
 };
 export default (state = initialState, action) => {
+    // console.log('action', action);
+
     switch (action.type) {
         case LOGIN: {
             return {
+                id: action.payload.id,
                 isLogin: true,
                 userId: action.payload.userId,
-                isAlive: true
+                isAlive: true,
+                // ...action.payload
             };
         }
-        case LOGIN_EXPIRE: {
+        case LOGIN_ERROR: {
             return {
-                ...state,
-                isLogin: false,
-                isAlive: false
+                token: action.payload,
+                ...state
+            };
+        }
+        case TOKEN: {
+            console.log(action.payload);
+
+            return {
+                token: action.payload,
+                ...state
             };
         }
         case LOGOUT: {

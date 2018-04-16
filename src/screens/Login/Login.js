@@ -7,17 +7,18 @@ import {
     Image,
     Animated,
     Platform,
-    
+    Alert
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { login, checkAlive } from '../../actions';
+import { login, checkAlive, getToken } from '../../actions';
 // import { CONSTANST } from '../../ultils/constants/String';
 import styles from './styles';
 import { CustomTextInput } from '../../components';
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
+const backgroundImage = require('../../ultils/images/cafe.png');
 
 class Login extends PureComponent {
     constructor(props) {
@@ -28,17 +29,13 @@ class Login extends PureComponent {
             iconAnimations: new Animated.Value(0),
             username: '',
             password: '',
-            userId: '',
-            error: '',
+            user: {}
             // isLogin: this.props.isLogin,
         };
     }
     componentWillMount() {
         const { user } = this.props;
         console.log('componentWillMount isLogin', this.props.user.isLogin);
-        // if (user.isLogin) {
-        //     this.checkAliveAccount(user.userId);
-        // }
         const arrAnimated = [];
         for (let i = 0; i < this.arr.length; i++) {
             arrAnimated.push(new Animated.Value(0));
@@ -47,27 +44,34 @@ class Login extends PureComponent {
     }
     componentDidMount() {
         const { user } = this.props;
+        console.log(user);
+
+        // if (user.isLogin) {
         this.startAnimation(user);
+        // }
     }
     componentWillReceiveProps(newProps) {
         console.log('componentWillReceiveProps', newProps);
-        // this.setState({ isLogin: newProps.LoginReducer.isLogin });
-        // if (newProps.StatusReducer === undefined) {
-        //     console.log('1');
-        // } else if (newProps.StatusReducer === null || newProps.StatusReducer.length === 0) {
-        //     console.log('2');
-        // } else {
-        //     console.log('newProps.StatusReducer', newProps.LoginReducer.isLogin);
-        //     // this.setState({ isLogin:  });
-        // }
+        const { user } = newProps;
+        this.setState({ user });
+        console.log(user);
+        if (user.userId === undefined || user.userId === '') {
+            Alert.alert('Lỗi đăng nhập', 'Sai tài khoản hoặc mật khẩu');
+        } else {
+            this.navigationToMain(newProps.user.userId);
+            // console.log('getToken');
+
+            // this.props.getToken(newProps.user.id, newProps.user.userId);
+        }
     }
 
     onLogin = () => {
         const { username, password } = this.state;
-        // console.log(this.props);
-        const loginResult = this.props.login(username, password);
-        this.navigationToMain();
-        console.log(loginResult);
+        if (username === '' || password === '') {
+            Alert.alert('Lỗi đăng nhập', 'Bạn phải nhập tài khoản và mật khẩu');
+        } else {
+            this.props.login(username, password);
+        }
     }
     onChangePassword = (password) => {
         this.setState({ password });
@@ -98,7 +102,9 @@ class Login extends PureComponent {
             50,
             [...animationsArr]
         ).start(() => {
-
+            if (user.userId !== undefined && user.isLogin) {
+                this.navigationToMain(user.userId);
+            }
         });
     }
     checkAliveAccount = (userId) => {
@@ -119,23 +125,27 @@ class Login extends PureComponent {
         this.props.navigation.dispatch(resetAction);
     }
     render() {
-        const { animations, iconAnimations, username, error } = this.state;
+        const { animations, iconAnimations, username, password, user } = this.state;
         return (
             <View
                 style={styles.container}
             >
                 <Image
-                    source={require('../../ultils/images/cafe.png')}
+                    source={backgroundImage}
                     style={styles.background_image}
                 />
-                <View style={{ flex: 1 }}>
+                <View style={{ flex: 1 }} />
 
-                </View>
                 <View style={styles.content}>
                     <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-                        <AnimatedIcon name='ios-cafe' color='#fff' size={90} style={{ opacity: iconAnimations }} />
+                        <AnimatedIcon
+                            name='ios-cafe'
+                            color='#fff'
+                            size={90}
+                            style={{ opacity: iconAnimations }}
+                        />
                     </View>
-                    <View style={{ flex: 0.5, flexDirection: 'row', alignItems: 'flex-start' }}>
+                    <View style={styles.freddo_layout}>
                         {
                             this.arr.map((value, index) => (
                                 <Animated.Text
@@ -149,23 +159,25 @@ class Login extends PureComponent {
                             ))
                         }
                     </View>
-                    <View style={{ flex: 2, width: '100%', alignItems: 'center', justifyContent: 'space-around' }}>
+                    <View style={styles.input_layout}>
                         <CustomTextInput
                             label='Tài khoản'
                             placeholder='Tài khoản'
+                            text={username}
+                            onTextChange={this.onChangeUsername}
                         />
                         <CustomTextInput
                             label='Mật khẩu'
                             type='pass'
+                            text={password}
+                            onTextChange={this.onChangePassword}
                         />
-                        <TouchableOpacity style={{ width: '60%', backgroundColor: '#fff', justifyContent: 'center', alignItems: 'center', height: 40, borderRadius: 20 }} onPress={this.onLogin}>
+                        <TouchableOpacity style={styles.button} onPress={this.onLogin}>
                             <Text style={{ color: '#000000', fontWeight: 'bold' }}>Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>
                 </View>
-                <View style={{ flex: 1 }}>
-
-                </View>
+                <View style={{ flex: 1 }} />
             </View>
         );
     }
@@ -173,7 +185,8 @@ class Login extends PureComponent {
 
 const mapDispatchToProps = (dispatch) => ({
     login: (username, password) => { dispatch(login(username, password)); },
-    checkAlive: (userId) => { dispatch(checkAlive(userId)); }
+    checkAlive: (userId) => { dispatch(checkAlive(userId)); },
+    getToken: (id) => { dispatch(getToken(id)); }
 });
 
 const mapStateToProps = (state) => {

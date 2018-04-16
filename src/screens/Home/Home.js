@@ -5,17 +5,20 @@ import {
     Image,
     Text,
     TouchableOpacity,
+    ActivityIndicator
     // Dimensions
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
 // import styles from './styles';
 import { Table, Header } from '../../components';
 import { COLOR } from '../../ultils/constants/color';
 import styles from './styles';
+import { getTable } from '../../actions';
 
 // const { height, width } = Dimensions.get('window');
 
-export default class Home extends PureComponent {
+class Home extends PureComponent {
     static navigationOptions = {
         tabBarIcon: () => (
             <Icon name='ios-home' size={25} color='#fff' />
@@ -25,25 +28,35 @@ export default class Home extends PureComponent {
     state = {
         sortById: true,
         sortByState: true,
+        tables: []
+    }
+
+    componentWillMount() {
+        this.props.getTable();
+    }
+    componentWillReceiveProps(newProps) {
+        // console.log('componentWillReceiveProps', newProps);
+        this.setState({ tables: newProps.tables });
     }
     onPressTable = (orderId) => {
         this.props.navigation.navigate('Detail', { orderId });
     }
-
     onPressState = () => this.setState({ sortByState: !this.state.sortByState });
-
     onPressId = () => this.setState({ sortById: !this.state.sortById });
 
-    renderItem = ({ item }) => {
-        console.log();
-        return (
-            <Table text={item} onPress={() => this.onPressTable(item)} isEmpty />
-        );
-    }
+    renderItem = ({ item }) => (
+        <Table
+            text={item.name}
+            onPress={() => this.onPressTable(item.orderid)}
+            status={item.status}
+        />
+    );
     render() {
-        const { sortById, sortByState } = this.state;
+        const { sortById, sortByState, tables } = this.state;
+        // console.log(tables);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff', }}>
+
                 <Header title='Danh sách bàn' />
                 <View style={{ flex: 1 }}>
                     <Image
@@ -67,14 +80,35 @@ export default class Home extends PureComponent {
                             <Icon name={sortByState ? 'md-arrow-dropdown' : 'md-arrow-dropup'} size={30} color='#fff' />
                         </TouchableOpacity>
                     </View>
-                    <FlatList
-                        data={[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]}
-                        keyExtractor={(item, index) => index}
-                        renderItem={this.renderItem}
-                        numColumns={3}
-                    />
+                    {
+                        tables.length === 0 ?
+                            <ActivityIndicator
+                                size='large'
+                                color='#fff'
+                            />
+                            :
+                            <FlatList
+                                data={tables}
+                                keyExtractor={(item) => item.id}
+                                renderItem={this.renderItem}
+                                numColumns={3}
+                            />
+                    }
+
                 </View>
             </View>
         );
     }
 }
+const mapDispatchToProps = (dispatch) => ({
+    getTable: () => { dispatch(getTable()); }
+});
+
+const mapStateToProps = (state) => {
+    // console.log(state);
+    return {
+        tables: state.TableReducer
+    };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(Home);

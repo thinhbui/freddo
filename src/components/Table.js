@@ -9,7 +9,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const { width } = Dimensions.get('window');
 
-const Table = ({ text, onPress, isEmpty }) => {
+const Table = ({ text, onPress, status }) => {
     console.log();
     return (
         <TouchableHighlight
@@ -32,14 +32,14 @@ const Table = ({ text, onPress, isEmpty }) => {
                     alignItems: 'center',
                 }}
             >
-                <Text style={{ color: '#fff', fontSize: 16 }}>Bàn {text}</Text>
+                <Text style={{ color: '#fff', fontSize: 16 }}>{text}</Text>
                 <Icon name="ios-cafe-outline" size={50} color='#fff' />
                 <View
                     style={{
                         width: 6,
                         height: 6,
                         borderRadius: 3,
-                        backgroundColor: isEmpty ? '#00ff1d' : '#ff3f00',
+                        backgroundColor: status ? '#ff3f00' : '#00ff1d',
                         position: 'absolute',
                         top: 10,
                         right: 10

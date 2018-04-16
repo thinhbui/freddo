@@ -2,6 +2,9 @@
 
 import RootNavigator from '../RootNavigator';
 import LoginReducer from './LoginReducer';
+import TableReducer from './TableReducer';
+import OrderReducer from './OrderReducer';
+import MenuReducer from './MenuReducer';
 
 const nav = (state, action) => {
     const newState = RootNavigator.router.getStateForAction(action, state);
@@ -9,5 +12,8 @@ const nav = (state, action) => {
 };
 export default ({
     nav,
-    LoginReducer
+    LoginReducer,
+    TableReducer,
+    OrderReducer,
+    MenuReducer
 });

@@ -23,7 +23,7 @@ class BillItem extends PureComponent {
             deleteKey: -1
         };
     }
-  
+
     onPressUp = () => {
         const { amount } = this.state;
         this.setState({ amount: parseInt(amount, 10) + 1 });
@@ -34,7 +34,7 @@ class BillItem extends PureComponent {
             this.setState({ amount: parseInt(amount, 10) - 1 });
         }
     }
-  
+
     delete = () => {
         const { index, onSwipeRight } = this.props;
         Alert.alert(
@@ -77,8 +77,8 @@ class BillItem extends PureComponent {
                 rightActionActivationDistance={width / 3}
             >
                 <View style={{ width, height: 50, flexDirection: 'row', alignItems: 'center' }}>
-                    <View style={{ flex: 1, alignItems: 'center' }}>
-                        <Text style={{ fontSize: 18 }}>{name + index}</Text>
+                    <View style={{ flex: 2, alignItems: 'center' }}>
+                        <Text style={{ fontSize: 18 }}>{name}</Text>
                     </View>
                     <View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
                         <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
