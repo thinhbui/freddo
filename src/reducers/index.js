@@ -7,6 +7,8 @@ import OrderReducer from './OrderReducer';
 import MenuReducer from './MenuReducer';
 
 const nav = (state, action) => {
+    // console.log('state', state);
+    // console.log('action', action);
     const newState = RootNavigator.router.getStateForAction(action, state);
     return newState || state;
 };

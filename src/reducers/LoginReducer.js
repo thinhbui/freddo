@@ -9,8 +9,6 @@ const initialState = {
     id: ''
 };
 export default (state = initialState, action) => {
-    // console.log('action', action);
-
     switch (action.type) {
         case LOGIN: {
             return {

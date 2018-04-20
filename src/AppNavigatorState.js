@@ -7,7 +7,7 @@ import RootNavigator from './RootNavigator';
 class AppNavigatorState extends Component {
     render() {
         const { dispatch, nav } = this.props;
-        console.log('nav', nav);
+        // console.log('nav', nav);
         return (
             <RootNavigator
                 navigation={addNavigationHelpers({

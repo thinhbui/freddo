@@ -10,7 +10,9 @@ import { COLOR } from './ultils/constants/color';
 
 const MainNavigator = TabNavigator({
     Home: { screen: Home },
-    Menu: { screen: Menu },
+    Menu: {
+        screen: Menu,
+    },
     Queue: { screen: Queue },
     History: { screen: Historys },
 }, {
@@ -37,7 +39,7 @@ const RootNavigator = StackNavigator({
     },
     MenuOrder: {
         screen: Menu,
-        path: '/Menu/:orderId'
+        path: 'MenuOrder/:orderId'
     },
 },
     {
