@@ -21,7 +21,9 @@ export default class Historys extends PureComponent {
     renderItem = ({ item, index }) => {
         const date = new Date();
         return (
-            <HistoryItem table={item} time={date.toDateString()} />
+            <View>
+                <HistoryItem table={item} time={date.toDateString()} />
+            </View>
         );
     }
     render() {
@@ -31,7 +33,7 @@ export default class Historys extends PureComponent {
                 <FlatList
                     data={data}
                     renderItem={this.renderItem}
-                    keyExtractor={(item, index) => index}
+                    keyExtractor={(item, index) => index.toString()}
                 />
             </View>
         );

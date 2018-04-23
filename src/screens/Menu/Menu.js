@@ -75,22 +75,22 @@ class Menu extends PureComponent {
 
     onItemPress = (item) => {
         // console.log('item', item);
-        this.setState({
-            visible: true,
-            itemSelected: item
-        });
+        const { detail } = this.props.navigation.state.params;
+        if (detail) this.setState({ visible: true, itemSelected: item });
     }
     backToDetail = () => {
         this.props.navigation.state.params.refresh();
         this.props.navigation.goBack();
     }
     renderItem = ({ item }) => (
-        <MenuItem
-            name={item.name}
-            price={item.price}
-            img='http://bizweb.dktcdn.net/thumb/grande/100/229/171/products/cafe.jpg?v=1498729476127'
-            onPress={() => this.onItemPress(item)}
-        />
+        <View>
+            <MenuItem
+                name={item.name}
+                price={item.price}
+                img='http://bizweb.dktcdn.net/thumb/grande/100/229/171/products/cafe.jpg?v=1498729476127'
+                onPress={() => this.onItemPress(item)}
+            />
+        </View>
     );
 
 

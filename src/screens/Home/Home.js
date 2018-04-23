@@ -31,6 +31,7 @@ class Home extends PureComponent {
 		sortByState: true,
 		tables: []
 	}
+
 	componentWillMount() {
 		const { tables } = this.props;
 		this.props.getTable();
@@ -38,21 +39,28 @@ class Home extends PureComponent {
 		this.setState({ tables });
 		// }
 	}
+
 	componentWillReceiveProps(newProps) {
 		this.setState({ tables: newProps.tables });
 	}
-	onPressTable = (orderId) => {
-		this.props.navigation.navigate('Detail', { orderId });
+	componentDidUpdate() {
+		// const { sortById, sortByState, tables } = this.state;
+		// if (sortById) tables.sort((a, b) => ((a.id > b.id) ? 1 : -1));
+	}
+	onPressTable = (orderId, table) => {
+		this.props.navigation.navigate('Detail', { orderId, table });
 	}
 	onPressState = () => this.setState({ sortByState: !this.state.sortByState });
 	onPressId = () => this.setState({ sortById: !this.state.sortById });
 
 	renderItem = ({ item }) => (
-		<Table
-			text={item.name}
-			onPress={() => this.onPressTable(item.orderid)}
-			status={item.status}
-		/>
+		<View>
+			<Table
+				text={item.name}
+				onPress={() => this.onPressTable(item.orderid, item.id)}
+				status={item.status}
+			/>
+		</View>
 	);
 	render() {
 		const { sortById, sortByState, tables } = this.state;

@@ -2,20 +2,17 @@ import React, { PureComponent } from 'react';
 import {
     View,
     FlatList,
-    // Dimensions,
     Text,
     TouchableOpacity,
     BackHandler
 } from 'react-native';
 import { connect } from 'react-redux';
-// import Icon from 'react-native-vector-icons/Ionicons';
+import moment from 'moment';
 import { NavigationActions } from 'react-navigation';
-// import styles from './styles';
 import { BillItem, Header } from '../../components';
-// import { data } from '../../ultils/constants/data';
-// import { COLOR } from '../../ultils/constants/color';
 import styles from './styles';
-import { getOrder, addNewOrder, deleteItemOrder, postOrder, resetOrder } from '../../actions';
+import { getOrder, addNewOrder, deleteItemOrder, postOrder, resetOrder, updateTable }
+    from '../../actions';
 
 // const { width } = Dimensions.get('window');
 
@@ -61,6 +58,7 @@ class Detail extends PureComponent {
     onSavePress = () => {
         const { order } = this.props;
         const { orderId } = this.props.navigation.state.params;
+        order.billdate = moment.unix();
         if (order.listItems.length > 0 && orderId === '') {
             this.props.postOrder(order);
         }
@@ -73,11 +71,17 @@ class Detail extends PureComponent {
     }
     onOutPress = () => {
         const { order } = this.props;
-        if (order !== {}) {
-            console.log(order);
-        } else {
-            ///
-        }
+        const { table } = this.props.navigation.state.params;
+        order.status = true;
+        this.props.updateOrder(order);
+        table.state = false;
+        this.props.updateTable(table);
+        // this.props.updateTable(); 
+        // if (order !== {}) {
+        //     console.log(order);
+        // } else {
+        //     ///
+        // }
     }
     setData = () => {
         const { order } = this.props;
@@ -94,7 +98,7 @@ class Detail extends PureComponent {
     navigationToMenu = () => {
         BackHandler.removeEventListener('backHome', this.backHandler);
         this.props.navigation.navigate('MenuOrder',
-            { orderId: '', username: '', refresh: this.refresh });
+            { orderId: '', username: '', refresh: this.refresh, detail: true });
     }
     renderItem = ({ item, index }) => {
         console.log(item);
@@ -130,7 +134,11 @@ class Detail extends PureComponent {
         console.log(data);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff' }}>
-                <Header title='Chi tiết bàn' />
+                <Header
+                    title='Chi tiết bàn'
+                    arrow
+                    onArrowPress={() => this.props.navigation.goBack()}
+                />
                 {this.renderColumn()}
                 <View style={{ justifyContent: 'center', alignItems: 'center', height: 50 }}>
                     <TouchableOpacity
@@ -167,7 +175,8 @@ const mapDispatchToProps = (dispatch) => ({
     addNewOrder: (order) => dispatch(addNewOrder(order)),
     deleteItemOrder: index => dispatch(deleteItemOrder(index)),
     postOrder: order => dispatch(postOrder(order)),
-    resetOrder: () => dispatch(resetOrder())
+    resetOrder: () => dispatch(resetOrder()),
+    updateTable: (table) => dispatch(updateTable(table))
 });
 const mapStateToProps = (state) =>
     ({

@@ -2,7 +2,7 @@ import types from '../ultils/constants/actionType';
 import url from '../ultils/constants/api';
 /*eslint-disable*/
 const getItemSuccess = (item) => ({ type: types.GET_TABLE, payload: item });
-
+const update = (item) => ({ type: types.UPDATE_TABLE, payload: item });
 
 const error = err => ({ type: types.ITEM_HAS_ERROR });
 
@@ -51,5 +51,5 @@ const updateTable = (table) => dispatch => {
         })
         .catch((err) => dispatch(error(err)));
 };
-export { getTable };
+export { getTable, updateTable };
 

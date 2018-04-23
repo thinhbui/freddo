@@ -32,7 +32,9 @@ const Header = ({ title, arrow, onArrowPress }) => (
         <StatusBar
             barStyle='light-content'
         />
-        <Text style={{ color: '#fff', fontSize: 16 }}>{title}</Text>
+        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+            <Text style={{ color: '#fff', fontSize: 16 }}>{title}</Text>
+        </View>
     </View>
 );
 
