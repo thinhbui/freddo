@@ -1,20 +1,19 @@
-import { GET_MENU, ITEM_HAS_ERROR } from '../ultils/constants/actionType';
+import types from '../ultils/constants/actionType';
 
 import url from '../ultils/constants/api';
 
 const getItemSuccess = (item) => {
     // console.log(item);
-    return { type: GET_MENU, payload: item };
+    return { type: types.GET_MENU, payload: item };
 };
 
 const error = err => {
     console.log('Login Error', err);
-    return { type: ITEM_HAS_ERROR };
+    return { type: types.ITEM_HAS_ERROR };
 };
 
 const getMenu = (id) => dispatch => {
     const api = url.GET_MENU;
-    console.log(api);
     fetch(api, {
         method: 'GET',
         headers: {

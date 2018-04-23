@@ -44,6 +44,10 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         height: 40,
         borderRadius: 20
+    },
+    text_button: {
+        color: '#000000',
+        fontWeight: 'bold'
     }
 });
 export default styles;

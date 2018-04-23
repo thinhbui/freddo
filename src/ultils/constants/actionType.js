@@ -1,11 +1,17 @@
-export const ITEM_HAS_ERROR = 1;
-export const LOGIN = 2;
-export const LOGIN_ERROR = 3;
-export const LOGOUT = 4;
-export const ADD_ORDER = 5;
-export const FIND_ORDER = 6;
-export const GET_TABLE = 7;
-export const UPDATE_TABLE = 8;
-export const TOKEN = 9;
-export const GET_MENU = 10;
-export const ADD_NEW_ITEM_ORDER = 'ADD_NEW_ITEM_ORDER';
+const types = {
+    ITEM_HAS_ERROR: 'ITEM_HAS_ERROR',
+    LOGIN: 'LOGIN',
+    LOGIN_ERROR: 'LOGIN_ERROR',
+    LOGOUT: 'LOGOUT',
+    ADD_ORDER: 'ADD_ORDER',
+    FIND_ORDER: 'FIND_ORDER',
+    GET_TABLE: 'GET_TABLE',
+    UPDATE_TABLE: 'UPDATE_TABLE',
+    TOKEN: 'TOKEN',
+    GET_MENU: 'GET_MENU',
+    ADD_NEW_ITEM_ORDER: 'ADD_NEW_ITEM_ORDER',
+    ADD_NEW_ORDER: 'ADD_NEW_ORDER',
+    GET_ORDER_ID: 'GET_ORDER_ID',
+    UPDATE_ORDER: 'GET_ORDER_ID',
+};
+export default types;

@@ -6,14 +6,14 @@ import {
     Text
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-import styles from './styles';
+// import styles from './styles';
 import { Header, QueueItem } from '../../components';
 
 const { height, width } = Dimensions.get('window');
 
-const queueData = [
-    1, 2, 3, 4
-];
+// const queueData = [
+//     1, 2, 3, 4
+// ];
 export default class Queue extends PureComponent {
     static navigationOptions = {
         tabBarIcon: () => (
@@ -32,11 +32,11 @@ export default class Queue extends PureComponent {
         return (
             <View style={{ flex: 1, backgroundColor: '#fff', }}>
                 <Header title='Hàng đợi' />
-                <FlatList
+                {/* <FlatList
                     data={queueData}
                     renderItem={this.renderItem}
                     keyExtractor={(item, index) => index}
-                />
+                /> */}
             </View>
         );
     }

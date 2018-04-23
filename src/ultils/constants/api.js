@@ -5,6 +5,8 @@ const url = {
     API_GET_TABLE: `${host}/tables`,
     updateTable: (id) => `${host}/tables/${id}`,
     getToken: (id) => `${host}/accounts/${id}/accessTokens`,
-    GET_MENU: `${host}/menu_items`
+    GET_MENU: `${host}/menu_items`,
+    getOrder: (id) => `${host}/orders/${id}`,
+    postOrder: `${host}/orders`,
 };
 export default url;
