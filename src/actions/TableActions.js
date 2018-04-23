@@ -1,15 +1,10 @@
-import { ITEM_HAS_ERROR, GET_TABLE } from '../ultils/constants/actionType';
+import types from '../ultils/constants/actionType';
 import url from '../ultils/constants/api';
 
-const getItemSuccess = (item) => {
-    // console.log(item);
-    return { type: GET_TABLE, payload: item };
-};
+const getItemSuccess = (item) => ({ type: types.GET_TABLE, payload: item });
 
-const error = err => {
-    console.log('Login Error', err);
-    return { type: ITEM_HAS_ERROR };
-};
+
+const error = err => ({ type: types.ITEM_HAS_ERROR });
 
 const getTable = () => dispatch => {
     const api = url.API_GET_TABLE;

@@ -1,15 +1,15 @@
 import React, { PureComponent } from 'react';
 import {
     View,
-    SectionList,
-    Dimensions,
+    // SectionList,
+    // Dimensions,
     Text,
     Image,
     TextInput,
     TouchableOpacity,
     FlatList,
     ActivityIndicator,
-    Modal
+    // Modal
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
@@ -19,9 +19,10 @@ import styles from './styles';
 import { MenuItem } from '../../components';
 // import { sectionListData } from '../../ultils/constants/data';
 import { getMenu } from '../../actions/MenuActions';
-
+import { addOrderItem } from '../../actions/OrderActions';
 
 // const { height, width } = Dimensions.get('window');
+const background = require('../../ultils/images/cafe.png');
 
 class Menu extends PureComponent {
     static navigationOptions = {
@@ -36,12 +37,14 @@ class Menu extends PureComponent {
             textInput: '',
             data: [],
             visible: false,
-            menuId: ''
+            menuId: '',
+            itemSelected: {},
+            quantity: 1,
         };
     }
     componentWillMount() {
         const { user, menus } = this.props;
-        console.log('menus', menus);
+        // console.log('menus', menus);
 
         if (menus.length === 0) {
             this.props.getMenu(user.id);
@@ -51,27 +54,42 @@ class Menu extends PureComponent {
     }
 
     componentWillReceiveProps(newProps) {
-        console.log('newProps', newProps.menus);
-        this.setState({ data: [...newProps.menus] });
+        if (this.state.data.length === 0) this.setState({ data: newProps.menus });
     }
-    onSubmit(text) {
+    onSubmit = () => {
+        const { quantity, itemSelected } = this.state;
+        const { order } = this.props;
+        const filter = order.listItems.filter(item => item.code === itemSelected.code);
+        if (filter.length === 0) itemSelected.quantity = quantity;
+        else itemSelected.quantity = parseInt(filter[0].quantity, 10) + parseInt(quantity, 10);
+
+        // console.log('itemSelected', itemSelected);
         this.setState({ visible: false });
+        this.props.addOrderItem(itemSelected);
     }
     onChangeText = (text) => {
         const { menus } = this.props;
-
         const arrFilter = menus.filter((item) => item.code.includes(text.toUpperCase()));
         this.setState({ text, data: arrFilter });
     }
+
+    onItemPress = (item) => {
+        // console.log('item', item);
+        this.setState({
+            visible: true,
+            itemSelected: item
+        });
+    }
     backToDetail = () => {
-        this.props.navigation.dispatch(NavigationActions.pop());
+        this.props.navigation.state.params.refresh();
+        this.props.navigation.goBack();
     }
     renderItem = ({ item }) => (
         <MenuItem
             name={item.name}
             price={item.price}
             img='http://bizweb.dktcdn.net/thumb/grande/100/229/171/products/cafe.jpg?v=1498729476127'
-            onPress={() => this.setState({ visible: true })}
+            onPress={() => this.onItemPress(item)}
         />
     );
 
@@ -79,7 +97,7 @@ class Menu extends PureComponent {
     render() {
         const { data, visible } = this.state;
         const { orderId } = this.props.navigation.state.params;
-        console.log('data', orderId);
+        // console.log('data', this.props.order);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff', }}>
                 <View style={styles.arrowLayout}>
@@ -103,7 +121,7 @@ class Menu extends PureComponent {
                 </View>
                 <View style={{ flex: 1 }}>
                     <Image
-                        source={require('../../ultils/images/cafe.png')}
+                        source={background}
                         style={{ position: 'absolute', width: '100%', height: '100%' }}
                     />
                     {/* <SectionList
@@ -112,8 +130,11 @@ class Menu extends PureComponent {
                         keyExtractor={(item, index) => index.toString()}
                         renderItem={this.renderItem}
                         renderSectionHeader={({ section, index }) => (
-                            <View key={index} style={{ backgroundColor: COLOR.light_theme, height: 30, justifyContent: 'center' }}>
-                                <Text style={{ color: '#fff', paddingLeft: 5 }}>{section.title}</Text>
+                            <View key={index} 
+                            style={{ backgroundColor: COLOR.light_theme, h
+                                eight: 30, justifyContent: 'center' }}>
+                                <Text style={{ c
+                                    olor: '#fff', paddingLeft: 5 }}>{section.title}</Text>
                             </View>
                         )}
                     /> */}
@@ -132,14 +153,12 @@ class Menu extends PureComponent {
                     }
                 </View>
 
-                <Modal
-                    visible={visible}
-                    onRequestClose={() => this.setState({ visible: false })}
-                    onDismiss={() => this.setState({ visible: false })}
-                    transparent
-                >
-                    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', backgroundColor: 'transparent' }}>
-                        <View style={{ justifyContent: 'center', alignItems: 'center', backgroundColor: '#fff', borderWidth: 1, borderColor: 'gray' }}>
+                {visible &&
+                    <TouchableOpacity
+                        onPress={() => this.setState({ visible: false })}
+                        style={styles.modal_layout}
+                    >
+                        <View style={styles.quantity_layout}>
                             <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                                 <Text>Số lượng</Text>
                                 <TextInput
@@ -151,33 +170,37 @@ class Menu extends PureComponent {
                             </View>
                             <View style={{ flexDirection: 'row' }}>
                                 <TouchableOpacity
-                                    onPress={() => this.setState({ visible: false })}
-                                    style={{ width: 100, height: 40, backgroundColor: 'steelblue', justifyContent: 'center', alignItems: 'center' }}>
+                                    onPress={this.onSubmit}
+                                    style={styles.button}
+                                >
                                     <Text>Xác nhận</Text>
                                 </TouchableOpacity>
                                 <TouchableOpacity
                                     onPress={() => this.setState({ visible: false })}
-                                    style={{ width: 100, height: 40, backgroundColor: 'steelblue', justifyContent: 'center', alignItems: 'center' }}>
+                                    style={styles.button}
+                                >
                                     <Text>Hủy</Text>
                                 </TouchableOpacity>
                             </View>
                         </View>
-                    </View>
-                </Modal>
+                    </TouchableOpacity>
+                }
 
             </View>
         );
     }
 }
 const mapDispatchToProps = (dispatch) => ({
-    getMenu: (id) => { dispatch(getMenu(id)); }
+    getMenu: (id) => { dispatch(getMenu(id)); },
+    addOrderItem: (item) => { dispatch(addOrderItem(item)); }
 });
 
-const mapStateToProps = (state) =>
-    // console.log('menu', state);
-    ({
+const mapStateToProps = (state) => {
+    return {
         menus: state.MenuReducer,
-        user: state.LoginReducer
-    });
+        user: state.LoginReducer,
+        order: state.OrderReducer,
+    };
+};
 
 export default connect(mapStateToProps, mapDispatchToProps)(Menu);

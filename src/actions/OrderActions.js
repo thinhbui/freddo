@@ -1,23 +1,31 @@
-import { ITEM_HAS_ERROR, ADD_ORDER, ADD_NEW_ITEM_ORDER } from '../ultils/constants/actionType';
+import types from '../ultils/constants/actionType';
 import url from '../ultils/constants/api';
 
-const getItemSuccess = (item) => {
-    // console.log(item);
-    return { type: ADD_ORDER, payload: item };
-};
-const addItemOrder = () => ({
-    type: ADD_NEW_ITEM_ORDER
+const getOrderSuccess = (item) => ({ type: types.ADD_ORDER, payload: item });
+
+const updateSuccess = (item) => ({ type: types.UPDATE_ORDER, payload: item });
+const addNewOrder = () => ({
+    type: types.ADD_NEW_ORDER
 });
 const addOrderItem = payload => ({
-    type: ADD_NEW_ITEM_ORDER, payload
+    type: types.ADD_NEW_ITEM_ORDER, payload
 });
 const error = err => {
     console.log('Login Error', err);
-    return { type: ITEM_HAS_ERROR };
+    return { type: types.ITEM_HAS_ERROR };
 };
-
-const addOrder = () => dispatch => {
-    const api = url.API_GET_TABLE;
+const addOrder = order => dispatch => {
+    const api = url.postOrder;
+    fetch(api, {
+        method: 'POST',
+        body: JSON.stringify(order)
+    })
+        .then(res => res.json())
+        .then(res => console.log(res))
+        .catch((err) => dispatch(error(err)));
+};
+const getOrder = (id) => dispatch => {
+    const api = url.getOrder(id);
     fetch(api, {
         method: 'GET',
         headers: {
@@ -33,8 +41,7 @@ const addOrder = () => dispatch => {
         })
         .then(response => response.json())
         .then((res) => {
-            console.log('getTable', res);
-            dispatch(getItemSuccess(res));
+            dispatch(getOrderSuccess(res));
         })
         .catch((err) => dispatch(error(err)));
 };
@@ -57,9 +64,9 @@ const updateOrder = (order) => dispatch => {
         .then(response => response.json())
         .then((res) => {
             console.log('getTable', res);
-            dispatch(getItemSuccess(res));
+            dispatch(updateSuccess(res));
         })
         .catch((err) => dispatch(error(err)));
 };
-export { addOrder, updateOrder };
+export { getOrder, updateOrder, addNewOrder, addOrderItem, addOrder };
 

@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "eslint-config-rallycoding": "^3.2.0",
+    "moment": "^2.22.1",
     "react": "16.0.0",
     "react-native": "0.52.0",
     "react-native-swipeable": "^0.6.0",

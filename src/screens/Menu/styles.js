@@ -3,7 +3,7 @@ import {
 } from 'react-native';
 import { COLOR } from '../../ultils/constants/color';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 
 const styles = StyleSheet.create({
     container: {
@@ -12,7 +12,13 @@ const styles = StyleSheet.create({
     table: {
         flex: 1,
         backgroundColor: 'red',
-
+    },
+    quantity_layout: {
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#fff',
+        borderWidth: 1,
+        borderColor: 'gray'
     },
     textLayout: {
         width: '80%',
@@ -40,6 +46,22 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: COLOR.theme
+    },
+    modal_layout: {
+        position: 'absolute',
+        width,
+        height,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: 'transparent'
+    },
+    button: {
+        width: 100,
+        height: 40,
+        backgroundColor: 'steelblue',
+        justifyContent: 'center',
+        alignItems: 'center'
+
     }
 });
 export default styles;

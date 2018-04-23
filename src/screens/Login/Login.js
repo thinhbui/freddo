@@ -3,7 +3,6 @@ import {
     View,
     Text,
     TouchableOpacity,
-    TextInput,
     Image,
     Animated,
     Platform,
@@ -34,7 +33,6 @@ class Login extends PureComponent {
         };
     }
     componentWillMount() {
-        const { user } = this.props;
         console.log('componentWillMount isLogin', this.props.user.isLogin);
         const arrAnimated = [];
         for (let i = 0; i < this.arr.length; i++) {
@@ -45,10 +43,7 @@ class Login extends PureComponent {
     componentDidMount() {
         const { user } = this.props;
         console.log(user);
-
-        // if (user.isLogin) {
         this.startAnimation(user);
-        // }
     }
     componentWillReceiveProps(newProps) {
         console.log('componentWillReceiveProps', newProps);
@@ -59,9 +54,6 @@ class Login extends PureComponent {
             Alert.alert('Lỗi đăng nhập', 'Sai tài khoản hoặc mật khẩu');
         } else {
             this.navigationToMain(newProps.user.userId);
-            // console.log('getToken');
-
-            // this.props.getToken(newProps.user.id, newProps.user.userId);
         }
     }
 
@@ -108,7 +100,6 @@ class Login extends PureComponent {
         });
     }
     checkAliveAccount = (userId) => {
-        // const { user } = this.props;
         console.log(userId);
         const isAlive = this.props.checkAlive(userId);
         console.log(isAlive);
@@ -117,7 +108,6 @@ class Login extends PureComponent {
         const resetAction = NavigationActions.reset({
             index: 0,
             actions: [
-                //the userMain who is loging in app
                 NavigationActions.navigate({ routeName: 'Main', params: { userId } })
             ],
 
@@ -173,7 +163,7 @@ class Login extends PureComponent {
                             onTextChange={this.onChangePassword}
                         />
                         <TouchableOpacity style={styles.button} onPress={this.onLogin}>
-                            <Text style={{ color: '#000000', fontWeight: 'bold' }}>Đăng nhập</Text>
+                            <Text style={styles.text_button}>Đăng nhập</Text>
                         </TouchableOpacity>
                     </View>
                 </View>

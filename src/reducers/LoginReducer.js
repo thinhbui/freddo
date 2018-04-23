@@ -1,4 +1,4 @@
-import { LOGIN, LOGOUT, LOGIN_ERROR, TOKEN } from '../ultils/constants/actionType';
+import types from '../ultils/constants/actionType';
 // import { initialState } from '../store';
 
 const initialState = {
@@ -10,7 +10,7 @@ const initialState = {
 };
 export default (state = initialState, action) => {
     switch (action.type) {
-        case LOGIN: {
+        case types.LOGIN: {
             return {
                 id: action.payload.id,
                 isLogin: true,
@@ -19,13 +19,13 @@ export default (state = initialState, action) => {
                 // ...action.payload
             };
         }
-        case LOGIN_ERROR: {
+        case types.LOGIN_ERROR: {
             return {
                 token: action.payload,
                 ...state
             };
         }
-        case TOKEN: {
+        case types.TOKEN: {
             console.log(action.payload);
 
             return {
@@ -33,7 +33,7 @@ export default (state = initialState, action) => {
                 ...state
             };
         }
-        case LOGOUT: {
+        case types.LOGOUT: {
             return {
                 isLogin: false,
                 isAlive: false,

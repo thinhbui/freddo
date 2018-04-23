@@ -1,22 +1,22 @@
-import { LOGIN, LOGOUT, LOGIN_ERROR, TOKEN } from '../ultils/constants/actionType';
+import types from '../ultils/constants/actionType';
 import url from '../ultils/constants/api';
 
 const loginSuccess = (item) => {
     // console.log(item);
-    return { type: LOGIN, payload: item };
+    return { type: types.LOGIN, payload: item };
 };
 const getTokenSuccess = (item) => {
     // console.log('getTokenSuccess', item);
-    return { type: TOKEN, payload: item };
+    return { type: types.TOKEN, payload: item };
 };
 
 const loginError = err => {
-    // console.log('Login Error', err);
-    return { type: LOGIN_ERROR, payload: null };
+    console.log('Login Error', err);
+    return { type: types.LOGIN_ERROR, payload: null };
 };
 const logout = () => {
     // console.log('Login out');
-    return { type: LOGOUT, payload: null };
+    return { type: types.LOGOUT, payload: null };
 };
 const login = (username, password) => dispatch => {
     const apiLogin = url.API_LOGIN;
