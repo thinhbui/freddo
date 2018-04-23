@@ -15,7 +15,7 @@ import { BillItem, Header } from '../../components';
 // import { data } from '../../ultils/constants/data';
 // import { COLOR } from '../../ultils/constants/color';
 import styles from './styles';
-import { getOrder, addNewOrder } from '../../actions';
+import { getOrder, addNewOrder, deleteItemOrder, postOrder, resetOrder } from '../../actions';
 
 // const { width } = Dimensions.get('window');
 
@@ -34,38 +34,54 @@ class Detail extends PureComponent {
         if (orderId) this.props.getOrder(orderId);
     }
     componentDidMount() {
-        console.log('componentDidMount');
+        // console.log('componentDidMount');
+        console.log('componentWillReceiveProps', this.props.order);
+        this.setData();
         BackHandler.addEventListener('backHome', this.backHandler);
     }
+    componentWillReceiveProps(newProps) {
+        console.log('componentWillReceiveProps', newProps.order.listItems);
 
+        this.setState({ data: newProps.order.listItems });
+    }
     componentDidUpdate() {
         console.log('componentDidUpdate');
-        const { order } = this.props;
-        this.setState({ data: order.listItems });
+        this.setData();
     }
     componentWillUnmount() {
         BackHandler.removeEventListener('backHome', this.backHandler);
         console.log('componentDidUpdate');
-
     }
+
     onSwipeRight(index) {
         this.setState({ deleteKey: index });
+        this.props.deleteItemOrder(index);
     }
 
     onSavePress = () => {
         const { order } = this.props;
-        if (order !== {}) {
-            console.log(order);
-        } else {
-            // order();
+        const { orderId } = this.props.navigation.state.params;
+        if (order.listItems.length > 0 && orderId === '') {
+            this.props.postOrder(order);
         }
+        if (orderId !== '') {
+            if (order.listItems.length === 0) this.props.deleteOrder();
+            else this.props.updateOrder(order);
+        }
+        this.props.resetOrder();
+        this.props.navigation.goBack();
     }
     onOutPress = () => {
         const { order } = this.props;
         if (order !== {}) {
             console.log(order);
         } else {
+            ///
         }
+    }
+    setData = () => {
+        const { order } = this.props;
+        this.setState({ data: order.listItems });
     }
     backHandler = () => {
         this.props.navigation.dispatch(NavigationActions.back());
@@ -73,7 +89,6 @@ class Detail extends PureComponent {
     }
     refresh = () => {
         console.log('refresh');
-
         this.setState({ refresh: !this.refresh });
     }
     navigationToMenu = () => {
@@ -91,7 +106,7 @@ class Detail extends PureComponent {
                 index={index}
                 onSwipeRight={() => this.onSwipeRight(index)}
             />
-        )
+        );
     }
     renderColumn = () => (
         <View style={styles.header_column}>
@@ -110,24 +125,30 @@ class Detail extends PureComponent {
         </View>
     )
     render() {
-        const { orderId } = this.props.navigation.state.params;
+        // const { orderId } = this.props.navigation.state.params;
         const { data } = this.state;
         console.log(data);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                 <Header title='Chi tiết bàn' />
                 {this.renderColumn()}
-                <TouchableOpacity
-                    style={styles.add_button}
-                    onPress={this.navigationToMenu}
-                >
-                    <Text style={{ color: '#fff' }}> Thêm đồ </Text>
-                </TouchableOpacity>
-                <FlatList
-                    data={data}
-                    keyExtractor={(item) => item.code}
-                    renderItem={this.renderItem}
-                />
+                <View style={{ justifyContent: 'center', alignItems: 'center', height: 50 }}>
+                    <TouchableOpacity
+                        style={styles.add_button}
+                        onPress={this.navigationToMenu}
+                    >
+                        <Text style={{ color: '#fff' }}> Thêm đồ </Text>
+                    </TouchableOpacity>
+                </View>
+                {
+                    data.length > 0 &&
+                    <FlatList
+                        data={data}
+                        extraData={this.state}
+                        keyExtractor={(item) => item.code}
+                        renderItem={this.renderItem}
+                    />
+                }
                 <View style={styles.button}>
                     <TouchableOpacity style={styles.save_button} onPress={this.onSavePress} >
                         <Text style={{ color: '#fff' }}>Lưu</Text>
@@ -143,7 +164,10 @@ class Detail extends PureComponent {
 }
 const mapDispatchToProps = (dispatch) => ({
     getOrder: (id) => dispatch(getOrder(id)),
-    addNewOrder: (order) => dispatch(addNewOrder(order))
+    addNewOrder: (order) => dispatch(addNewOrder(order)),
+    deleteItemOrder: index => dispatch(deleteItemOrder(index)),
+    postOrder: order => dispatch(postOrder(order)),
+    resetOrder: () => dispatch(resetOrder())
 });
 const mapStateToProps = (state) =>
     ({

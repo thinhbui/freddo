@@ -34,9 +34,9 @@ class Home extends PureComponent {
 	componentWillMount() {
 		const { tables } = this.props;
 		this.props.getTable();
-		if (tables.length !== 0) {
-			this.setState({ tables });
-		}
+		// if (tables.length !== 0) {
+		this.setState({ tables });
+		// }
 	}
 	componentWillReceiveProps(newProps) {
 		this.setState({ tables: newProps.tables });
@@ -115,12 +115,8 @@ const mapDispatchToProps = (dispatch) => ({
 	getTable: () => { dispatch(getTable()); }
 });
 
-const mapStateToProps = (state) => {
-	// console.log(state);
-	return {
-		tables: state.TableReducer,
-		
-	};
-};
+const mapStateToProps = (state) => ({
+	tables: state.TableReducer,
+});
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

@@ -11,7 +11,7 @@ import {
     ActivityIndicator,
     // Modal
 } from 'react-native';
-import { NavigationActions } from 'react-navigation';
+// import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 
@@ -195,12 +195,11 @@ const mapDispatchToProps = (dispatch) => ({
     addOrderItem: (item) => { dispatch(addOrderItem(item)); }
 });
 
-const mapStateToProps = (state) => {
-    return {
-        menus: state.MenuReducer,
-        user: state.LoginReducer,
-        order: state.OrderReducer,
-    };
-};
+const mapStateToProps = (state) => ({
+    menus: state.MenuReducer,
+    user: state.LoginReducer,
+    order: state.OrderReducer,
+});
+
 
 export default connect(mapStateToProps, mapDispatchToProps)(Menu);

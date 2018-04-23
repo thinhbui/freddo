@@ -7,13 +7,13 @@ import {
 	TextInput,
 	Alert
 } from 'react-native';
-import { NavigationActions } from 'react-navigation';
+// import { NavigationActions } from 'react-navigation';
 import Swipeable from 'react-native-swipeable';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { data, dataSplice } from '../ultils/constants/data';
+// import { data, dataSplice } from '../ultils/constants/data';
 
-const { width, height } = Dimensions.get('window');
-
+const { width } = Dimensions.get('window');
+/*eslint-disable*/
 class BillItem extends PureComponent {
 	constructor(props) {
 		super(props);
@@ -46,7 +46,7 @@ class BillItem extends PureComponent {
 				{
 					text: 'OK',
 					onPress: () => {
-						data.splice(index, 1);
+						//data.splice(index, 1);
 						onSwipeRight(index);
 						this.handleUserBeganScrollingParentView();
 					}
@@ -84,8 +84,8 @@ class BillItem extends PureComponent {
 					<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
 						<View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
 							<TextInput
-								style={{ fontSize: 18, borderWidth: 1, borderColor: 'gray' }}
-								onChangeText={(text) => this.setState({ amount: text })}
+								style={{ fontSize: 18, borderWidth: 1, borderColor: 'gray', width: 50 }}
+								onChangeText={(text) => this.setState({ quantity: text })}
 								value={quantity.toString()}
 							/>
 							<View style={{ alignItems: 'center', flexDirection: 'column', marginLeft: 5 }}>
@@ -117,7 +117,7 @@ class BillItem extends PureComponent {
 						<Text style={{ fontSize: 18 }}>{price}</Text>
 					</View>
 					<View style={{ flex: 1, alignItems: 'center' }}>
-						<Text style={{ fontSize: 18 }}>{price * amount}</Text>
+						<Text style={{ fontSize: 18 }}>{price * quantity}</Text>
 					</View>
 				</View>
 			</Swipeable>

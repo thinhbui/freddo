@@ -1,5 +1,5 @@
 import {
-    StyleSheet, Dimensions
+    StyleSheet, Dimensions, Platform
 } from 'react-native';
 import { COLOR } from '../../ultils/constants/color';
 
@@ -41,11 +41,12 @@ const styles = StyleSheet.create({
         borderRadius: 5
     },
     arrowLayout: {
-        height: 50,
+        height: Platform.OS === 'ios' ? 70 : 50,
         width,
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: COLOR.theme
+        backgroundColor: COLOR.theme,
+        paddingTop: Platform.OS === 'ios' ? 20 : 0
     },
     modal_layout: {
         position: 'absolute',

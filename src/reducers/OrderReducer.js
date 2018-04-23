@@ -13,15 +13,12 @@ const initialState = {
 };
 
 export default (state = initialState, action) => {
-    // console.log(action);
     switch (action.type) {
         case types.ADD_NEW_ITEM_ORDER: {
-            console.log(action);
             const filter = state.listItems.filter(item => item.code === action.payload.code);
             if (filter.length !== 0) {
                 const index = state.listItems.findIndex(item => item.code === action.payload.code);
                 state.listItems.splice(index, 1);
-                console.log(state.listItems);
             }
             return {
                 ...state,
@@ -33,18 +30,15 @@ export default (state = initialState, action) => {
                 ]
             };
         }
-        case types.UPDATE_ORDER: {
+        case types.DELETE_ORDER_ITEM: {
+            state.listItems.splice(action.payload, 1);
+            console.log(state);
             return {
                 ...state,
-                listItems: [
-
-                ],
-                amount: 0,
-                discount: 0,
-                custpaid: 0,
-                payback: 0,
             };
         }
+        case types.UPDATE_ORDER: { return action.payload; }
+        case types.RESET_ORDER: { return initialState; }
         case types.GET_ORDER_ID: {
             return state;
         }

@@ -1,6 +1,6 @@
 import types from '../ultils/constants/actionType';
 import url from '../ultils/constants/api';
-
+/*eslint-disable*/
 const getOrderSuccess = (item) => ({ type: types.ADD_ORDER, payload: item });
 
 const updateSuccess = (item) => ({ type: types.UPDATE_ORDER, payload: item });
@@ -10,10 +10,14 @@ const addNewOrder = () => ({
 const addOrderItem = payload => ({
     type: types.ADD_NEW_ITEM_ORDER, payload
 });
+const resetOrder = () => ({ type: types.RESET_ORDER })
 const error = err => {
     console.log('Login Error', err);
     return { type: types.ITEM_HAS_ERROR };
 };
+const deleteItemOrder = index => ({
+    type: types.DELETE_ORDER_ITEM, payload: index
+});
 const addOrder = order => dispatch => {
     const api = url.postOrder;
     fetch(api, {
@@ -24,6 +28,22 @@ const addOrder = order => dispatch => {
         .then(res => console.log(res))
         .catch((err) => dispatch(error(err)));
 };
+const postOrder = (order) => dispatch => {
+    const api = url.postOrder;
+    fetch(api, {
+        method: 'POST',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(order),
+    })
+        .then(res => res.json())
+        .then((res) => {
+            console.log('postOrder', res);
+        })
+        .catch((err) => dispatch(error(err)));
+}
 const getOrder = (id) => dispatch => {
     const api = url.getOrder(id);
     fetch(api, {
@@ -68,5 +88,5 @@ const updateOrder = (order) => dispatch => {
         })
         .catch((err) => dispatch(error(err)));
 };
-export { getOrder, updateOrder, addNewOrder, addOrderItem, addOrder };
+export { getOrder, updateOrder, addNewOrder, addOrderItem, addOrder, postOrder, deleteItemOrder, resetOrder };
 

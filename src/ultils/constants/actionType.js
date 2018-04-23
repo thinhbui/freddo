@@ -13,5 +13,7 @@ const types = {
     ADD_NEW_ORDER: 'ADD_NEW_ORDER',
     GET_ORDER_ID: 'GET_ORDER_ID',
     UPDATE_ORDER: 'GET_ORDER_ID',
+    DELETE_ORDER_ITEM: 'DELETE_ORDER_ITEM',
+    RESET_ORDER: 'RESET_ORDER'
 };
 export default types;
