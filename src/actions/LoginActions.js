@@ -2,20 +2,20 @@ import { LOGIN, LOGOUT, LOGIN_ERROR, TOKEN } from '../ultils/constants/actionTyp
 import url from '../ultils/constants/api';
 
 const loginSuccess = (item) => {
-    console.log(item);
+    // console.log(item);
     return { type: LOGIN, payload: item };
 };
 const getTokenSuccess = (item) => {
-    console.log('getTokenSuccess', item);
+    // console.log('getTokenSuccess', item);
     return { type: TOKEN, payload: item };
 };
 
 const loginError = err => {
-    console.log('Login Error', err);
+    // console.log('Login Error', err);
     return { type: LOGIN_ERROR, payload: null };
 };
 const logout = () => {
-    console.log('Login out');
+    // console.log('Login out');
     return { type: LOGOUT, payload: null };
 };
 const login = (username, password) => dispatch => {
@@ -33,6 +33,7 @@ const login = (username, password) => dispatch => {
             if (res.error) {
                 dispatch(loginError(res.error));
             } else {
+                // res.username = username;
                 dispatch(loginSuccess(res));
             }
         })

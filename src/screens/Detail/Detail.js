@@ -8,9 +8,9 @@ import {
     BackHandler,
     Alert
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+// import Icon from 'react-native-vector-icons/Ionicons';
 import { NavigationActions } from 'react-navigation';
-import styles from './styles';
+// import styles from './styles';
 import { BillItem, Header } from '../../components';
 import { data } from '../../ultils/constants/data';
 import { COLOR } from '../../ultils/constants/color';
@@ -25,7 +25,7 @@ export default class Detail extends Component {
         };
     }
     componentWillMount() {
-        const { orderId } = this.props.navigation.state.params;
+        // const { orderId } = this.props.navigation.state.params;
     }
     componentDidMount() {
         BackHandler.addEventListener('backHome', this.backHandler);
@@ -34,7 +34,7 @@ export default class Detail extends Component {
         BackHandler.removeEventListener('backHome', this.backHandler);
     }
     onSwipeRight(index) {
-        console.log('onSwipeRight', index);
+        // console.log('onSwipeRight', index);
         this.setState({ deleteKey: index });
     }
     backHandler = () => {
@@ -42,16 +42,24 @@ export default class Detail extends Component {
         return true;
     }
     navigationToMenu = () => {
-        const { orderId } = this.props.navigation.state.params;
-        const navigate = NavigationActions.navigate({ routeName: 'MenuOrder', params: { orderId } });
-        this.props.navigation.dispatch(navigate);
         BackHandler.removeEventListener('backHome', this.backHandler);
+
+        // const { orderId } = this.props.navigation.state.params;
+        // const navigate = NavigationActions.navigate({
+        //     routeName: 'MenuOrder',
+        //     params: { orderId }
+        // });
+        // this.props.navigation.dispatch(navigate);
+        this.props.navigation.navigate('MenuOrder', { orderId: '', username: '' });
     }
     renderItem = ({ item, index }) =>
         <View>
             {
                 index === 0 &&
-                <TouchableOpacity style={{ width, justifyContent: 'center', alignItems: 'center' }} onPress={this.navigationToMenu}>
+                <TouchableOpacity
+                    style={{ width, justifyContent: 'center', alignItems: 'center' }}
+                    onPress={this.navigationToMenu}
+                >
                     <Text style={{}}> Thêm đồ </Text>
                 </TouchableOpacity>
             }

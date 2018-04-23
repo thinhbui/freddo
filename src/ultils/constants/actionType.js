@@ -8,3 +8,4 @@ export const GET_TABLE = 7;
 export const UPDATE_TABLE = 8;
 export const TOKEN = 9;
 export const GET_MENU = 10;
+export const ADD_NEW_ITEM_ORDER = 'ADD_NEW_ITEM_ORDER';

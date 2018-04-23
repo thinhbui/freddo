@@ -1,11 +1,16 @@
-import { ITEM_HAS_ERROR, ADD_ORDER } from '../ultils/constants/actionType';
+import { ITEM_HAS_ERROR, ADD_ORDER, ADD_NEW_ITEM_ORDER } from '../ultils/constants/actionType';
 import url from '../ultils/constants/api';
 
 const getItemSuccess = (item) => {
     // console.log(item);
     return { type: ADD_ORDER, payload: item };
 };
-
+const addItemOrder = () => ({
+    type: ADD_NEW_ITEM_ORDER
+});
+const addOrderItem = payload => ({
+    type: ADD_NEW_ITEM_ORDER, payload
+});
 const error = err => {
     console.log('Login Error', err);
     return { type: ITEM_HAS_ERROR };
