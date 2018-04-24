@@ -83,14 +83,13 @@ class Menu extends PureComponent {
         this.props.navigation.goBack();
     }
     renderItem = ({ item }) => (
-        <View>
-            <MenuItem
-                name={item.name}
-                price={item.price}
-                img='http://bizweb.dktcdn.net/thumb/grande/100/229/171/products/cafe.jpg?v=1498729476127'
-                onPress={() => this.onItemPress(item)}
-            />
-        </View>
+
+        <MenuItem
+            name={item.name}
+            price={item.price}
+            img='http://bizweb.dktcdn.net/thumb/grande/100/229/171/products/cafe.jpg?v=1498729476127'
+            onPress={() => this.onItemPress(item)}
+        />
     );
 
 

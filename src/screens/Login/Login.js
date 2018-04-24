@@ -43,6 +43,7 @@ class Login extends PureComponent {
     }
     componentDidMount() {
         const { user } = this.props;
+        this.checkAliveAccount(user.id);
         console.log(user);
         this.startAnimation(user);
     }
@@ -103,7 +104,7 @@ class Login extends PureComponent {
     checkAliveAccount = (userId) => {
         console.log(userId);
         const isAlive = this.props.checkAlive(userId);
-        console.log(isAlive);
+        console.log('checkAliveAccount', isAlive);
     }
     navigationToMain = (userId) => {
         const resetAction = NavigationActions.reset({
@@ -116,7 +117,7 @@ class Login extends PureComponent {
         this.props.navigation.dispatch(resetAction);
     }
     render() {
-        const { animations, iconAnimations, username, password, user } = this.state;
+        const { animations, iconAnimations, username, password } = this.state;
         return (
             <View
                 style={styles.container}

@@ -37,6 +37,10 @@ export default (state = initialState, action) => {
                 ...state,
             };
         }
+        case types.ADD_NEW_ORDER: {
+            return action.payload;
+        }
+
         case types.UPDATE_ORDER: { return action.payload; }
         case types.RESET_ORDER: { return initialState; }
         case types.GET_ORDER_ID: {

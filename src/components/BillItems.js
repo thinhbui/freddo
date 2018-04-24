@@ -20,7 +20,8 @@ class BillItem extends PureComponent {
 		this.swipeable = null;
 		this.state = {
 			quantity: 1,
-			deleteKey: -1
+			deleteKey: -1,
+			amount: 0,
 		};
 	}
 	componentDidMount() {
@@ -47,8 +48,8 @@ class BillItem extends PureComponent {
 					text: 'OK',
 					onPress: () => {
 						//data.splice(index, 1);
-						onSwipeRight(index);
 						this.handleUserBeganScrollingParentView();
+						onSwipeRight(index);
 					}
 				},
 				{ text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
@@ -84,7 +85,7 @@ class BillItem extends PureComponent {
 					<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
 						<View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
 							<TextInput
-								style={{ fontSize: 18, borderWidth: 1, borderColor: 'gray', width: 50 }}
+								style={{ fontSize: 18, borderWidth: 1, borderColor: 'gray', width: 30 }}
 								onChangeText={(text) => this.setState({ quantity: text })}
 								value={quantity.toString()}
 							/>

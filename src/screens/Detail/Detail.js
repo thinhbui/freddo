@@ -11,7 +11,7 @@ import moment from 'moment';
 import { NavigationActions } from 'react-navigation';
 import { BillItem, Header } from '../../components';
 import styles from './styles';
-import { getOrder, addNewOrder, deleteItemOrder, postOrder, resetOrder, updateTable }
+import { getOrder, addNewOrder, deleteItemOrder, postOrder, resetOrder, updateTable, updateOrder }
     from '../../actions';
 
 // const { width } = Dimensions.get('window');
@@ -25,6 +25,7 @@ class Detail extends PureComponent {
             data: [],
             refresh: true,
         };
+        this.amount = 0;
     }
     componentWillMount() {
         const { orderId } = this.props.navigation.state.params;
@@ -32,12 +33,12 @@ class Detail extends PureComponent {
     }
     componentDidMount() {
         // console.log('componentDidMount');
-        console.log('componentWillReceiveProps', this.props.order);
+        // console.log('componentWillReceiveProps', this.props.order);
         this.setData();
         BackHandler.addEventListener('backHome', this.backHandler);
     }
     componentWillReceiveProps(newProps) {
-        console.log('componentWillReceiveProps', newProps.order.listItems);
+        // console.log('componentWillReceiveProps', newProps.order.listItems);
 
         this.setState({ data: newProps.order.listItems });
     }
@@ -57,8 +58,9 @@ class Detail extends PureComponent {
 
     onSavePress = () => {
         const { order } = this.props;
-        const { orderId } = this.props.navigation.state.params;
-        order.billdate = moment.unix();
+        const { orderId, table } = this.props.navigation.state.params;
+        order.billdate = moment().format();
+        order.listItems.map(item => (this.amount = item.quantity * item.price));
         if (order.listItems.length > 0 && orderId === '') {
             this.props.postOrder(order);
         }
@@ -66,6 +68,9 @@ class Detail extends PureComponent {
             if (order.listItems.length === 0) this.props.deleteOrder();
             else this.props.updateOrder(order);
         }
+        table.status = true;
+        table.orderid = order.id;
+        this.props.updateTable(table);
         this.props.resetOrder();
         this.props.navigation.goBack();
     }
@@ -100,18 +105,16 @@ class Detail extends PureComponent {
         this.props.navigation.navigate('MenuOrder',
             { orderId: '', username: '', refresh: this.refresh, detail: true });
     }
-    renderItem = ({ item, index }) => {
-        console.log(item);
-        return (
-            <BillItem
-                name={item.name}
-                price={20}
-                quantity={item.quantity}
-                index={index}
-                onSwipeRight={() => this.onSwipeRight(index)}
-            />
-        );
-    }
+    renderItem = ({ item, index }) => (
+        <BillItem
+            name={item.name}
+            price={20}
+            quantity={item.quantity}
+            index={index}
+            onSwipeRight={() => this.onSwipeRight(index)}
+        />
+    );
+
     renderColumn = () => (
         <View style={styles.header_column}>
             <View style={{ flex: 2, alignItems: 'center' }}>
@@ -131,7 +134,7 @@ class Detail extends PureComponent {
     render() {
         // const { orderId } = this.props.navigation.state.params;
         const { data } = this.state;
-        console.log(data);
+        // console.log(data);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                 <Header
@@ -176,6 +179,7 @@ const mapDispatchToProps = (dispatch) => ({
     deleteItemOrder: index => dispatch(deleteItemOrder(index)),
     postOrder: order => dispatch(postOrder(order)),
     resetOrder: () => dispatch(resetOrder()),
+    updateOrder: (order) => dispatch(updateOrder(order)),
     updateTable: (table) => dispatch(updateTable(table))
 });
 const mapStateToProps = (state) =>

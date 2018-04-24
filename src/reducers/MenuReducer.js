@@ -8,7 +8,7 @@ export default (state = [], action) => {
         }
         case types.GET_MENU: {
             // console.log(state);
-            return action.payload;
+            return [action.payload];
         }
         default:
             return state;

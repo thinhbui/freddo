@@ -1,5 +1,5 @@
 import { StackNavigator, TabNavigator } from 'react-navigation';
-// import { Platform } from 'react-native';
+import { Platform } from 'react-native';
 // import Icon from 'react-native-vector-icons/Ionicons';
 import Detail from './screens/Detail/Detail';
 import Login from './screens/Login/Login';
@@ -17,7 +17,7 @@ const MainNavigator = TabNavigator({
 }, {
         headerMode: 'none',
         tabBarPosition: 'bottom',
-        // lazy: false,
+        lazy: Platform.OS === 'ios',
         swipeEnabled: false,
         tabBarOptions: {
             showLabel: false,

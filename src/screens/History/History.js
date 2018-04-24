@@ -18,12 +18,12 @@ export default class Historys extends PureComponent {
         ),
         header: null,
     };
-    renderItem = ({ item, index }) => {
+    renderItem = ({ item }) => {
         const date = new Date();
         return (
-            <View>
-                <HistoryItem table={item} time={date.toDateString()} />
-            </View>
+            // <View>
+            <HistoryItem table={item} time={date.toDateString()} />
+            // </View>
         );
     }
     render() {

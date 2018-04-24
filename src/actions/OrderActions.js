@@ -1,9 +1,12 @@
 import types from '../ultils/constants/actionType';
 import url from '../ultils/constants/api';
 /*eslint-disable*/
-const getOrderSuccess = (item) => ({ type: types.ADD_ORDER, payload: item });
+const getOrderSuccess = item => ({ type: types.ADD_ORDER, payload: item });
 
-const updateSuccess = (item) => ({ type: types.UPDATE_ORDER, payload: item });
+const updateSuccess = item => ({ type: types.UPDATE_ORDER, payload: item });
+
+const postOrderSuccess = item => ({ type: types.ADD_ORDER, payload: item })
+
 const addNewOrder = () => ({
     type: types.ADD_NEW_ORDER
 });
@@ -12,7 +15,7 @@ const addOrderItem = payload => ({
 });
 const resetOrder = () => ({ type: types.RESET_ORDER })
 const error = err => {
-    console.log('Login Error', err);
+    console.log('Order Error', err);
     return { type: types.ITEM_HAS_ERROR };
 };
 const deleteItemOrder = index => ({
@@ -40,7 +43,7 @@ const postOrder = (order) => dispatch => {
     })
         .then(res => res.json())
         .then((res) => {
-            console.log('postOrder', res);
+            dispatch(postOrderSuccess(res))
         })
         .catch((err) => dispatch(error(err)));
 }

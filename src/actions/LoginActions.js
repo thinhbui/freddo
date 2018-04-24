@@ -15,7 +15,7 @@ const loginError = err => {
     return { type: types.LOGIN_ERROR, payload: null };
 };
 const logout = () => {
-    // console.log('Login out');
+    console.log('Login out');
     return { type: types.LOGOUT, payload: null };
 };
 const login = (username, password) => dispatch => {
@@ -68,14 +68,9 @@ const checkAlive = (userId) => dispatch => {
     fetch(apiCheckAlive, {
         method: 'GET'
     })
-        .then(response => {
-            if (!response.ok) {
-                throw Error(response.statusText);
-            }
-            return response;
-        })
         .then(response => response.json())
         .then((res) => {
+            console.log('checkAliveActions', res);
             if (res.ttl <= 0) {
                 dispatch(logout());
             }

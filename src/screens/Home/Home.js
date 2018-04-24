@@ -14,7 +14,7 @@ import { connect } from 'react-redux';
 import { Table, Header } from '../../components';
 // import { COLOR } from '../../ultils/constants/color';
 import styles from './styles';
-import { getTable } from '../../actions';
+import { getTable, updateTable } from '../../actions';
 import Images from '../../ultils/constants/Images';
 
 // const { height, width } = Dimensions.get('window');
@@ -43,24 +43,27 @@ class Home extends PureComponent {
 	componentWillReceiveProps(newProps) {
 		this.setState({ tables: newProps.tables });
 	}
+
 	componentDidUpdate() {
 		// const { sortById, sortByState, tables } = this.state;
 		// if (sortById) tables.sort((a, b) => ((a.id > b.id) ? 1 : -1));
 	}
 	onPressTable = (orderId, table) => {
-		this.props.navigation.navigate('Detail', { orderId, table });
+		this.props.navigation.navigate('Detail',
+			{ orderId, table }
+		);
 	}
 	onPressState = () => this.setState({ sortByState: !this.state.sortByState });
 	onPressId = () => this.setState({ sortById: !this.state.sortById });
 
 	renderItem = ({ item }) => (
-		<View>
-			<Table
-				text={item.name}
-				onPress={() => this.onPressTable(item.orderid, item.id)}
-				status={item.status}
-			/>
-		</View>
+		// <View>
+		<Table
+			text={item.name}
+			onPress={() => this.onPressTable(item.orderid, item.id)}
+			status={item.status}
+		/>
+		// </View>
 	);
 	render() {
 		const { sortById, sortByState, tables } = this.state;
@@ -120,7 +123,8 @@ class Home extends PureComponent {
 	}
 }
 const mapDispatchToProps = (dispatch) => ({
-	getTable: () => { dispatch(getTable()); }
+	getTable: () => { dispatch(getTable()); },
+	updateTable: (table) => { dispatch(updateTable(table)); },
 });
 
 const mapStateToProps = (state) => ({
