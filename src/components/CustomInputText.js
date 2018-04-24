@@ -52,7 +52,7 @@ class CustomTextInput extends PureComponent {
                     onFocus={() => this.setState({ isForcus: true })}
                     onBlur={() => this.setState({ isForcus: false })}
                     value={text}
-
+                    autoCapitalize='none'
                     style={[{
                         padding: 0,
                         paddingLeft: 3,

@@ -6,7 +6,8 @@ import {
     Image,
     Animated,
     Platform,
-    Alert
+    Alert,
+    StatusBar
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 import { connect } from 'react-redux';
@@ -120,6 +121,7 @@ class Login extends PureComponent {
             <View
                 style={styles.container}
             >
+                <StatusBar barStyle='light-content' />
                 <Image
                     source={backgroundImage}
                     style={styles.background_image}

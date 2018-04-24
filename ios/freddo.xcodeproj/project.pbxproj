@@ -36,13 +36,7 @@
 		2D02E4C81E0B4AEC006451C7 /* libRCTWebSocket-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3E991DF850E9000B6D8A /* libRCTWebSocket-tvOS.a */; };
 		2D16E6881FA4F8E400B85C8A /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 2D16E6891FA4F8E400B85C8A /* libReact.a */; };
 		2DCD954D1E0B4F2C00145EB5 /* freddoTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* freddoTests.m */; };
-<<<<<<< ours
-		4B0D19737615488EB7455885 /* SimpleLineIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 4BBB10738DBB44D8A5F795CC /* SimpleLineIcons.ttf */; };
-		5A20EA24BB3A4866A73C64C4 /* Feather.ttf in Resources */ = {isa = PBXBuildFile; fileRef = DA74682D28DF4DDCAF31C7C2 /* Feather.ttf */; };
-		5B182DBD637E4FCCB44A3444 /* MaterialCommunityIcons.ttf in Resources */ = {isa = PBXBuildFile; fileRef = A21AABC618604BEFAF08B4D5 /* MaterialCommunityIcons.ttf */; };
-=======
 		2DF0FFEE2056DD460020B375 /* libReact.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 3DAD3EA31DF850E9000B6D8A /* libReact.a */; };
->>>>>>> theirs
 		5E9157361DD0AC6A00FF2AA8 /* libRCTAnimation.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5E9157331DD0AC6500FF2AA8 /* libRCTAnimation.a */; };
 		711AED614C524B8E8F4F6DE3 /* FontAwesome.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 0CA5376769B449C8AF7FB0FB /* FontAwesome.ttf */; };
 		78ECB966D6FB45659AE51168 /* Shrikhand-Regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 771B3B5F5CF64D0296AFC879 /* Shrikhand-Regular.ttf */; };
@@ -603,16 +597,6 @@
 				3DAD3EAB1DF850E9000B6D8A /* libcxxreact.a */,
 				3DAD3EAD1DF850E9000B6D8A /* libjschelpers.a */,
 				3DAD3EAF1DF850E9000B6D8A /* libjschelpers.a */,
-<<<<<<< ours
-				AABEFAE0208D82DD00CB773D /* libjsinspector.a */,
-				AABEFAE2208D82DD00CB773D /* libjsinspector-tvOS.a */,
-				AABEFAE4208D82DD00CB773D /* libthird-party.a */,
-				AABEFAE6208D82DD00CB773D /* libthird-party.a */,
-				AABEFAE8208D82DD00CB773D /* libdouble-conversion.a */,
-				AABEFAEA208D82DD00CB773D /* libdouble-conversion.a */,
-				AABEFAEC208D82DD00CB773D /* libprivatedata.a */,
-				AABEFAEE208D82DD00CB773D /* libprivatedata-tvOS.a */,
-=======
 				2DF0FFDF2056DD460020B375 /* libjsinspector.a */,
 				2DF0FFE12056DD460020B375 /* libjsinspector-tvOS.a */,
 				2DF0FFE32056DD460020B375 /* libthird-party.a */,
@@ -621,7 +605,6 @@
 				2DF0FFE92056DD460020B375 /* libdouble-conversion.a */,
 				2DF0FFEB2056DD460020B375 /* libprivatedata.a */,
 				2DF0FFED2056DD460020B375 /* libprivatedata-tvOS.a */,
->>>>>>> theirs
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1574,15 +1557,9 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "freddo-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-<<<<<<< ours
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-=======
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
->>>>>>> theirs
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.freddo-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -1605,15 +1582,9 @@
 				GCC_NO_COMMON_BLOCKS = YES;
 				INFOPLIST_FILE = "freddo-tvOSTests/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
-<<<<<<< ours
-				LIBRARY_SEARCH_PATHS = (
-					"$(inherited)",
-					"\"$(SRCROOT)/$(TARGET_NAME)\"",
-=======
 				OTHER_LDFLAGS = (
 					"-ObjC",
 					"-lc++",
->>>>>>> theirs
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "com.facebook.REACT.freddo-tvOSTests";
 				PRODUCT_NAME = "$(TARGET_NAME)";

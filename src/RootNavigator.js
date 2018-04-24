@@ -1,5 +1,5 @@
 import { StackNavigator, TabNavigator } from 'react-navigation';
-import { Platform } from 'react-native';
+// import { Platform } from 'react-native';
 // import Icon from 'react-native-vector-icons/Ionicons';
 import Detail from './screens/Detail/Detail';
 import Login from './screens/Login/Login';
@@ -11,15 +11,13 @@ import { COLOR } from './ultils/constants/color';
 
 const MainNavigator = TabNavigator({
     Home: { screen: Home },
-    Menu: {
-        screen: Menu,
-    },
+    Menu: { screen: Menu, },
     Queue: { screen: Queue },
     History: { screen: Historys },
 }, {
         headerMode: 'none',
         tabBarPosition: 'bottom',
-        lazy: Platform.OS === 'ios',
+        // lazy: false,
         swipeEnabled: false,
         tabBarOptions: {
             showLabel: false,

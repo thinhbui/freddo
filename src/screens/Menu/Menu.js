@@ -97,7 +97,7 @@ class Menu extends PureComponent {
     render() {
         const { data, visible } = this.state;
         const { orderId } = this.props.navigation.state.params;
-        // console.log('data', this.props.order);
+        console.log('menu', this.props.order);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff', }}>
                 <View style={styles.arrowLayout}>
@@ -185,7 +185,6 @@ class Menu extends PureComponent {
                         </View>
                     </TouchableOpacity>
                 }
-
             </View>
         );
     }
