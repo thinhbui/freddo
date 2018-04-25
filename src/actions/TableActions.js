@@ -30,6 +30,8 @@ const getTable = () => dispatch => {
 };
 const updateTable = (table) => dispatch => {
     const apiUpdate = url.updateTable(table.id);
+    console.log('updateTable', table);
+
     fetch(apiUpdate, {
         method: 'PUT',
         headers: {
@@ -38,15 +40,9 @@ const updateTable = (table) => dispatch => {
         },
         body: JSON.stringify(table)
     })
-        .then((response) => {
-            if (!response.ok) {
-                throw Error(response.statusText);
-            }
-            return response;
-        })
         .then(response => response.json())
         .then((res) => {
-            console.log('getTable', res);
+            console.log('update table', res);
             dispatch(getItemSuccess(res));
         })
         .catch((err) => dispatch(error(err)));

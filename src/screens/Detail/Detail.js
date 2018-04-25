@@ -11,8 +11,16 @@ import moment from 'moment';
 import { NavigationActions } from 'react-navigation';
 import { BillItem, Header } from '../../components';
 import styles from './styles';
-import { getOrder, addNewOrder, deleteItemOrder, postOrder, resetOrder, updateTable, updateOrder }
-    from '../../actions';
+import {
+    getOrder,
+    addNewOrder,
+    deleteItemOrder,
+    postOrder,
+    resetOrder,
+    updateTable,
+    updateOrder,
+    getTable
+} from '../../actions';
 
 // const { width } = Dimensions.get('window');
 
@@ -28,27 +36,23 @@ class Detail extends PureComponent {
         this.amount = 0;
     }
     componentWillMount() {
-        const { orderId } = this.props.navigation.state.params;
-        if (orderId) this.props.getOrder(orderId);
+        const { table } = this.props.navigation.state.params;
+        console.log(table);
+
+        if (table.orderid) this.props.getOrder(table.orderid);
     }
     componentDidMount() {
-        // console.log('componentDidMount');
-        // console.log('componentWillReceiveProps', this.props.order);
         this.setData();
         BackHandler.addEventListener('backHome', this.backHandler);
     }
     componentWillReceiveProps(newProps) {
-        // console.log('componentWillReceiveProps', newProps.order.listItems);
-
         this.setState({ data: newProps.order.listItems });
     }
     componentDidUpdate() {
-        console.log('componentDidUpdate');
         this.setData();
     }
     componentWillUnmount() {
         BackHandler.removeEventListener('backHome', this.backHandler);
-        console.log('componentDidUpdate');
     }
 
     onSwipeRight(index) {
@@ -58,13 +62,14 @@ class Detail extends PureComponent {
 
     onSavePress = () => {
         const { order } = this.props;
-        const { orderId, table } = this.props.navigation.state.params;
+        const { table } = this.props.navigation.state.params;
         order.billdate = moment().format();
         order.listItems.map(item => (this.amount = item.quantity * item.price));
-        if (order.listItems.length > 0 && orderId === '') {
+        if (order.listItems.length > 0 && table.orderid === '') {
+            // console.log();
             this.props.postOrder(order);
         }
-        if (orderId !== '') {
+        if (table.orderid !== '') {
             if (order.listItems.length === 0) this.props.deleteOrder();
             else this.props.updateOrder(order);
         }
@@ -73,20 +78,17 @@ class Detail extends PureComponent {
         this.props.updateTable(table);
         this.props.resetOrder();
         this.props.navigation.goBack();
+        this.props.getTable();
     }
     onOutPress = () => {
         const { order } = this.props;
         const { table } = this.props.navigation.state.params;
         order.status = true;
-        this.props.updateOrder(order);
-        table.state = false;
+        // this.props.updateOrder(order);
+        table.status = false;
         this.props.updateTable(table);
-        // this.props.updateTable(); 
-        // if (order !== {}) {
-        //     console.log(order);
-        // } else {
-        //     ///
-        // }
+        this.props.navigation.goBack();
+        this.props.getTable();
     }
     setData = () => {
         const { order } = this.props;
@@ -132,9 +134,9 @@ class Detail extends PureComponent {
         </View>
     )
     render() {
-        // const { orderId } = this.props.navigation.state.params;
+        const { table } = this.props.navigation.state.params;
         const { data } = this.state;
-        // console.log(data);
+        console.log('table', table);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff' }}>
                 <Header
@@ -180,7 +182,8 @@ const mapDispatchToProps = (dispatch) => ({
     postOrder: order => dispatch(postOrder(order)),
     resetOrder: () => dispatch(resetOrder()),
     updateOrder: (order) => dispatch(updateOrder(order)),
-    updateTable: (table) => dispatch(updateTable(table))
+    updateTable: (table) => dispatch(updateTable(table)),
+    getTable: () => dispatch(getTable())
 });
 const mapStateToProps = (state) =>
     ({

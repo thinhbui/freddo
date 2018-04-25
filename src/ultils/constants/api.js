@@ -8,5 +8,6 @@ const url = {
     GET_MENU: `${host}/menu_items`,
     getOrder: (id) => `${host}/orders/${id}`,
     postOrder: `${host}/orders`,
+    updateOrder: (id) => `${host}/orders/${id}`
 };
 export default url;

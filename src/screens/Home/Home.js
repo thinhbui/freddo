@@ -41,16 +41,17 @@ class Home extends PureComponent {
 	}
 
 	componentWillReceiveProps(newProps) {
+		console.log('componentWillReceiveProps', newProps.tables);
+
 		this.setState({ tables: newProps.tables });
 	}
 
-	componentDidUpdate() {
-		// const { sortById, sortByState, tables } = this.state;
-		// if (sortById) tables.sort((a, b) => ((a.id > b.id) ? 1 : -1));
+	componentDidUpdate(props, nextprops) {
+		console.log(props, nextprops);
 	}
-	onPressTable = (orderId, table) => {
+	onPressTable = (table) => {
 		this.props.navigation.navigate('Detail',
-			{ orderId, table }
+			{ table }
 		);
 	}
 	onPressState = () => this.setState({ sortByState: !this.state.sortByState });
@@ -60,7 +61,7 @@ class Home extends PureComponent {
 		// <View>
 		<Table
 			text={item.name}
-			onPress={() => this.onPressTable(item.orderid, item.id)}
+			onPress={() => this.onPressTable(item)}
 			status={item.status}
 		/>
 		// </View>
@@ -129,6 +130,7 @@ const mapDispatchToProps = (dispatch) => ({
 
 const mapStateToProps = (state) => ({
 	tables: state.TableReducer,
+
 });
 
 export default connect(mapStateToProps, mapDispatchToProps)(Home);

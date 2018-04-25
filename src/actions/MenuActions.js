@@ -1,7 +1,7 @@
 import types from '../ultils/constants/actionType';
 
 import url from '../ultils/constants/api';
-
+/*eslint-disable*/
 const getItemSuccess = (item) => {
     // console.log(item);
     return { type: types.GET_MENU, payload: item };

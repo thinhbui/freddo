@@ -44,13 +44,8 @@ class Menu extends PureComponent {
     }
     componentWillMount() {
         const { user, menus } = this.props;
-        // console.log('menus', menus);
-
-        if (menus.length === 0) {
-            this.props.getMenu(user.id);
-        } else {
-            this.setState({ data: menus });
-        }
+        if (menus.length === 0) this.props.getMenu(user.id);
+        else this.setState({ data: menus });
     }
 
     componentWillReceiveProps(newProps) {
@@ -96,7 +91,7 @@ class Menu extends PureComponent {
     render() {
         const { data, visible } = this.state;
         const { orderId } = this.props.navigation.state.params;
-        console.log('menu', this.props.order);
+        // console.log('menu', this.props.order);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff', }}>
                 <View style={styles.arrowLayout}>

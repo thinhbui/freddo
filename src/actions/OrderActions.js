@@ -33,6 +33,8 @@ const addOrder = order => dispatch => {
 };
 const postOrder = (order) => dispatch => {
     const api = url.postOrder;
+    console.log('postOrder', order);
+
     fetch(api, {
         method: 'POST',
         headers: {
@@ -43,12 +45,15 @@ const postOrder = (order) => dispatch => {
     })
         .then(res => res.json())
         .then((res) => {
+            console.log('POST ORDER', res);
+
             dispatch(postOrderSuccess(res))
         })
         .catch((err) => dispatch(error(err)));
 }
 const getOrder = (id) => dispatch => {
     const api = url.getOrder(id);
+    console.log('getOrder', api);
     fetch(api, {
         method: 'GET',
         headers: {
@@ -56,12 +61,6 @@ const getOrder = (id) => dispatch => {
             'Content-Type': 'application/json',
         },
     })
-        .then((response) => {
-            if (!response.ok) {
-                throw Error(response.statusText);
-            }
-            return response;
-        })
         .then(response => response.json())
         .then((res) => {
             dispatch(getOrderSuccess(res));
@@ -69,7 +68,9 @@ const getOrder = (id) => dispatch => {
         .catch((err) => dispatch(error(err)));
 };
 const updateOrder = (order) => dispatch => {
-    const apiUpdate = url.updateTable(order.id);
+    const apiUpdate = url.updateOrder(order.id);
+    console.log('apiUpdate', apiUpdate);
+    console.log('updateOrder', JSON.stringify(order));
     fetch(apiUpdate, {
         method: 'PUT',
         headers: {
@@ -78,15 +79,9 @@ const updateOrder = (order) => dispatch => {
         },
         body: JSON.stringify(order)
     })
-        .then((response) => {
-            if (!response.ok) {
-                throw Error(response.statusText);
-            }
-            return response;
-        })
         .then(response => response.json())
         .then((res) => {
-            console.log('getTable', res);
+            console.log('getOrder', res);
             dispatch(updateSuccess(res));
         })
         .catch((err) => dispatch(error(err)));
