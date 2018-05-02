@@ -78,7 +78,6 @@ class Menu extends PureComponent {
         this.props.navigation.goBack();
     }
     renderItem = ({ item }) => (
-
         <MenuItem
             name={item.name}
             price={item.price}

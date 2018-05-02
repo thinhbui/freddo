@@ -9,6 +9,7 @@ import {
 	// Dimensions
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+// import io from 'socket.io-client/dist/socket.io.js';
 import { connect } from 'react-redux';
 // import styles from './styles';
 import { Table, Header } from '../../components';
@@ -26,10 +27,14 @@ class Home extends PureComponent {
 		),
 		header: null,
 	};
-	state = {
-		sortById: true,
-		sortByState: true,
-		tables: []
+	constructor(props) {
+		super(props);
+		// this.socket = io('http://192.168.38.1:3000', { jsonp: false });
+		this.state = {
+			sortById: true,
+			sortByState: true,
+			tables: []
+		};
 	}
 
 	componentWillMount() {
@@ -39,7 +44,6 @@ class Home extends PureComponent {
 		this.setState({ tables });
 		// }
 	}
-
 	componentWillReceiveProps(newProps) {
 		console.log('componentWillReceiveProps', newProps.tables);
 
@@ -58,13 +62,11 @@ class Home extends PureComponent {
 	onPressId = () => this.setState({ sortById: !this.state.sortById });
 
 	renderItem = ({ item }) => (
-		// <View>
 		<Table
 			text={item.name}
 			onPress={() => this.onPressTable(item)}
 			status={item.status}
 		/>
-		// </View>
 	);
 	render() {
 		const { sortById, sortByState, tables } = this.state;

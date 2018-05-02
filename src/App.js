@@ -3,7 +3,6 @@ import { AppRegistry, View } from 'react-native';
 import { persistStore } from 'redux-persist';
 import { PersistGate } from 'redux-persist/lib/integration/react';
 import { Provider } from 'react-redux';
-
 import AppNavigatorState from './AppNavigatorState';
 import store from './store';
 

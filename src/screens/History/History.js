@@ -1,41 +1,54 @@
 import React, { PureComponent } from 'react';
-import {
-    View,
-    FlatList,
-    Dimensions
-} from 'react-native';
+import { View, FlatList } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { connect } from 'react-redux';
 import styles from './styles';
-import { Table, Header, HistoryItem } from '../../components';
-import { data } from '../../ultils/constants/data';
+import { Header, HistoryItem } from '../../components';
+import { getHistories } from '../../actions';
 
-const { height, width } = Dimensions.get('window');
+class HistoryScreen extends PureComponent {
+  static navigationOptions = {
+    tabBarIcon: () => <Icon name="ios-book" size={25} color="#fff" />
+  };
+  state = {
+    min: 0,
+    max: 10,
+    data: []
+  };
+  componentWillMount() {
+    const { user } = this.props;
+    const { min, max } = this.state;
+    this.props.getHistories(user.userId, min, max);
+  }
+  componentDidMount() {
+    console.log(this.props.history);
 
-export default class Historys extends PureComponent {
-    static navigationOptions = {
-        tabBarIcon: () => (
-            <Icon name='ios-book' size={25} color='#fff' />
-        ),
-        header: null,
-    };
-    renderItem = ({ item }) => {
-        const date = new Date();
-        return (
-            // <View>
-            <HistoryItem table={item} time={date.toDateString()} />
-            // </View>
-        );
-    }
-    render() {
-        return (
-            <View style={{ flex: 1, backgroundColor: '#fff', }}>
-                <Header title='Lịch sử thanh toán' />
-                <FlatList
-                    data={data}
-                    renderItem={this.renderItem}
-                    keyExtractor={(item, index) => index.toString()}
-                />
-            </View>
-        );
-    }
+    this.setState({
+      data: this.props.history
+    });
+  }
+  renderItem = ({ item }) => <HistoryItem item={item} />;
+  render() {
+    const { data } = this.state;
+    return (
+      <View style={styles.container}>
+        <Header title="Lịch sử thanh toán" />
+        <FlatList
+          data={data}
+          renderItem={this.renderItem}
+          keyExtractor={(item, index) => index.toString()}
+          //   onEndReachedThreshold={0.3}
+        />
+      </View>
+    );
+  }
 }
+const mapStateToProps = state => ({
+  user: state.LoginReducer,
+  history: state.HistoryReducer
+});
+const mapDispatchToProps = dispatch => ({
+  getHistories: (username, min, max) =>
+  dispatch(getHistories(username, min, max))
+});
+export default connect(mapStateToProps, mapDispatchToProps)(HistoryScreen);

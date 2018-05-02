@@ -15,8 +15,8 @@ const styles = StyleSheet.create({
 
     },
     add_button: {
-        height: 30,
-        width: '50%',
+        height: 40,
+        width: 150,
         justifyContent: 'center',
         alignItems: 'center',
         backgroundColor: 'green',
@@ -24,27 +24,35 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
     },
     button: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
+        paddingLeft: 15,
         width,
         flexDirection: 'row',
-        height: 40,
+        height: 70,
         justifyContent: 'center',
-        alignItems: 'center'
+        alignItems: 'center',
+        borderTopColor: COLOR.theme,
+        borderTopWidth: 1,
     },
     save_button: {
         flex: 1,
         height: 40,
         justifyContent: 'center',
         alignItems: 'center',
-        backgroundColor: COLOR.theme
+        backgroundColor: COLOR.theme,
+        borderRadius: 20,
+        marginRight: 15,
     },
     header_column: {
         width,
         height: 25,
         flexDirection: 'row',
         backgroundColor: COLOR.light_theme
+    },
+    add_button_layout: {
+        justifyContent: 'space-around',
+        alignItems: 'center',
+        height: 50,
+        flexDirection: 'row'
     }
 });
 export default styles;

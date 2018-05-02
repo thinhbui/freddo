@@ -1,3 +1,4 @@
+import moment from 'moment';
 import types from '../ultils/constants/actionType';
 import url from '../ultils/constants/api';
 
@@ -63,14 +64,21 @@ const getToken = (id, userId) => dispatch => {
         })
         .catch((err) => dispatch(loginError(err)));
 };
-const checkAlive = (userId) => dispatch => {
-    const apiCheckAlive = url.getUrlCheckToken(userId);
+const checkAlive = (user) => dispatch => {
+    const apiCheckAlive = url.getUrlCheckToken(user.userId);
+    // console.log('user', user);
     fetch(apiCheckAlive, {
-        method: 'GET'
+        method: 'GET',
+        headers: {
+            Accept: 'application/json',
+            'Content-Type': 'application/json',
+            Authorization: user.id
+        }
     })
         .then(response => response.json())
         .then((res) => {
-            console.log('checkAliveActions', res);
+            // const created = moment(res[0].created);
+            // const now = moment();
             if (res.ttl <= 0) {
                 dispatch(logout());
             }

@@ -30,12 +30,14 @@ class BillItem extends PureComponent {
 	onPressUp = () => {
 		const { quantity } = this.state;
 		this.setState({ quantity: parseInt(quantity, 10) + 1 });
+		// this.props.calAmount();
 	}
 	onPressDown = () => {
 		const { quantity } = this.state;
 		if (quantity > 1) {
 			this.setState({ quantity: parseInt(quantity, 10) - 1 });
 		}
+		// this.props.calAmount();
 	}
 
 	delete = () => {
@@ -79,10 +81,13 @@ class BillItem extends PureComponent {
 				rightActionActivationDistance={width / 3}
 			>
 				<View style={{ width, height: 50, flexDirection: 'row', alignItems: 'center' }}>
-					<View style={{ flex: 2, alignItems: 'center' }}>
+					<View style={{ flex: 3, alignItems: 'center' }}>
 						<Text style={{ fontSize: 18 }}>{name}</Text>
 					</View>
-					<View style={{ flex: 1, flexDirection: 'row', alignItems: 'center' }}>
+					<View style={{ flex: 1, alignItems: 'center' }}>
+						<Text style={{ fontSize: 18 }}>{price}</Text>
+					</View>
+					<View style={{ flex: 1.5, flexDirection: 'row', alignItems: 'center' }}>
 						<View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
 							<TextInput
 								style={{ fontSize: 18, borderWidth: 1, borderColor: 'gray', width: 30 }}
@@ -97,7 +102,7 @@ class BillItem extends PureComponent {
 									}}
 									onPress={this.onPressUp}
 								>
-									<Icon name='md-arrow-dropup' size={50} color='green' />
+									<Icon name='md-arrow-dropup' size={70} color='green' />
 								</TouchableOpacity>
 								<View style={{ height: 2 }} />
 								<TouchableOpacity
@@ -107,18 +112,10 @@ class BillItem extends PureComponent {
 									}}
 									onPress={this.onPressDown}
 								>
-
-									<Icon name='md-arrow-dropdown' size={50} color='red' />
+									<Icon name='md-arrow-dropdown' size={70} color='red' />
 								</TouchableOpacity>
 							</View>
 						</View>
-
-					</View>
-					<View style={{ flex: 1, alignItems: 'center' }}>
-						<Text style={{ fontSize: 18 }}>{price}</Text>
-					</View>
-					<View style={{ flex: 1, alignItems: 'center' }}>
-						<Text style={{ fontSize: 18 }}>{price * quantity}</Text>
 					</View>
 				</View>
 			</Swipeable>
