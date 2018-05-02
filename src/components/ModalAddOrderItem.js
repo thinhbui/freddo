@@ -4,13 +4,13 @@ import {
     Text,
     Dimensions,
     TouchableOpacity,
-    Image,
+    // Image,
     Modal,
     TextInput
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
-
-const { width, height } = Dimensions.get('window');
+// import Icon from 'react-native-vector-icons/Ionicons';
+// 
+// const { width, height } = Dimensions.get('window');
 
 class ModalAddOrderItem extends PureComponent {
     state = {

@@ -22,12 +22,11 @@ class HistoryScreen extends PureComponent {
   }
   componentDidMount() {
     console.log(this.props.history);
-
     this.setState({
       data: this.props.history
     });
   }
-  renderItem = ({ item }) => <HistoryItem item={item} />;
+  renderItem = ({ item, index }) => <HistoryItem item={item} index={index} />;
   render() {
     const { data } = this.state;
     return (
@@ -36,8 +35,8 @@ class HistoryScreen extends PureComponent {
         <FlatList
           data={data}
           renderItem={this.renderItem}
-          keyExtractor={(item, index) => index.toString()}
-          //   onEndReachedThreshold={0.3}
+          keyExtractor={item => item.id}
+        //   onEndReachedThreshold={0.3}
         />
       </View>
     );
@@ -49,6 +48,6 @@ const mapStateToProps = state => ({
 });
 const mapDispatchToProps = dispatch => ({
   getHistories: (username, min, max) =>
-  dispatch(getHistories(username, min, max))
+    dispatch(getHistories(username, min, max))
 });
 export default connect(mapStateToProps, mapDispatchToProps)(HistoryScreen);

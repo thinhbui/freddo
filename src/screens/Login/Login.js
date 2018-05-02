@@ -43,8 +43,8 @@ class Login extends PureComponent {
     }
     componentDidMount() {
         const { user } = this.props;
-        this.checkAliveAccount(user);
-        console.log(user);
+        // this.checkAliveAccount(user);
+        // console.log(user);
         this.startAnimation(user);
     }
     componentWillReceiveProps(newProps) {

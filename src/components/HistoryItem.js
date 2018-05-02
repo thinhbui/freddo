@@ -1,21 +1,28 @@
 import React from 'react';
 import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
 import moment from 'moment';
-import Icon from 'react-native-vector-icons/Ionicons';
-import { COLOR } from '../ultils/constants/color';
+// import Icon from 'react-native-vector-icons/Ionicons';
+// import { COLOR } from '../ultils/constants/color';
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 
-const HistoryItem = ({ item, onPress }) => {
-  const time = moment(item.billdate).unix();
+const HistoryItem = ({ item, onPress, index }) => {
+  const time = moment(item.billdate).format('DD-MM-YYYY HH:mm');
+  console.log(index % 2);
+
   return (
     <TouchableOpacity
-      style={{ height: 50, width, flexDirection: 'row', alignItems: 'center' }}
+      style={{ height: 50, width, flexDirection: 'row', alignItems: 'center', paddingLeft: 15, backgroundColor: index % 2 === 0 ? '#d8e7ff' : '#fff' }}
       onPress={onPress}
     >
-      <View>
+      <View style={{ flex: 2 }}>
         <Text style={{ fontSize: 16 }}>{item.tableid}</Text>
         <Text>{time}</Text>
+      </View>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
+        <Text style={{}}>
+          {item.amount}đ
+        </Text>
       </View>
     </TouchableOpacity>
   );

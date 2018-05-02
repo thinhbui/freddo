@@ -6,10 +6,12 @@ import {
   TouchableOpacity,
   BackHandler
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import moment from 'moment';
 import { BillItem, Header } from '../../components';
 import styles from './styles';
+
 import {
   getOrder,
   addNewOrder,
@@ -143,7 +145,6 @@ class Detail extends PureComponent {
         />
         <View style={{ flex: 1, width: '100%' }}>
           {this.renderColumn()}
-
           {data.length > 0 && (
             <FlatList
               data={data}

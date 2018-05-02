@@ -5,7 +5,8 @@ import {
 	Dimensions,
 	TouchableOpacity,
 	TextInput,
-	Alert
+	Alert,
+	// Platform
 } from 'react-native';
 // import { NavigationActions } from 'react-navigation';
 import Swipeable from 'react-native-swipeable';
@@ -90,29 +91,35 @@ class BillItem extends PureComponent {
 					<View style={{ flex: 1.5, flexDirection: 'row', alignItems: 'center' }}>
 						<View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
 							<TextInput
-								style={{ fontSize: 18, borderWidth: 1, borderColor: 'gray', width: 30 }}
+								style={{ fontSize: 18, borderWidth: 1, borderColor: 'gray', width: 30, height: 50 }}
 								onChangeText={(text) => this.setState({ quantity: text })}
 								value={quantity.toString()}
 							/>
 							<View style={{ alignItems: 'center', flexDirection: 'column', marginLeft: 5 }}>
 								<TouchableOpacity
 									style={{
-										height: 16,
-										justifyContent: 'center'
+										justifyContent: 'center',
+										height: 25
 									}}
 									onPress={this.onPressUp}
 								>
-									<Icon name='md-arrow-dropup' size={70} color='green' />
+									<Icon
+										name={'md-arrow-dropup'}
+										size={70}
+										color='green'
+										style={{ alignSelf: 'center' }}
+									/>
 								</TouchableOpacity>
-								<View style={{ height: 2 }} />
 								<TouchableOpacity
 									style={{
-										height: 18,
-										justifyContent: 'center'
+										justifyContent: 'center',
+										height: 25
 									}}
 									onPress={this.onPressDown}
 								>
-									<Icon name='md-arrow-dropdown' size={70} color='red' />
+									<Icon name={'md-arrow-dropdown'}
+										size={70}
+										color='red' />
 								</TouchableOpacity>
 							</View>
 						</View>

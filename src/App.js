@@ -16,7 +16,7 @@ const persistor = persistStore(
     });
 console.ignoredYellowBox = [
     'Warning: Can only update a mounted or mounting component',
-    'Warning: isMounted'
+    'Warning: isMounted',
 ];
 class App extends Component {
     render() {
