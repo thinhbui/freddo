@@ -1,7 +1,7 @@
 import types from '../ultils/constants/actionType';
 import url from '../ultils/constants/api';
 /*eslint-disable*/
-const getOrderSuccess = item => ({ type: types.ADD_ORDER, payload: item });
+const getOrderSuccess = item => ({ type: types.GET_ORDER, payload: item });
 
 const updateSuccess = item => ({ type: types.UPDATE_ORDER, payload: item });
 
@@ -15,6 +15,9 @@ const addNewOrder = () => ({
 const addOrderItem = payload => ({
   type: types.ADD_NEW_ITEM_ORDER,
   payload
+});
+const changeQuantity = item => ({
+  type: types.CHANGE_ORDER_QUANTITY, payload: item
 });
 const resetOrder = () => ({ type: types.RESET_ORDER });
 const error = err => {
@@ -35,30 +38,21 @@ const addOrder = order => dispatch => {
     .then(res => dispatch())
     .catch(err => dispatch(error(err)));
 };
-const postOrder = order => dispatch => {
+const postOrder = (order, table) => dispatch => {
   const api = url.postOrder;
-  // console.log('postOrder', order);
-  const result = fetch(api, {
+  return result = fetch(api, {
     method: 'POST',
     headers: {
       Accept: 'application/json',
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(order)
-  });
-  result
-    .then(res => res.json())
-    .then(res => {
-      dispatch(postOrderSuccess(res));
-    })
-    .catch(err => dispatch(error(err)));
-  return result;
+  }).then(res => res.json())
+    .catch(err => console.log(err))
 };
 
 const getHistories = (username, min, max) => dispatch => {
   const api = url.getHistory(username, min, max);
-  // console.log(api);
-  // 
   const result = fetch(api, {
     method: 'GET',
     headers: {
@@ -68,13 +62,12 @@ const getHistories = (username, min, max) => dispatch => {
   })
     .then(res => res.json())
     .then(res => {
-      // console.log(res);
       dispatch(getHistorySuccess(res));
     });
 };
 const getOrder = id => dispatch => {
   const api = url.getOrder(id);
-  console.log('getOrder', api);
+  // console.log('getOrder', api);
   fetch(api, {
     method: 'GET',
     headers: {
@@ -84,14 +77,11 @@ const getOrder = id => dispatch => {
   })
     .then(response => response.json())
     .then(res => {
-      dispatch(getOrderSuccess(res));
+      dispatch(getOrderSuccess(res))
     })
-    .catch(err => dispatch(error(err)));
 };
 const updateOrder = order => dispatch => {
   const apiUpdate = url.updateOrder(order.id);
-  console.log('apiUpdate', apiUpdate);
-  console.log('updateOrder', JSON.stringify(order));
   fetch(apiUpdate, {
     method: 'PUT',
     headers: {
@@ -102,7 +92,6 @@ const updateOrder = order => dispatch => {
   })
     .then(response => response.json())
     .then(res => {
-      console.log('getOrder', res);
       dispatch(updateSuccess(res));
     })
     .catch(err => dispatch(error(err)));
@@ -116,5 +105,6 @@ export {
   postOrder,
   deleteItemOrder,
   resetOrder,
-  getHistories
+  getHistories,
+  changeQuantity
 };

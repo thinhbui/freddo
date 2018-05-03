@@ -4,12 +4,14 @@ import {
   FlatList,
   Text,
   TouchableOpacity,
-  BackHandler
+  Alert
+  // BackHandler
 } from 'react-native';
-import Icon from 'react-native-vector-icons/Ionicons';
+// import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import moment from 'moment';
-import { BillItem, Header } from '../../components';
+import { Header } from '../../components';
+import BillItem from '../../components/BillItems';
 import styles from './styles';
 
 import {
@@ -37,9 +39,7 @@ class Detail extends PureComponent {
   }
   componentWillMount() {
     const { table } = this.props.navigation.state.params;
-    console.log(table);
-
-    if (table.orderid !== '') this.props.getOrder(table.orderid);
+    if (table.orderid !== '') { this.props.getOrder(table.orderid); }
   }
   componentDidMount() {
     this.setData();
@@ -58,52 +58,62 @@ class Detail extends PureComponent {
   onSavePress = () => {
     const { order } = this.props;
     const { table } = this.props.navigation.state.params;
-    let result = {};
+    // let result = {};
     order.billdate = moment().format();
-    // let amount = 0;
     order.listItems.map(item => (this.amount += item.quantity * item.price));
     order.amount = this.amount;
     if (order.listItems.length > 0 && table.orderid === '') {
-      result = this.props.postOrder(order);
+      this.props.postOrder(order, table)
+        .then(res => {
+          if (res.error) {
+            Alert.alert(res.error.message);
+            return;
+          }
+          table.orderid = res.id;
+          table.status = true;
+          this.props.updateTable(table);
+        });
     }
     if (table.orderid !== '') {
       if (order.listItems.length === 0) this.props.deleteOrder();
       else this.props.updateOrder(order);
     }
-    table.status = true;
-    table.orderid = result.orderid;
-    this.props.updateTable(table);
     this.props.resetOrder();
+    this.props.navigation.state.params.refresh();
     this.props.navigation.goBack();
-    this.props.getTable();
   };
-  onOutPress = () => {
+  onPayPress = () => {
     const { order } = this.props;
     const { table } = this.props.navigation.state.params;
-    order.status = true;
-    // this.props.updateOrder(order);
-    table.status = false;
-    this.props.updateTable(table);
-    this.props.navigation.goBack();
-    this.props.getTable();
+    console.log(order);
+
+    if (order.id !== '' && order.id !== undefined) {
+      order.status = true;
+      this.props.updateOrder(order);
+      table.status = false;
+      table.orderid = '';
+      this.props.updateTable(table);
+      console.log('table', table);
+      this.props.navigation.state.params.refresh();
+      this.props.navigation.goBack();
+    } else Alert.alert('Thông báo', 'Bàn trống không thể thanh toán');
+    this.props.resetOrder();
   };
   setData = () => {
     const { order } = this.props;
-    this.setState({ data: order.listItems });
-    this.amount = order.amount;
+    console.log('order', order);
+    this.setState({ data: order.listItems, amount: order.amount });
   };
   refresh = () => {
-    console.log('refresh');
-    this.setState({ refresh: !this.refresh });
-    this.amount = 0;
-    this.props.order.listItems.map(
-      item => (this.amount += item.quantity * item.price)
-    );
+    console.log('this.refresh');
+    const { order } = this.props;
+
+    this.setState({ refresh: !this.refresh, amount: order.amount });
+    // this.setState({});
   };
   navigationToMenu = () => {
-    BackHandler.removeEventListener('backHome', this.backHandler);
     this.props.navigation.navigate('MenuOrder', {
-      orderId: '',
+      orderid: '',
       username: '',
       refresh: this.refresh,
       detail: true
@@ -111,10 +121,10 @@ class Detail extends PureComponent {
   };
   renderItem = ({ item, index }) => (
     <BillItem
-      name={item.name}
-      price={20}
-      quantity={item.quantity}
+      item={item}
       index={index}
+      refresh={() => this.setState({ refresh: !this.state.refresh })}
+      canChange={this.props.navigation.state.params.table.id !== undefined}
       onSwipeRight={() => this.onSwipeRight(index)}
     />
   );
@@ -135,13 +145,16 @@ class Detail extends PureComponent {
   render() {
     const { table } = this.props.navigation.state.params;
     const { data } = this.state;
-    console.log('table', table);
+    // console.log('table', data);
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <Header
-          title="Chi tiết bàn"
+          title={table.id === undefined ? 'Chi tiết hoá đơn' : 'Chi tiết bàn'}
           arrow
-          onArrowPress={() => this.props.navigation.goBack()}
+          onArrowPress={() => {
+            this.props.resetOrder();
+            this.props.navigation.goBack();
+          }}
         />
         <View style={{ flex: 1, width: '100%' }}>
           {this.renderColumn()}
@@ -154,7 +167,7 @@ class Detail extends PureComponent {
             />
           )}
         </View>
-        <View style={styles.add_button_layout}>
+        {table.id !== undefined && <View style={styles.add_button_layout}>
           <TouchableOpacity
             style={styles.add_button}
             onPress={this.navigationToMenu}
@@ -167,28 +180,31 @@ class Detail extends PureComponent {
           >
             <Text style={{ color: '#fff' }}> Lưu lại </Text>
           </TouchableOpacity>
-        </View>
+        </View>}
         <View style={styles.button}>
-          {/* <TouchableOpacity style={styles.save_button} onPress={this.onSavePress} >
-                        <Text style={{ color: '#fff' }}>Lưu</Text>
-                    </TouchableOpacity> */}
           <View style={{ flex: 2, height: '100%' }}>
             <View>
-              <Text style={{ fontSize: 16 }}>Tổng tiền</Text>
+              <Text style={{ fontSize: 16, marginTop: 5 }}>Tổng tiền</Text>
             </View>
-            <View>
+            <View
+              style={{
+                alignItems: table.id !== undefined ? 'flex-start' : 'flex-end',
+                marginRight: 15
+              }}
+            >
               <Text style={{ color: COLOR.theme, fontSize: 23 }}>
-                {this.amount}
+                {this.state.amount}đ
               </Text>
             </View>
           </View>
-          <View style={{ width: 1, height: '100%', backgroundColor: '#fff' }} />
-          <TouchableOpacity
-            style={styles.save_button}
-            onPress={this.onOutPress}
-          >
-            <Text style={{ color: '#fff' }}>Thanh toán</Text>
-          </TouchableOpacity>
+          {table.id !== undefined &&
+            <TouchableOpacity
+              style={styles.save_button}
+              onPress={this.onPayPress}
+            >
+              <Text style={{ color: '#fff' }}>Thanh toán</Text>
+            </TouchableOpacity>
+          }
         </View>
       </View>
     );
@@ -198,7 +214,7 @@ const mapDispatchToProps = dispatch => ({
   getOrder: id => dispatch(getOrder(id)),
   addNewOrder: order => dispatch(addNewOrder(order)),
   deleteItemOrder: index => dispatch(deleteItemOrder(index)),
-  postOrder: order => dispatch(postOrder(order)),
+  postOrder: (order, table) => dispatch(postOrder(order, table)),
   resetOrder: () => dispatch(resetOrder()),
   updateOrder: order => dispatch(updateOrder(order)),
   updateTable: table => dispatch(updateTable(table)),

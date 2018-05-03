@@ -6,14 +6,21 @@ import moment from 'moment';
 
 const { width } = Dimensions.get('window');
 
-const HistoryItem = ({ item, onPress, index }) => {
+const HistoryItem = ({ item, index, navigation }) => {
   const time = moment(item.billdate).format('DD-MM-YYYY HH:mm');
   console.log(index % 2);
 
   return (
     <TouchableOpacity
-      style={{ height: 50, width, flexDirection: 'row', alignItems: 'center', paddingLeft: 15, backgroundColor: index % 2 === 0 ? '#d8e7ff' : '#fff' }}
-      onPress={onPress}
+      style={{
+        height: 50,
+        width,
+        flexDirection: 'row',
+        alignItems: 'center',
+        paddingLeft: 15,
+        backgroundColor: index % 2 === 0 ? '#d8e7ff' : '#fff'
+      }}
+      onPress={() => navigation.navigate('Detail', { table: {}, orderItem: item })}
     >
       <View style={{ flex: 2 }}>
         <Text style={{ fontSize: 16 }}>{item.tableid}</Text>
@@ -24,8 +31,7 @@ const HistoryItem = ({ item, onPress, index }) => {
           {item.amount}đ
         </Text>
       </View>
-    </TouchableOpacity>
+    </TouchableOpacity >
   );
 };
-
 export { HistoryItem };

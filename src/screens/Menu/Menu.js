@@ -57,8 +57,6 @@ class Menu extends PureComponent {
         const filter = order.listItems.filter(item => item.code === itemSelected.code);
         if (filter.length === 0) itemSelected.quantity = quantity;
         else itemSelected.quantity = parseInt(filter[0].quantity, 10) + parseInt(quantity, 10);
-
-        // console.log('itemSelected', itemSelected);
         this.setState({ visible: false });
         this.props.addOrderItem(itemSelected);
     }
@@ -89,12 +87,12 @@ class Menu extends PureComponent {
 
     render() {
         const { data, visible } = this.state;
-        const { orderId } = this.props.navigation.state.params;
+        const { orderid } = this.props.navigation.state.params;
         // console.log('menu', this.props.order);
         return (
             <View style={{ flex: 1, backgroundColor: '#fff', }}>
                 <View style={styles.arrowLayout}>
-                    {orderId !== undefined &&
+                    {orderid !== undefined &&
                         <TouchableOpacity style={{ marginLeft: 5 }} onPress={this.backToDetail}>
                             <Icon name='ios-arrow-back-outline' size={30} color='#fff' />
                         </TouchableOpacity>

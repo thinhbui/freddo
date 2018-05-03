@@ -26,18 +26,20 @@ class HistoryScreen extends PureComponent {
       data: this.props.history
     });
   }
-  renderItem = ({ item, index }) => <HistoryItem item={item} index={index} />;
+  renderItem = ({ item, index }) =>
+    <HistoryItem item={item} index={index} navigation={this.props.navigation} />;
   render() {
     const { data } = this.state;
     return (
       <View style={styles.container}>
         <Header title="Lịch sử thanh toán" />
-        <FlatList
-          data={data}
-          renderItem={this.renderItem}
-          keyExtractor={item => item.id}
-        //   onEndReachedThreshold={0.3}
-        />
+        {
+          data.length > 0 && <FlatList
+            data={data}
+            renderItem={this.renderItem}
+            keyExtractor={item => item.id}
+          />
+        }
       </View>
     );
   }

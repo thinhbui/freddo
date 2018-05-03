@@ -23,15 +23,13 @@ const getTable = () => dispatch => {
         })
         .then(response => response.json())
         .then((res) => {
-            // console.log('getTable', res);
+            console.log('getTable', res);
             dispatch(getItemSuccess(res));
         })
         .catch((err) => dispatch(error(err)));
 };
 const updateTable = (table) => dispatch => {
     const apiUpdate = url.updateTable(table.id);
-    console.log('updateTable', table);
-
     fetch(apiUpdate, {
         method: 'PUT',
         headers: {
@@ -42,7 +40,6 @@ const updateTable = (table) => dispatch => {
     })
         .then(response => response.json())
         .then((res) => {
-            console.log('update table', res);
             dispatch(getItemSuccess(res));
         })
         .catch((err) => dispatch(error(err)));

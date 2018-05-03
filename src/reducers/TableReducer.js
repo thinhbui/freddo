@@ -11,7 +11,7 @@ export default (state = [], action) => {
             return [...state, action.payload];
         }
         case types.GET_TABLE: {
-            // console.log(state);
+            // console.log('GET_TABLE', [...action.payload]);
             return [...action.payload];
         }
         default:

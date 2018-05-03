@@ -8,12 +8,9 @@ import {
 import Icon from 'react-native-vector-icons/Ionicons';
 // import styles from './styles';
 import { Header, QueueItem } from '../../components';
+import { QueueData } from '../../ultils/constants/data';
 
-const { height, width } = Dimensions.get('window');
 
-// const queueData = [
-//     1, 2, 3, 4
-// ];
 export default class Queue extends PureComponent {
     static navigationOptions = {
         tabBarIcon: () => (
@@ -22,9 +19,9 @@ export default class Queue extends PureComponent {
         header: null,
     };
     renderItem = ({ item, index }) => {
-        console.log(index);
+        // console.log(index);
         return (
-            <QueueItem table={item} queue={[]} />
+            <QueueItem item={item} index={index} />
         );
     }
     render() {
@@ -32,11 +29,11 @@ export default class Queue extends PureComponent {
         return (
             <View style={{ flex: 1, backgroundColor: '#fff', }}>
                 <Header title='Hàng đợi' />
-                {/* <FlatList
-                    data={queueData}
+                <FlatList
+                    data={QueueData}
                     renderItem={this.renderItem}
-                    keyExtractor={(item, index) => index}
-                /> */}
+                    keyExtractor={(item) => item.id}
+                />
             </View>
         );
     }

@@ -10,7 +10,6 @@ import Icon from 'react-native-vector-icons/Ionicons';
 const { width } = Dimensions.get('window');
 
 const Table = ({ text, onPress, status }) => {
-    console.log();
     return (
         <TouchableHighlight
             style={{

@@ -33,33 +33,32 @@ class Home extends PureComponent {
 		this.state = {
 			sortById: true,
 			sortByState: true,
-			tables: []
+			tables: [],
+			refresh: false,
 		};
 	}
 
 	componentWillMount() {
-		const { tables } = this.props;
 		this.props.getTable();
-		// if (tables.length !== 0) {
+	}
+	componentDidMount() {
+		const { tables } = this.props;
+		if (tables.length === 0) this.props.getTable();
 		this.setState({ tables });
-		// }
 	}
-	componentWillReceiveProps(newProps) {
-		console.log('componentWillReceiveProps', newProps.tables);
-
-		this.setState({ tables: newProps.tables });
-	}
-
 	componentDidUpdate(props, nextprops) {
-		console.log(props, nextprops);
+		// console.log(props, nextprops);
+		// this.setTables(nextprops.tables);
 	}
 	onPressTable = (table) => {
 		this.props.navigation.navigate('Detail',
-			{ table }
+			{ table, refresh: () => this.setState({ refresh: !this.state.refresh }) }
 		);
 	}
 	onPressState = () => this.setState({ sortByState: !this.state.sortByState });
 	onPressId = () => this.setState({ sortById: !this.state.sortById });
+	setTables = (tables) => this.setState({ tables });
+
 
 	renderItem = ({ item }) => (
 		<Table
@@ -71,6 +70,8 @@ class Home extends PureComponent {
 	render() {
 		const { sortById, sortByState, tables } = this.state;
 		// console.log(tables);
+		// console.log('this.props.tables', this.props.tables);
+
 		return (
 			<View style={{ flex: 1, backgroundColor: '#fff', }}>
 
@@ -114,6 +115,7 @@ class Home extends PureComponent {
 							:
 							<FlatList
 								data={tables}
+								extraData={this.state}
 								keyExtractor={(item) => item.id}
 								renderItem={this.renderItem}
 								numColumns={3}
