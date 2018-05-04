@@ -50,12 +50,12 @@ class Detail extends PureComponent {
   componentDidUpdate() {
     this.setData();
   }
-  onSwipeRight(index) {
-    this.setState({ deleteKey: index });
-    this.props.deleteItemOrder(index);
+  componentWillUnmount() {
+    this.props.resetOrder();
+    this.props.navigation.state.params.refresh();
   }
-
   onSavePress = () => {
+    this.props.navigation.goBack();
     const { order } = this.props;
     const { table } = this.props.navigation.state.params;
     // let result = {};
@@ -77,15 +77,14 @@ class Detail extends PureComponent {
     if (table.orderid !== '') {
       if (order.listItems.length === 0) this.props.deleteOrder();
       else this.props.updateOrder(order);
+      this.props.navigation.state.params.refresh();
     }
-    this.props.resetOrder();
-    this.props.navigation.state.params.refresh();
-    this.props.navigation.goBack();
   };
   onPayPress = () => {
     const { order } = this.props;
     const { table } = this.props.navigation.state.params;
     console.log(order);
+    this.props.navigation.goBack();
 
     if (order.id !== '' && order.id !== undefined) {
       order.status = true;
@@ -95,10 +94,14 @@ class Detail extends PureComponent {
       this.props.updateTable(table);
       console.log('table', table);
       this.props.navigation.state.params.refresh();
-      this.props.navigation.goBack();
     } else Alert.alert('Thông báo', 'Bàn trống không thể thanh toán');
-    this.props.resetOrder();
   };
+
+  onSwipeRight(index) {
+    this.setState({ deleteKey: index });
+    this.props.deleteItemOrder(index);
+  }
+
   setData = () => {
     const { order } = this.props;
     console.log('order', order);
@@ -107,9 +110,7 @@ class Detail extends PureComponent {
   refresh = () => {
     console.log('this.refresh');
     const { order } = this.props;
-
     this.setState({ refresh: !this.refresh, amount: order.amount });
-    // this.setState({});
   };
   navigationToMenu = () => {
     this.props.navigation.navigate('MenuOrder', {
@@ -152,7 +153,6 @@ class Detail extends PureComponent {
           title={table.id === undefined ? 'Chi tiết hoá đơn' : 'Chi tiết bàn'}
           arrow
           onArrowPress={() => {
-            this.props.resetOrder();
             this.props.navigation.goBack();
           }}
         />

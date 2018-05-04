@@ -46,14 +46,17 @@ export default (state = initialState, action) => {
             state.listItems.splice(index, 1, action.payload);
             let amount = 0;
             state.listItems.map(item => (amount += item.price * item.quantity));
-            state.amount = amount;
+            // state.amount = amount;
             console.log(state);
 
-            return state;
+            return { ...state, amount };
         }
         case types.ADD_NEW_ORDER: { return action.payload; }
         case types.UPDATE_ORDER: { return action.payload; }
-        case types.RESET_ORDER: { return initialState; }
+        case types.RESET_ORDER: {
+            console.log('RESET_ORDER', initialState);
+            return initialState;
+        }
         case types.GET_ORDER: { return action.payload; }
         default: return state;
     }

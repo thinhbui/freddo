@@ -15,7 +15,7 @@ import { connect } from 'react-redux';
 import { Table, Header } from '../../components';
 // import { COLOR } from '../../ultils/constants/color';
 import styles from './styles';
-import { getTable, updateTable } from '../../actions';
+import { getTable, updateTable, resetOrder } from '../../actions';
 import Images from '../../ultils/constants/Images';
 
 // const { height, width } = Dimensions.get('window');
@@ -39,12 +39,18 @@ class Home extends PureComponent {
 	}
 
 	componentWillMount() {
+		console.log('WillMount Home');
 		this.props.getTable();
+		this.props.resetOrder();
 	}
+
 	componentDidMount() {
 		const { tables } = this.props;
 		if (tables.length === 0) this.props.getTable();
 		this.setState({ tables });
+	}
+	componentWillReceiveProps(newProps) {
+		if (newProps.tables.length > 0) this.setState({ tables: newProps.tables });
 	}
 	componentDidUpdate(props, nextprops) {
 		// console.log(props, nextprops);
@@ -52,14 +58,19 @@ class Home extends PureComponent {
 	}
 	onPressTable = (table) => {
 		this.props.navigation.navigate('Detail',
-			{ table, refresh: () => this.setState({ refresh: !this.state.refresh }) }
+			{ table, refresh: this.refresh }
 		);
 	}
+
 	onPressState = () => this.setState({ sortByState: !this.state.sortByState });
 	onPressId = () => this.setState({ sortById: !this.state.sortById });
 	setTables = (tables) => this.setState({ tables });
 
+	refresh = () => {
+		console.log('refresh home');
 
+		this.setState({ refresh: !this.state.refresh });
+	}
 	renderItem = ({ item }) => (
 		<Table
 			text={item.name}
@@ -69,7 +80,7 @@ class Home extends PureComponent {
 	);
 	render() {
 		const { sortById, sortByState, tables } = this.state;
-		// console.log(tables);
+		console.log(tables);
 		// console.log('this.props.tables', this.props.tables);
 
 		return (
@@ -130,6 +141,8 @@ class Home extends PureComponent {
 const mapDispatchToProps = (dispatch) => ({
 	getTable: () => { dispatch(getTable()); },
 	updateTable: (table) => { dispatch(updateTable(table)); },
+	resetOrder: () => dispatch(resetOrder()),
+
 });
 
 const mapStateToProps = (state) => ({
