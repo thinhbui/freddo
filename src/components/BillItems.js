@@ -23,7 +23,7 @@ class BillItem extends PureComponent {
     this.state = {
       quantity: 1,
       deleteKey: -1,
-      amount: 0,
+      amount: 0
     };
   }
   componentDidMount() {
@@ -34,10 +34,10 @@ class BillItem extends PureComponent {
     const { quantity } = this.state;
     this.setState({ quantity: parseInt(quantity, 10) + 1 });
     item.quantity = quantity + 1;
-    this.props.changeQuantity(item);
-    this.props.refresh();
+    // this.props.changeQuantity(item);
+    this.props.onChangeQuantity(item);
     // this.props.calAmount();
-  }
+  };
   onPressDown = () => {
     const { quantity } = this.state;
     const { item } = this.props;
@@ -45,11 +45,11 @@ class BillItem extends PureComponent {
       this.setState({ quantity: parseInt(quantity, 10) - 1 });
       item.quantity = quantity - 1;
     }
-    this.props.changeQuantity(item);
-    this.props.refresh();
+    // this.props.changeQuantity(item);
+    this.props.onChangeQuantity(item);
 
     // this.props.calAmount();
-  }
+  };
 
   delete = () => {
     const { index, onSwipeRight } = this.props;
@@ -65,79 +65,130 @@ class BillItem extends PureComponent {
             onSwipeRight(index);
           }
         },
-        { text: 'Cancel', onPress: () => console.log('Cancel Pressed'), style: 'cancel' },
+        {
+          text: 'Cancel',
+          onPress: () => console.log('Cancel Pressed'),
+          style: 'cancel'
+        }
       ],
-      { cancelable: true });
-  }
+      { cancelable: true }
+    );
+  };
   handleUserBeganScrollingParentView = () => {
     this.swipeable.recenter();
-  }
+  };
 
   render() {
     const { item, canChange } = this.props;
     const { quantity } = this.state;
     return (
       <Swipeable
-        onRef={ref => this.swipeable = ref}
+        onRef={ref => (this.swipeable = ref)}
         rightButtons={[
           <TouchableOpacity
             onPress={this.delete}
-            style={{ flex: 1, paddingLeft: 20, justifyContent: 'center', backgroundColor: 'red' }}
+            style={{
+              flex: 1,
+              paddingLeft: 20,
+              justifyContent: 'center',
+              backgroundColor: 'red'
+            }}
           >
-            <Icon name='ios-trash' color='#fff' size={30} />
+            <Icon name="ios-trash" color="#fff" size={30} />
           </TouchableOpacity>
         ]}
         rightButtonWidth={60}
         onRightActionRelease={this.delete}
         rightActionActivationDistance={width / 3}
       >
-        <View style={{ width, height: 50, flexDirection: 'row', alignItems: 'center' }}>
+        <View
+          style={{
+            width,
+            height: 50,
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}
+        >
           <View style={{ flex: 3, alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>{item.name}</Text>
           </View>
           <View style={{ flex: 1, alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>{item.price}</Text>
           </View>
-          <View style={{ flex: 1.5, flexDirection: 'row', alignItems: 'center' }}>
-            <View style={{ flex: 1, alignItems: 'center', flexDirection: 'row', justifyContent: 'center' }}>
-              {
-                canChange ? <TextInput
-                  style={{ fontSize: 18, borderWidth: 1, borderColor: 'gray', minWidth: 30, height: 50 }}
-                  onChangeText={(text) => this.setState({ quantity: text })}
+          <View
+            style={{ flex: 1.5, flexDirection: 'row', alignItems: 'center' }}
+          >
+            <View
+              style={{
+                flex: 1,
+                alignItems: 'center',
+                flexDirection: 'row',
+                justifyContent: 'center'
+              }}
+            >
+              {canChange ? (
+                <TextInput
+                  style={{
+                    fontSize: 18,
+                    borderWidth: 1,
+                    borderColor: 'gray',
+                    minWidth: 30,
+                    height: 50
+                  }}
+                  onChangeText={text => {
+                    const { item } = this.props;
+                    this.setState({ quantity: text });
+                    item.quantity = text;
+                    this.props.onChangeQuantity(item);
+                  }}
                   value={item.quantity.toString()}
                 />
-                  :
-                  <View style={{ alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>
-                    {item.quantity}
-                  </Text></View>
-              }
-              {canChange && <View style={{ alignItems: 'center', marginLeft: 5 }}>
-                <TouchableOpacity
-                  style={{
-                    justifyContent: 'center',
-                    height: 25
-                  }}
-                  onPress={this.onPressUp}
+              ) : (
+                <View
+                  style={{ alignItems: 'center', justifyContent: 'center' }}
                 >
-                  <Icon
-                    name={Platform.OS === 'ios' ? 'ios-add-outline' : 'md-arrow-dropup'}
-                    size={Platform.OS === 'ios' ? 35 : 70}
-                    color='green'
-                    style={{ alignSelf: 'center' }}
-                  />
-                </TouchableOpacity>
-                <TouchableOpacity
-                  style={{
-                    justifyContent: 'center',
-                    height: 25
-                  }}
-                  onPress={this.onPressDown}
-                >
-                  <Icon name={Platform.OS === 'ios' ? 'ios-remove-outline' : 'md-arrow-dropdown'}
-                    size={Platform.OS === 'ios' ? 35 : 70}
-                    color='red' />
-                </TouchableOpacity>
-              </View>}
+                  <Text style={{ fontSize: 18 }}>{item.quantity}</Text>
+                </View>
+              )}
+              {canChange && (
+                <View style={{ alignItems: 'center', marginLeft: 5 }}>
+                  <TouchableOpacity
+                    style={{
+                      justifyContent: 'center',
+                      height: 25
+                    }}
+                    onPress={this.onPressUp}
+                  >
+                    <Icon
+                      name={
+                        Platform.OS === 'ios'
+                          ? 'ios-add-outline'
+                          : 'md-arrow-dropup'
+                      }
+                      size={Platform.OS === 'ios' ? 35 : 70}
+                      color="green"
+                      style={{ alignSelf: 'center' }}
+                    />
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={{
+                      justifyContent: 'center',
+                      height: 25
+                    }}
+                    onPress={this.onPressDown}
+                  >
+                    <Icon
+                      name={
+                        Platform.OS === 'ios'
+                          ? 'ios-remove-outline'
+                          : 'md-arrow-dropdown'
+                      }
+                      size={Platform.OS === 'ios' ? 35 : 70}
+                      color="red"
+                    />
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           </View>
         </View>
@@ -146,10 +197,7 @@ class BillItem extends PureComponent {
   }
 }
 const mapDispatchToProps = dispatch => ({
-  changeQuantity: (item) => dispatch(changeQuantity(item))
+  // changeQuantity: (item) => dispatch(changeQuantity(item))
 });
-const mapStateToProps = state => ({
-
-});
+const mapStateToProps = state => ({});
 export default connect(mapStateToProps, mapDispatchToProps)(BillItem);
-
