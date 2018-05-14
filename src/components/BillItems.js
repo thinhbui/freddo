@@ -11,7 +11,6 @@ import {
 import { connect } from 'react-redux';
 import Swipeable from 'react-native-swipeable';
 import Icon from 'react-native-vector-icons/Ionicons';
-import { changeQuantity } from '../actions';
 // import { data, dataSplice } from '../ultils/constants/data';
 
 const { width } = Dimensions.get('window');

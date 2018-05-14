@@ -1,38 +1,42 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import {
   View,
   FlatList,
   Image,
   Text,
-  TouchableOpacity,
-  ActivityIndicator
+  TouchableWithoutFeedback,
+  ActivityIndicator,
+  Alert
   // Dimensions
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
-// import io from 'socket.io-client/dist/socket.io.js';
+import io from 'socket.io-client/dist/socket.io.js';
 import { connect } from 'react-redux';
-// import styles from './styles';
 import { Table, Header } from '../../components';
-// import { COLOR } from '../../ultils/constants/color';
 import styles from './styles';
-import { getTable, updateTable, resetOrder, getOrders } from '../../actions';
+import {
+  getTable,
+  updateTable,
+  resetOrder,
+  getOrders,
+  deleteOrder
+} from '../../actions';
 import Images from '../../ultils/constants/Images';
 
-// const { height, width } = Dimensions.get('window');
-
-class Home extends PureComponent {
+class Home extends Component {
   static navigationOptions = {
     tabBarIcon: () => <Icon name="ios-home" size={25} color="#fff" />,
     header: null
   };
   constructor(props) {
     super(props);
-    // this.socket = io('http://192.168.38.1:3000', { jsonp: false });
+    this.socket = io('http://192.168.38.1:3000', { jsonp: false });
     this.state = {
       sortById: true,
-      sortByState: true,
       tables: [],
-      refresh: false
+      refresh: false,
+      changeTable: false,
+      rootTable: {}
     };
   }
 
@@ -44,21 +48,101 @@ class Home extends PureComponent {
 
   componentDidMount() {
     const { tables } = this.props;
+    console.log('componentDidMount Home', tables);
+
     if (tables.length === 0) this.props.getTable();
     this.setState({ tables });
   }
+
   componentWillReceiveProps(newProps) {
     if (newProps.tables.length > 0) this.setState({ tables: newProps.tables });
   }
+  shouldComponentUpdate(nextProps, nextState) {
+    const { tables } = this.state;
+    if (this.state.sortById !== nextState.sortById) {
+      if (nextState.sortById) {
+        this.setState({
+          tables: tables.sort((a, b) => (a.id > b.id ? 1 : -1))
+        });
+      } else if (tables.findIndex(item => item.status === true) !== -1) {
+        this.setState({
+          tables: tables.sort(a => (a.state ? 1 : -1))
+        });
+      }
+    }
+    return true;
+  }
   onPressTable = table => {
-    this.props.navigation.navigate('Detail', {
-      table,
-      refresh: this.refresh
-    });
+    const { rootTable } = this.state;
+    const { orders, tables } = this.props;
+    console.log(rootTable);
+
+    const rootOrder = orders.find(element => (element.id = rootTable.orderid));
+    const order = orders.find(element => (element.id = table.orderid));
+    if (rootTable.id === undefined) {
+      console.log('Detail');
+
+      this.props.navigation.navigate('Detail', {
+        table,
+        refresh: this.refresh
+      });
+    } else if (table === rootTable) this.setState({ rootTable: {} });
+    else if (rootTable.orderid !== '' && table.orderid !== '') {
+      Alert.alert(
+        'Thông báo',
+        'Bạn có muốn gộp 2 bàn lại không?',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              order.listItems = this.gatherArray(
+                order.listItems,
+                rootOrder.listItems
+              );
+              this.props.deleteOrder(rootTable.orderid);
+              const index = orders.findIndex(
+                item => item.id === rootTable.orderid
+              );
+              orders.splice(index, 1);
+            }
+          },
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel'
+          }
+        ],
+        { cancelable: true }
+      );
+    }
   };
 
-  onPressState = () => this.setState({ sortByState: !this.state.sortByState });
-  onPressId = () => this.setState({ sortById: !this.state.sortById });
+  gatherArray = (arr1, arr2) => {
+    const temp1 = [...arr1];
+    const temp2 = [...arr2];
+    arr1.forEach((element, index) => {
+      arr2.filter((item, index1) => {
+        if (item.id === element.id) {
+          const temp = item;
+          temp.quantity = item.quantity + element.quantity;
+          temp1.splice(index, 1, temp);
+          temp2.splice(index1, 1);
+          return true;
+        }
+        return false;
+      });
+    });
+    return [...temp1, ...temp2];
+  };
+
+  onPressState = () => this.setState({ sortById: false });
+
+  onPressId = () => this.setState({ sortById: true });
+
+  onLongPress = item => {
+    console.log('onLongPress', item);
+    this.setState({ rootTable: item });
+  };
   setTables = tables => this.setState({ tables });
 
   refresh = () => {
@@ -66,15 +150,15 @@ class Home extends PureComponent {
   };
   renderItem = ({ item }) => (
     <Table
+      rootTable={item === this.state.rootTable}
       text={item.name}
       onPress={() => this.onPressTable(item)}
       status={item.status}
+      onLongPress={() => this.onLongPress(item)}
     />
   );
   render() {
-    const { sortById, sortByState, tables } = this.state;
-    console.log(tables);
-    // console.log('this.props.tables', this.props.tables);
+    const { sortById, tables } = this.state;
 
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
@@ -86,28 +170,33 @@ class Home extends PureComponent {
           />
           <View style={styles.change_sort_bar}>
             <Text style={{ color: '#fff', marginLeft: 10 }}>Sắp xếp</Text>
-            <TouchableOpacity
+            <TouchableWithoutFeedback
               onPress={this.onPressId}
-              style={styles.change_sort_item}
+              style={[{ opacity: sortById ? 1 : 0.5 }]}
             >
-              <Text style={{ color: '#fff', marginRight: 5 }}>Thứ tự</Text>
-              <Icon
-                name={sortById ? 'md-arrow-dropdown' : 'md-arrow-dropup'}
-                size={30}
-                color="#fff"
-              />
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={this.onPressState}
-              style={styles.change_sort_item}
-            >
-              <Text style={{ color: '#fff', marginRight: 5 }}>Trạng thái</Text>
-              <Icon
-                name={sortByState ? 'md-arrow-dropdown' : 'md-arrow-dropup'}
-                size={30}
-                color="#fff"
-              />
-            </TouchableOpacity>
+              <View
+                style={[
+                  styles.change_sort_item,
+                  { opacity: sortById ? 1 : 0.5 }
+                ]}
+              >
+                <Text style={{ color: '#fff', marginRight: 5 }}>Thứ tự</Text>
+                <Icon name={'md-arrow-dropdown'} size={30} color="#fff" />
+              </View>
+            </TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={this.onPressState}>
+              <View
+                style={[
+                  styles.change_sort_item,
+                  { opacity: !sortById ? 1 : 0.5 }
+                ]}
+              >
+                <Text style={{ color: '#fff', marginRight: 5 }}>
+                  Trạng thái
+                </Text>
+                <Icon name={'md-arrow-dropdown'} size={30} color="#fff" />
+              </View>
+            </TouchableWithoutFeedback>
           </View>
           {tables.length === 0 ? (
             <ActivityIndicator size="large" color="#fff" />
@@ -133,7 +222,8 @@ const mapDispatchToProps = dispatch => ({
     dispatch(updateTable(table));
   },
   resetOrder: () => dispatch(resetOrder()),
-  getOrders: () => dispatch(getOrders())
+  getOrders: () => dispatch(getOrders()),
+  deleteOrder: id => dispatch(deleteOrder(id))
 });
 
 const mapStateToProps = state => ({

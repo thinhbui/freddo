@@ -5,8 +5,10 @@ const API = {
   GET_TABLE: '/tables',
   updateTable: id => `/tables/${id}`,
   getToken: id => `/accounts/${id}/accessTokens`,
+  deleteOrder: id => `/orders/${id}`,
   GET_MENU: '/menu_items',
   GET_ORDER: '/orders?filter[where][status]=false',
+  GET_ORDER_ID: id => `/orders/${id}`,
   POST_ORDER: '/orders',
   updateOrder: id => `/orders/${id}`,
   getHistory: (min, max) =>

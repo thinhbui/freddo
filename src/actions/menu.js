@@ -13,8 +13,8 @@ const error = err => {
   return { type: types.ITEM_HAS_ERROR };
 };
 
-const getMenu = () => async dispatch => {
-  const result = await getMenus();
+const getMenu = id => async dispatch => {
+  const result = await getMenus(id);
   console.log(result);
   if (result.status === 200) {
     dispatch(getItemSuccess(result.data));

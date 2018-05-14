@@ -45,8 +45,9 @@ class Menu extends PureComponent {
   componentWillMount() {
     const { user, menus } = this.props;
     const { listItems } = this.props.navigation.state.params;
-    if (menus.length === 0) this.props.getMenu(user.id);
-    else this.setState({ data: menus });
+    if (menus.length === 0) {
+      this.props.getMenu(user.id);
+    } else this.setState({ data: menus });
     if (listItems !== undefined) {
       this.setState({ itemSelected: listItems });
     }

@@ -8,8 +8,16 @@ const updateSuccess = item => ({ type: types.UPDATE_ORDER, payload: item });
 
 const postOrderSuccess = item => ({ type: types.ADD_ORDER, payload: item });
 
-const getHistorySuccess = item => ({ type: types.GET_HISTORY, payload: item });
+const deleteOrderSuccess = item => ({
+  type: types.DELETE_ORDER,
+  payload: item
+});
 
+const getHistorySuccess = item => ({ type: types.GET_HISTORY, payload: item });
+const getNewHistorySuccess = item => ({
+  type: types.GET_NEW_HISTORY,
+  payload: item
+});
 const addNewOrder = () => ({
   type: types.ADD_NEW_ORDER
 });
@@ -37,6 +45,7 @@ const postOrder = (order, table) => async dispatch => {
 
   if (result.status === 200) {
     const orderResult = result.data;
+    console.log('postOrder orderResult', orderResult);
     const tableUpdate = { ...table, orderid: orderResult.id, status: true };
     dispatch(postOrderSuccess(orderResult));
     dispatch(updateTable(tableUpdate));
@@ -44,12 +53,22 @@ const postOrder = (order, table) => async dispatch => {
     dispatch(error(result.response.data || result));
   }
 };
-const getHistories = (username, min, max) => async dispatch => {
+const getHistory = (min, max) => async dispatch => {
   const result = await freedoAPI.getOldOrders(min, max);
   console.log('getHistories', result);
 
   if (result.status === 200) {
     dispatch(getHistorySuccess(result.data));
+  } else {
+    dispatch(error(result.response.data || result));
+  }
+};
+const getNewHistory = (min, max) => async dispatch => {
+  const result = await freedoAPI.getOldOrders(min, max);
+  console.log('getHistories', result);
+
+  if (result.status === 200) {
+    dispatch(getNewHistorySuccess(result.data));
   } else {
     dispatch(error(result.response.data || result));
   }
@@ -73,6 +92,15 @@ const updateOrder = order => async dispatch => {
     dispatch(error(result.response.data || result));
   }
 };
+const deleteOrder = id => async dispatch => {
+  console.log('updateOrder', id);
+  const result = await freedoAPI.deleteOrder(id);
+  if (result.status === 200) {
+    dispatch(deleteOrderSuccess(result.data));
+  } else {
+    dispatch(error(result.response.data || result));
+  }
+};
 export {
   getOrders,
   updateOrder,
@@ -81,6 +109,8 @@ export {
   postOrder,
   deleteItemOrder,
   resetOrder,
-  getHistories,
-  changeQuantity
+  getHistory,
+  changeQuantity,
+  getNewHistory,
+  deleteOrder
 };

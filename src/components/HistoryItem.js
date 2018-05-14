@@ -8,8 +8,6 @@ const { width } = Dimensions.get('window');
 
 const HistoryItem = ({ item, index, navigation }) => {
   const time = moment(item.billdate).format('DD-MM-YYYY HH:mm');
-  console.log(index % 2);
-
   return (
     <TouchableOpacity
       style={{
@@ -20,18 +18,21 @@ const HistoryItem = ({ item, index, navigation }) => {
         paddingLeft: 15,
         backgroundColor: index % 2 === 0 ? '#d8e7ff' : '#fff'
       }}
-      onPress={() => navigation.navigate('Detail', { table: {}, orderItem: item })}
+      onPress={() => navigation.navigate('Detail', { orderItem: item })}
     >
       <View style={{ flex: 2 }}>
         <Text style={{ fontSize: 16 }}>{item.tableid}</Text>
-        <Text>{time}</Text>
+        <View style={{ flexDirection: 'row' }}>
+          <Text>{time}</Text>
+        </View>
       </View>
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', }}>
-        <Text style={{}}>
-          {item.amount}đ
-        </Text>
+      <View>
+        <Text>{item.username}</Text>
       </View>
-    </TouchableOpacity >
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{}}>{item.amount}đ</Text>
+      </View>
+    </TouchableOpacity>
   );
 };
 export { HistoryItem };

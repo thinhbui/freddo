@@ -5,6 +5,7 @@ import Home from './screens/Home/Home';
 import Menu from './screens/Menu/Menu';
 import Queue from './screens/Queue/Queue';
 import HistoryScreen from './screens/History/History';
+import Options from './screens/Options/Options';
 import { COLOR } from './ultils/constants/color';
 
 const MainNavigator = TabNavigator(
@@ -12,7 +13,8 @@ const MainNavigator = TabNavigator(
     Home: { screen: Home },
     Menu: { screen: Menu },
     Queue: { screen: Queue },
-    History: { screen: HistoryScreen }
+    History: { screen: HistoryScreen },
+    Options: { screen: Options }
   },
   {
     headerMode: 'none',

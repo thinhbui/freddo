@@ -1,12 +1,13 @@
-import React, { PureComponent } from 'react';
+import React, { Component } from 'react';
 import { View, FlatList } from 'react-native';
+import { withNavigationFocus } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import styles from './styles';
 import { Header, HistoryItem } from '../../components';
-import { getHistories } from '../../actions';
+import { getHistory, getNewHistory } from '../../actions';
 
-class HistoryScreen extends PureComponent {
+class HistoryScreen extends Component {
   static navigationOptions = {
     tabBarIcon: () => <Icon name="ios-book" size={25} color="#fff" />
   };
@@ -17,13 +18,24 @@ class HistoryScreen extends PureComponent {
   };
   componentWillMount() {
     const { min, max } = this.state;
-    this.props.getHistories(min, max);
+    this.props.getNewHistory(min, max);
   }
   componentDidMount() {
-    console.log(this.props.history);
+    const { history } = this.props;
+    console.log('componentDidMount');
+    this.didFocus = this.props.navigation.addListener('didFocus', () =>
+      console.log('did focus')
+    );
     this.setState({
-      data: this.props.history
+      data: history
     });
+  }
+  componentDidUpdate() {
+    console.log(this.props);
+  }
+
+  componentWillUnmount() {
+    this.didFocus.remove();
   }
   renderItem = ({ item, index }) => (
     <HistoryItem item={item} index={index} navigation={this.props.navigation} />
@@ -44,11 +56,18 @@ class HistoryScreen extends PureComponent {
     );
   }
 }
-const mapStateToProps = state => ({
-  user: state.LoginReducer,
-  history: state.HistoryReducer
-});
+const mapStateToProps = state => {
+  // console.log(state);
+
+  return {
+    user: state.LoginReducer,
+    history: state.HistoryReducer
+  };
+};
 const mapDispatchToProps = dispatch => ({
-  getHistories: (min, max) => dispatch(getHistories(min, max))
+  getHistory: (min, max) => dispatch(getHistory(min, max)),
+  getNewHistory: (min, max) => dispatch(getNewHistory(min, max))
 });
-export default connect(mapStateToProps, mapDispatchToProps)(HistoryScreen);
+export default connect(mapStateToProps, mapDispatchToProps)(
+  withNavigationFocus(HistoryScreen)
+);

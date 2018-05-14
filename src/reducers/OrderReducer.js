@@ -5,6 +5,8 @@ import types from '../ultils/constants/actionType';
 export default (state = [], action) => {
   switch (action.type) {
     case types.ADD_ORDER: {
+      console.log('ADD_ORDER', state);
+
       return [...state, action.payload];
     }
     case types.UPDATE_ORDER: {
