@@ -26,8 +26,13 @@ class HistoryScreen extends Component {
       data: history
     });
   }
-  componentDidUpdate() {
-    console.log(this.props);
+  shouldComponentUpdate(nextProps) {
+    console.log(nextProps);
+
+    if (nextProps !== this.props) {
+      this.setState({ data: nextProps.history });
+    }
+    return true;
   }
 
   componentWillUnmount() {}

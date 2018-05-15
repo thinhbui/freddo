@@ -27,20 +27,11 @@ class Detail extends PureComponent {
     this.amount = 0;
   }
   componentWillMount() {
-    const { table, orderItem } = this.props.navigation.state.params;
-    // const { orders } = this.props;
-    console.log('table', table);
+    const { orderItem } = this.props.navigation.state.params;
     console.log('orders', orderItem);
     if (orderItem) {
       this.setState({ order: orderItem });
     }
-    //  else if (!table.orderid && table.orderid !== '') {
-    //   console.log('table.orderid', table.orderid);
-    //   const order = orders.find(item => item.id === table.orderid);
-    //   console.log('order detail', order);
-    //   order.id = table.orderid;
-    //   this.setState({ order });
-    // }
   }
 
   componentDidUpdate() {}
@@ -110,10 +101,6 @@ class Detail extends PureComponent {
   onSwipeRight(index) {
     const { order } = this.state;
     order.listItems.splice(index, 1);
-    console.log('index', index);
-
-    console.log('delete', order);
-
     order.amount = this.calAmount(order.listItems);
     this.setState({ order, deleteKey: index });
   }
@@ -247,7 +234,6 @@ class Detail extends PureComponent {
   }
 }
 const mapDispatchToProps = dispatch => ({
-  getOrder: id => dispatch(getOrder(id)),
   postOrder: (order, table) => dispatch(postOrder(order, table)),
   updateOrder: order => dispatch(updateOrder(order)),
   updateTable: table => dispatch(updateTable(table))

@@ -77,7 +77,7 @@ class Home extends Component {
     const { orders, tables } = this.props;
     console.log('orders', orders);
 
-    // const rootOrder = orders.find(element => (element.id = rootTable.orderid));
+    const rootOrder = orders.find(element => element.id === rootTable.orderid);
     const order = orders.find(element => element.id === table.orderid);
     if (rootTable.id === undefined) {
       console.log('order', order);
@@ -87,34 +87,34 @@ class Home extends Component {
         refresh: this.refresh
       });
     } else if (table === rootTable) this.setState({ rootTable: {} });
-    // else if (rootTable.orderid !== '' && table.orderid !== '') {
-    //   Alert.alert(
-    //     'Thông báo',
-    //     'Bạn có muốn gộp 2 bàn lại không?',
-    //     [
-    //       {
-    //         text: 'OK',
-    //         onPress: () => {
-    //           order.listItems = this.gatherArray(
-    //             order.listItems,
-    //             rootOrder.listItems
-    //           );
-    //           this.props.deleteOrder(rootTable.orderid);
-    //           const index = orders.findIndex(
-    //             item => item.id === rootTable.orderid
-    //           );
-    //           orders.splice(index, 1);
-    //         }
-    //       },
-    //       {
-    //         text: 'Cancel',
-    //         onPress: () => console.log('Cancel Pressed'),
-    //         style: 'cancel'
-    //       }
-    //     ],
-    //     { cancelable: true }
-    //   );
-    // }
+    else if (rootTable.orderid !== '' && table.orderid !== '') {
+      Alert.alert(
+        'Thông báo',
+        'Bạn có muốn gộp 2 bàn lại không?',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              order.listItems = this.gatherArray(
+                order.listItems,
+                rootOrder.listItems
+              );
+              this.props.deleteOrder(rootTable.orderid);
+              const index = orders.findIndex(
+                item => item.id === rootTable.orderid
+              );
+              orders.splice(index, 1);
+            }
+          },
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel'
+          }
+        ],
+        { cancelable: true }
+      );
+    }
   };
 
   gatherArray = (arr1, arr2) => {

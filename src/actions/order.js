@@ -12,7 +12,7 @@ const deleteOrderSuccess = item => ({
   type: types.DELETE_ORDER,
   payload: item
 });
-
+const addHistory = item => ({ type: types.ADD_HISTORY, payload: item });
 const getHistorySuccess = item => ({ type: types.GET_HISTORY, payload: item });
 const getNewHistorySuccess = item => ({
   type: types.GET_NEW_HISTORY,
@@ -71,6 +71,7 @@ const getNewHistory = (min, max) => async dispatch => {
     dispatch(error(result.response.data || result));
   }
 };
+
 const getOrders = () => async dispatch => {
   const result = await freedoAPI.getOrders();
   console.log('getOrders', result);
@@ -110,5 +111,6 @@ export {
   getHistory,
   changeQuantity,
   getNewHistory,
-  deleteOrder
+  deleteOrder,
+  addHistory
 };

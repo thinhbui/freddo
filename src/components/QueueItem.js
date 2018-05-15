@@ -27,19 +27,22 @@ class QueueItem extends React.PureComponent {
     item.listItems.forEach(element => {
       if (!element.status) {
         count++;
-        const time = moment().unix() - moment(element.created * 1000).unix();
-        console.log(moment(time).format('HH:mm'));
-
+        const time = moment().unix() - element.created;
         if (time > max) {
           max = time;
         }
         data = [...data, { ...element, rangeTime: time }];
       }
     });
-    this.setState({ count, maxTime: moment(max).format('HH:mm'), data });
+    this.setState({
+      count,
+      maxTime: moment.utc(max * 1000).format('HH:mm'),
+      data
+    });
   }
   renderItem = ({ item }) => {
     const { index } = this.props;
+
     return (
       <View style={{ flexDirection: 'row', marginLeft: 15, marginRight: 15 }}>
         <View
@@ -58,7 +61,7 @@ class QueueItem extends React.PureComponent {
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
           <Text style={{ color: index % 2 === 0 ? 'black' : '#fff' }}>
-            {moment(item.rangeTime).format('HH:mm')}
+            {moment.utc(item.rangeTime * 1000).format('HH:mm')}
           </Text>
         </View>
       </View>

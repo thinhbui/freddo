@@ -98,7 +98,7 @@ class BillItem extends PureComponent {
         ]}
         rightButtonWidth={60}
         onRightActionRelease={this.delete}
-        rightActionActivationDistance={width / 3}
+        rightActionActivationDistance={width / 2}
       >
         <View
           style={{
