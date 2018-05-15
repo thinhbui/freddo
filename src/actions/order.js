@@ -41,11 +41,9 @@ const deleteItemOrder = index => ({
 
 const postOrder = (order, table) => async dispatch => {
   const result = await freedoAPI.postOrder(order);
-  console.log('postOrder', result);
-
   if (result.status === 200) {
     const orderResult = result.data;
-    console.log('postOrder orderResult', orderResult);
+    console.log('postOrder orderResult', orderResult.id);
     const tableUpdate = { ...table, orderid: orderResult.id, status: true };
     dispatch(postOrderSuccess(orderResult));
     dispatch(updateTable(tableUpdate));

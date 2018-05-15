@@ -13,9 +13,8 @@ import moment from 'moment';
 import { Header } from '../../components';
 import BillItem from '../../components/BillItems';
 import styles from './styles';
-import { getOrder, postOrder, updateTable, updateOrder } from '../../actions';
+import { postOrder, updateTable, updateOrder } from '../../actions';
 import { COLOR } from '../../ultils/constants/color';
-import { getOrderById } from '../../services/freddoAPI';
 
 class Detail extends PureComponent {
   constructor(props) {
@@ -29,27 +28,19 @@ class Detail extends PureComponent {
   }
   componentWillMount() {
     const { table, orderItem } = this.props.navigation.state.params;
-    const { orders } = this.props;
+    // const { orders } = this.props;
     console.log('table', table);
-    console.log('orders', orders);
+    console.log('orders', orderItem);
     if (orderItem) {
-      getOrderById(orderItem.id).then(res => {
-        if (res.status === 200) {
-          this.setState({ order: res.data });
-        } else {
-          Alert.alert('Lỗi', `${res.error}`);
-        }
-      });
-    } else if (table.orderid !== '' && table.orderid !== undefined) {
-      console.log('table.orderid', table.orderid);
-      const orderArr = orders.filter(item => item.id === table.orderid);
-      const order = orderArr[0];
-      console.log('order detail', order);
-      order.id = table.orderid;
-      this.setState({
-        order
-      });
+      this.setState({ order: orderItem });
     }
+    //  else if (!table.orderid && table.orderid !== '') {
+    //   console.log('table.orderid', table.orderid);
+    //   const order = orders.find(item => item.id === table.orderid);
+    //   console.log('order detail', order);
+    //   order.id = table.orderid;
+    //   this.setState({ order });
+    // }
   }
 
   componentDidUpdate() {}
@@ -62,23 +53,22 @@ class Detail extends PureComponent {
     const { order } = this.state;
     const { table } = this.props.navigation.state.params;
     let listItem = [];
-    if (order.listItems !== undefined && table.orderid === '') {
-      if (order.listItems.length > 0) {
-        order.username = 'thinhbd';
-        order.billdate = moment().format();
-        order.status = false;
-        order.tableid = table.name;
-        order.listItems.forEach(item => {
-          if (!item.status && !item.created) {
-            item.created = moment().unix();
-            console.log(item.created);
-            listItem = [...listItem, item];
-          }
-        });
-        order.listItems = listItem;
-        this.props.postOrder(order, table);
-      }
-    } else Alert.alert('Thông báo', 'Không có gì để lưu');
+    if (table.orderid === '' && order.listItems.length > 0) {
+      order.username = 'thinhbd';
+      order.billdate = moment().format();
+      order.status = false;
+      order.tableid = table.name;
+      order.listItems.forEach(item => {
+        if (!item.status && !item.created) {
+          item.created = moment().unix();
+          listItem = [...listItem, item];
+        }
+      });
+      order.listItems = listItem;
+      this.props.postOrder(order, table);
+    } else if (order.listItems.length === 0) {
+      Alert.alert('Thông báo', 'Không có gì để lưu');
+    }
     if (table.orderid !== '') {
       if (order.listItems.length === 0) this.props.deleteOrder();
       else {
@@ -99,7 +89,7 @@ class Detail extends PureComponent {
     const { table } = this.props.navigation.state.params;
     console.log('onPayPress', order);
     let listItem = [];
-    if (order.id !== '' && order.id !== undefined) {
+    if (order.listItems.length > 0) {
       order.listItems.forEach(item => {
         if (!item.status && !item.created) {
           item.status = true;
@@ -112,10 +102,10 @@ class Detail extends PureComponent {
       table.status = false;
       table.orderid = '';
       this.props.updateTable(table);
+      this.props.navigation.goBack();
     } else if (order.listItems.length === 0) {
       Alert.alert('Thông báo', 'Bàn trống không thể thanh toán');
     }
-    this.props.navigation.goBack();
   };
   onSwipeRight(index) {
     const { order } = this.state;
@@ -262,7 +252,5 @@ const mapDispatchToProps = dispatch => ({
   updateOrder: order => dispatch(updateOrder(order)),
   updateTable: table => dispatch(updateTable(table))
 });
-const mapStateToProps = state => ({
-  orders: state.OrderReducer
-});
+const mapStateToProps = state => ({});
 export default connect(mapStateToProps, mapDispatchToProps)(Detail);

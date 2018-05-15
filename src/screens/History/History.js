@@ -22,10 +22,6 @@ class HistoryScreen extends Component {
   }
   componentDidMount() {
     const { history } = this.props;
-    console.log('componentDidMount');
-    this.didFocus = this.props.navigation.addListener('didFocus', () =>
-      console.log('did focus')
-    );
     this.setState({
       data: history
     });
@@ -34,9 +30,7 @@ class HistoryScreen extends Component {
     console.log(this.props);
   }
 
-  componentWillUnmount() {
-    this.didFocus.remove();
-  }
+  componentWillUnmount() {}
   renderItem = ({ item, index }) => (
     <HistoryItem item={item} index={index} navigation={this.props.navigation} />
   );

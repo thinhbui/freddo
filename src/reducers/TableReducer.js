@@ -6,8 +6,6 @@ export default (state = [], action) => {
       return state || undefined;
     }
     case types.UPDATE_TABLE: {
-      console.log('UPDATE_TABLE', state);
-
       const index = state.findIndex(item => item.id === action.payload.id);
       state.splice(index, 1, action.payload);
       return [...state];
