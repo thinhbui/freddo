@@ -34,7 +34,7 @@ class Detail extends PureComponent {
     }
   }
 
-  componentDidUpdate() {}
+  componentDidUpdate() { }
   componentWillUnmount() {
     if (this.props.navigation.state.params.table !== undefined) {
       this.props.navigation.state.params.refresh();
@@ -238,5 +238,5 @@ const mapDispatchToProps = dispatch => ({
   updateOrder: order => dispatch(updateOrder(order)),
   updateTable: table => dispatch(updateTable(table))
 });
-const mapStateToProps = state => ({});
+const mapStateToProps = () => ({});
 export default connect(mapStateToProps, mapDispatchToProps)(Detail);

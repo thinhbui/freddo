@@ -13,7 +13,7 @@ class HistoryScreen extends Component {
   };
   state = {
     min: 0,
-    max: 10,
+    max: 20,
     data: []
   };
   componentWillMount() {
@@ -35,7 +35,7 @@ class HistoryScreen extends Component {
     return true;
   }
 
-  componentWillUnmount() {}
+  componentWillUnmount() { }
   renderItem = ({ item, index }) => (
     <HistoryItem item={item} index={index} navigation={this.props.navigation} />
   );
@@ -49,20 +49,19 @@ class HistoryScreen extends Component {
             data={data}
             renderItem={this.renderItem}
             keyExtractor={item => item.id}
+            onEndReached={() => console.log('onEndReached')}
+            onEndReachedThreshold={0.7}
           />
         )}
       </View>
     );
   }
 }
-const mapStateToProps = state => {
-  // console.log(state);
+const mapStateToProps = state => ({
+  user: state.LoginReducer,
+  history: state.HistoryReducer
+});
 
-  return {
-    user: state.LoginReducer,
-    history: state.HistoryReducer
-  };
-};
 const mapDispatchToProps = dispatch => ({
   getHistory: (min, max) => dispatch(getHistory(min, max)),
   getNewHistory: (min, max) => dispatch(getNewHistory(min, max))

@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { Alert, AsyncStorage } from 'react-native';
+import { Alert } from 'react-native';
 import url, { HOST } from '../ultils/constants/api';
 
 const freddo = axios.create({
@@ -18,7 +18,6 @@ const login = async (username, password) => {
     });
     if (result.status === 200) {
       freddo.defaults.headers.Authorization = result.data.id;
-      console.log(freddo);
     }
     return result;
   } catch (error) {

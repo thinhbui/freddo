@@ -1,6 +1,5 @@
 // import moment from 'moment';
 import types from '../ultils/constants/actionType';
-import url from '../ultils/constants/api';
 import * as freddoAPI from '../services/freddoAPI';
 
 const loginSuccess = item => ({ type: types.LOGIN, payload: item });

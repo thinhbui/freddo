@@ -6,7 +6,7 @@ export default (state = [], action) => {
   switch (action.type) {
     case types.ADD_ORDER: {
       console.log('ADD_ORDER', action.payload);
-      return [...state, action.payload];
+      return [action.payload, ...state];
     }
     case types.UPDATE_ORDER: {
       console.log('UPDATE_ORDER', state);
