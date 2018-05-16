@@ -9,7 +9,13 @@ import { getHistory, getNewHistory } from '../../actions';
 
 class HistoryScreen extends Component {
   static navigationOptions = {
-    tabBarIcon: () => <Icon name="ios-book" size={25} color="#fff" />
+    tabBarIcon: ({ focused }) => (
+      <Icon
+        name={focused ? 'ios-book' : 'ios-book-outline'}
+        size={25}
+        color="#fff"
+      />
+    )
   };
   state = {
     min: 0,
@@ -35,7 +41,7 @@ class HistoryScreen extends Component {
     return true;
   }
 
-  componentWillUnmount() { }
+  componentWillUnmount() {}
   renderItem = ({ item, index }) => (
     <HistoryItem item={item} index={index} navigation={this.props.navigation} />
   );

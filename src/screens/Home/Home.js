@@ -19,13 +19,20 @@ import {
   updateTable,
   resetOrder,
   getOrders,
-  deleteOrder
+  deleteOrder,
+  updateOrder
 } from '../../actions';
 import Images from '../../ultils/constants/Images';
 
 class Home extends Component {
   static navigationOptions = {
-    tabBarIcon: () => <Icon name="ios-home" size={25} color="#fff" />,
+    tabBarIcon: ({ focused }) => (
+      <Icon
+        name={focused ? 'ios-home' : 'ios-home-outline'}
+        size={25}
+        color="#fff"
+      />
+    ),
     header: null
   };
   constructor(props) {
@@ -74,8 +81,8 @@ class Home extends Component {
   }
   onPressTable = table => {
     const { rootTable } = this.state;
-    const { orders, tables } = this.props;
-    console.log('orders', orders);
+    const { orders } = this.props;
+    console.log('orders', rootTable);
 
     const rootOrder = orders.find(element => element.id === rootTable.orderid);
     const order = orders.find(element => element.id === table.orderid);
@@ -95,10 +102,19 @@ class Home extends Component {
           {
             text: 'OK',
             onPress: () => {
+              let amount = 0;
               order.listItems = this.gatherArray(
                 order.listItems,
                 rootOrder.listItems
               );
+              order.listItems.forEach(
+                item => (amount += item.price * item.quantity)
+              );
+              order.amount = amount;
+              this.props.updateOrder(order);
+              rootTable.status = false;
+              rootTable.orderid = '';
+              this.props.updateTable(rootTable);
               this.props.deleteOrder(rootTable.orderid);
               const index = orders.findIndex(
                 item => item.id === rootTable.orderid
@@ -114,37 +130,59 @@ class Home extends Component {
         ],
         { cancelable: true }
       );
+    } else if (rootTable.orderid !== '' && table.orderid === '') {
+      Alert.alert(
+        'Thông báo',
+        'Bạn có muốn chuyển bàn không?',
+        [
+          {
+            text: 'OK',
+            onPress: () => {
+              table.orderid = rootTable.orderid;
+              this.props.updateTable(rootTable);
+              rootTable.orderid = '';
+              this.props.updateTable(rootTable);
+            }
+          },
+          {
+            text: 'Cancel',
+            onPress: () => console.log('Cancel Pressed'),
+            style: 'cancel'
+          }
+        ],
+        { cancelable: true }
+      );
     }
-  };
-
-  gatherArray = (arr1, arr2) => {
-    const temp1 = [...arr1];
-    const temp2 = [...arr2];
-    arr1.forEach((element, index) => {
-      arr2.filter((item, index1) => {
-        if (item.id === element.id) {
-          const temp = item;
-          temp.quantity = item.quantity + element.quantity;
-          temp1.splice(index, 1, temp);
-          temp2.splice(index1, 1);
-          return true;
-        }
-        return false;
-      });
-    });
-    return [...temp1, ...temp2];
   };
 
   onPressState = () => this.setState({ sortById: false });
 
   onPressId = () => this.setState({ sortById: true });
 
-  // onLongPress = item => {
-  //   console.log('onLongPress', item);
-  //   this.setState({ rootTable: item });
-  // };
+  onLongPress = item => {
+    if (item.orderid !== '') {
+      this.setState({ rootTable: item });
+      Alert.alert('Hãy chọn bài muốn chuyển hoặc gộp');
+    } else Alert.alert('Bàn rỗng không thể chuyển hoặc gộp');
+  };
+
   setTables = tables => this.setState({ tables });
 
+  gatherArray = (arr1, arr2) => {
+    const temp1 = [...arr1];
+    const temp2 = [...arr2];
+    arr1.forEach((element, index) => {
+      arr2.forEach((item, index1) => {
+        if (item.id === element.id) {
+          const temp = item;
+          temp.quantity = item.quantity + element.quantity;
+          temp1.splice(index, 1, temp);
+          temp2.splice(index1, 1);
+        }
+      });
+    });
+    return [...temp1, ...temp2];
+  };
   refresh = () => {
     this.setState({ refresh: !this.state.refresh });
   };
@@ -215,12 +253,9 @@ class Home extends Component {
   }
 }
 const mapDispatchToProps = dispatch => ({
-  getTable: () => {
-    dispatch(getTable());
-  },
-  updateTable: table => {
-    dispatch(updateTable(table));
-  },
+  getTable: () => dispatch(getTable()),
+  updateTable: table => dispatch(updateTable(table)),
+  updateOrder: order => dispatch(updateOrder(order)),
   resetOrder: () => dispatch(resetOrder()),
   getOrders: () => dispatch(getOrders()),
   deleteOrder: id => dispatch(deleteOrder(id))

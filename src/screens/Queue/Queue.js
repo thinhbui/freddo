@@ -7,7 +7,13 @@ import { Header, QueueItem } from '../../components';
 
 class Queue extends Component {
   static navigationOptions = {
-    tabBarIcon: () => <Icon name="ios-clock" size={25} color="#fff" />,
+    tabBarIcon: ({ focused }) => (
+      <Icon
+        name={focused ? 'ios-alarm' : 'ios-alarm-outline'}
+        size={25}
+        color="#fff"
+      />
+    ),
     header: null
   };
   state = {

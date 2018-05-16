@@ -27,7 +27,13 @@ const background = require('../../ultils/images/cafe.png');
 
 class Menu extends PureComponent {
   static navigationOptions = {
-    tabBarIcon: () => <Icon name="ios-restaurant" size={25} color="#fff" />,
+    tabBarIcon: ({ focused }) => (
+      <Icon
+        name={focused ? 'ios-restaurant' : 'ios-restaurant-outline'}
+        size={25}
+        color="#fff"
+      />
+    ),
     header: null
   };
   constructor(props) {

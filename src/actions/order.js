@@ -92,7 +92,7 @@ const updateOrder = order => async dispatch => {
   }
 };
 const deleteOrder = id => async dispatch => {
-  console.log('updateOrder', id);
+  console.log('deleteOrder', id);
   const result = await freedoAPI.deleteOrder(id);
   if (result.status === 200) {
     dispatch(deleteOrderSuccess(result.data));

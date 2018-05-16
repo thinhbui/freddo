@@ -9,41 +9,50 @@ import { logout } from '../../actions';
 
 class Options extends Component {
   static navigationOptions = {
-    tabBarIcon: () => <Icon name="ios-contact" size={25} color="#fff" />,
+    tabBarIcon: ({ focused }) => (
+      <Icon
+        name={focused ? 'ios-options' : 'ios-options-outline'}
+        size={25}
+        color="#fff"
+      />
+    ),
     header: null
   };
-  componentDidMount() { }
+  componentDidMount() {}
   logout = () => {
-    this.props.logout();
-    Alert.alert('Thông báo', 'Bạn có chắc chắn muốn đăng xuất không?',
-      [
-        {
-          text: 'Có',
-          onPress: () => {
-            const resetAction = NavigationActions.reset({
-              index: 0,
-              actions: [NavigationActions.navigate({ routeName: 'Login' })],
-            });
-            this.props.navigation.dispatch(resetAction);
-          }
-        }, {
-          text: 'Không',
-          onPress: () => console.log('Cancel Pressed'),
-          style: 'cancel'
+    Alert.alert('Thông báo', 'Bạn có chắc chắn muốn đăng xuất không?', [
+      {
+        text: 'Có',
+        onPress: () => {
+          const resetAction = NavigationActions.reset({
+            index: 0,
+            actions: [NavigationActions.navigate({ routeName: 'Login' })]
+          });
+          this.props.logout();
+          this.props.navigation.dispatch(resetAction);
         }
-      ]);
-  }
+      },
+      {
+        text: 'Không',
+        onPress: () => console.log('Cancel Pressed'),
+        style: 'cancel'
+      }
+    ]);
+  };
   render() {
     // const { user } = this.props;
     return (
-      <View style={{ flex: 1 }} >
-        <Header
-          title='Tuỳ chọn'
-        />
+      <View style={{ flex: 1 }}>
+        <Header title="Tuỳ chọn" />
         <View
-          style={{ justifyContent: 'center', alignItems: 'center', width: '100%', height: 200 }}
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            width: '100%',
+            height: 200
+          }}
         >
-          <Icon name='ios-contact' color={COLOR.theme} size={100} />
+          <Icon name="ios-contact" color={COLOR.theme} size={100} />
           <Text>ASALDKJASKJLD</Text>
         </View>
         <View style={{ flex: 1 }}>
@@ -57,7 +66,7 @@ class Options extends Component {
             }}
             onPress={this.logout}
           >
-            <Icon name='ios-exit-outline' size={30} style={{ margin: 5 }} />
+            <Icon name="ios-exit-outline" size={30} style={{ margin: 5 }} />
             <Text>Đăng xuất</Text>
           </TouchableOpacity>
         </View>
@@ -66,7 +75,7 @@ class Options extends Component {
   }
 }
 const mapDisPatchToProps = dispatch => ({
-  logout: () => dispatch(logout()),
+  logout: () => dispatch(logout())
 });
 const mapStateToProps = state => ({
   user: state.LoginReducer
