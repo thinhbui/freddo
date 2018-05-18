@@ -34,7 +34,7 @@ class Detail extends PureComponent {
     }
   }
 
-  componentDidUpdate() { }
+  componentDidUpdate() {}
   componentWillUnmount() {
     if (this.props.navigation.state.params.table !== undefined) {
       this.props.navigation.state.params.refresh();
@@ -66,8 +66,8 @@ class Detail extends PureComponent {
         order.listItems.forEach(item => {
           if (!item.status && !item.created) {
             item.created = moment().unix();
-            listItem = [...listItem, item];
           }
+          listItem = [...listItem, item];
         });
         order.listItems = listItem;
         this.props.updateOrder(order);

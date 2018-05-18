@@ -26,16 +26,20 @@ class Queue extends Component {
       console.log('did focus')
     );
   }
+  shouldComponentUpdate(nextProps, nextState) {
+    console.log('nextProps', nextProps);
+    console.log('nextState', nextState);
+    if (this.props !== nextProps) {
+      this.setState({ orders: nextProps.orders });
+      return true;
+    }
+    if (this.state !== nextState) return true;
+    return false;
+  }
   setOrder = orders => {
     this.setState({ orders });
   };
-  componentWillFocus() {
-    console.log('Queue componentWillFocus');
-  }
-  componentDidFocus() {
-    // const {} = this.props;
-    console.log('Queue componentDidFocus');
-  }
+
   renderItem = ({ item, index }) => {
     // console.log(index);
     return <QueueItem item={item} index={index} />;
@@ -54,8 +58,10 @@ class Queue extends Component {
     );
   }
 }
-const mapStateToProps = state => ({
-  orders: state.OrderReducer
-});
+const mapStateToProps = state => {
+  console.log(state);
+
+  return { orders: state.OrderReducer };
+};
 
 export default connect(mapStateToProps)(Queue);
