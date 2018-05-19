@@ -21,6 +21,8 @@ import { login } from '../../actions';
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const backgroundImage = require('../../ultils/images/cafe.png');
 
+// const senderID = '711529978568';
+
 class Login extends PureComponent {
   constructor(props) {
     super(props);

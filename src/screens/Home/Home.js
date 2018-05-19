@@ -9,6 +9,7 @@ import {
   Alert
   // Dimensions
 } from 'react-native';
+import PushNotification from 'react-native-push-notification';
 import Icon from 'react-native-vector-icons/Ionicons';
 import io from 'socket.io-client/dist/socket.io.js';
 import { connect } from 'react-redux';
@@ -23,6 +24,8 @@ import {
   updateOrder
 } from '../../actions';
 import Images from '../../ultils/constants/Images';
+
+// const senderID = '711529978568';
 
 class Home extends Component {
   static navigationOptions = {
