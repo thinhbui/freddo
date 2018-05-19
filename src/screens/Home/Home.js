@@ -11,10 +11,11 @@ import {
 } from 'react-native';
 // import PushNotification from 'react-native-push-notification';
 import Icon from 'react-native-vector-icons/Ionicons';
-import io from 'socket.io-client/dist/socket.io.js';
 import { connect } from 'react-redux';
 import { Table, Header } from '../../components';
 import styles from './styles';
+import PushNotification from 'react-native-push-notification';
+
 import {
   getTable,
   updateTable,
@@ -41,7 +42,6 @@ class Home extends Component {
   };
   constructor(props) {
     super(props);
-    this.socket = io('http://192.168.38.1:3000', { jsonp: false });
     this.state = {
       sortById: true,
       tables: [],
@@ -49,12 +49,38 @@ class Home extends Component {
       changeTable: false,
       rootTable: {}
     };
+    this.props.navigation.state.params.socket.on('require_pay', message => {
+      PushNotification.localNotification({
+        message: message // (required)
+      });
+    });
   }
-
+  // require_pay
   componentDidMount() {
     const { tables } = this.props;
-    console.log('componentDidMount Home', tables);
+    console.log('componentDidMount Home', this.props);
     this.setState({ tables });
+    PushNotification.configure({
+      onRegister: function(token) {
+        console.log('TOKEN:', token);
+      },
+      // (required) Called when a remote or local notification is opened or received
+      onNotification: function(notification) {
+        console.log('NOTIFICATION:', notification);
+        notification.finish(PushNotificationIOS.FetchResult.NoData);
+      },
+      // ANDROID ONLY: GCM Sender ID (optional - not required for local notifications, but is need to receive remote push notifications)
+      senderID: '711529978568',
+      // IOS ONLY (optional): default: all - Permissions to register.
+      permissions: {
+        alert: true,
+        badge: true,
+        sound: true
+      },
+
+      popInitialNotification: true,
+      requestPermissions: true
+    });
   }
 
   componentWillReceiveProps(newProps) {
@@ -87,7 +113,8 @@ class Home extends Component {
       this.props.navigation.navigate('Detail', {
         table,
         orderItem: order,
-        refresh: this.refresh
+        refresh: this.refresh,
+        socket: this.props.navigation.state.params.socket
       });
     } else if (table === rootTable) this.setState({ rootTable: {} });
     else if (order !== undefined && rootOrder !== undefined) {

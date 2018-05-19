@@ -19,6 +19,7 @@ import styles from './styles';
 import { CustomTextInput } from '../../components';
 import { login, loginSuccess, getOrders, getTable } from '../../actions';
 import { CONSTANST } from '../../ultils/constants/String';
+import io from 'socket.io-client/dist/socket.io.js';
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const backgroundImage = require('../../ultils/images/cafe.png');
@@ -37,6 +38,7 @@ class Login extends PureComponent {
       user: {}
       // isLogin: this.props.isLogin,
     };
+    this.socket = io('http://192.168.13.103:3000', { jsonp: false });
   }
   componentWillMount() {
     const arrAnimated = [];
@@ -110,7 +112,12 @@ class Login extends PureComponent {
   navigationToMain = () => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [NavigationActions.navigate({ routeName: 'Main', params: {} })]
+      actions: [
+        NavigationActions.navigate({
+          routeName: 'Main',
+          params: { socket: this.socket }
+        })
+      ]
     });
     this.props.navigation.dispatch(resetAction);
   };

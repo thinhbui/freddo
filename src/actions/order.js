@@ -1,5 +1,8 @@
+import io from 'socket.io-client/dist/socket.io.js';
 import types from '../ultils/constants/actionType';
 import * as freedoAPI from '../services/freddoAPI';
+
+// this.socket = io('http://192.168.13.103:3000', { jsonp: false });
 
 const getOrderSuccess = item => ({ type: types.GET_ORDER, payload: item });
 
@@ -38,18 +41,12 @@ const deleteItemOrder = index => ({
   payload: index
 });
 
-const postOrder = order => async dispatch => {
+const postOrder = (order, socket) => async dispatch => {
   console.log('order', order);
-  // const orderPost = {
-  //   user: order.user,
-  //   table: order.table,
-  //   listitems: JSON.stringify(order.listitems),
-  //   amount: order.amount
-  // };
-  // console.log('orderPost', orderPost);
   const result = await freedoAPI.postOrder(order);
   if (result.status === 200) {
     console.log('postOrder', result.data);
+    socket.emit('change_order', 'hihi');
     dispatch(postOrderSuccess(result.data));
   } else {
     dispatch(error(result.response.data || result));
@@ -86,10 +83,14 @@ const getOrders = () => async dispatch => {
     dispatch(error(result.response.data || result));
   }
 };
-const updateOrder = order => async dispatch => {
+const updateOrder = (order, socket) => async dispatch => {
   console.log('updateOrder', order);
   const result = await freedoAPI.updateOrder(order);
   if (result.status === 200) {
+    if (socket) {
+      console.log('thanhtoan', socket);
+      socket.emit('thanhtoan', 'ahihi');
+    }
     dispatch(updateSuccess(result.data));
   } else {
     dispatch(error(result.response.data || result));

@@ -1,8 +1,6 @@
 import React, { PureComponent } from 'react';
 import {
   View,
-  // SectionList,
-  // Dimensions,
   Text,
   Image,
   TextInput,
@@ -18,11 +16,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import styles from './styles';
 import { MenuItem } from '../../components';
 import { getMenu, addOrderItem } from '../../actions';
-// import { sectionListData } from '../../ultils/constants/data';
-// import { getMenu } from '../../actions/MenuActions';
-// import { addOrderItem } from '../../actions/OrderActions';
 
-// const { height, width } = Dimensions.get('window');
 const background = require('../../ultils/images/cafe.png');
 
 class Menu extends PureComponent {

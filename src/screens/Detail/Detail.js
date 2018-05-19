@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 // import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
+import io from 'socket.io-client/dist/socket.io.js';
 import moment from 'moment';
 import { Header } from '../../components';
 import BillItem from '../../components/BillItems';
@@ -26,10 +27,14 @@ class Detail extends PureComponent {
       refresh: true
     };
     this.amount = 0;
+    // this.socket = io('http://192.168.13.103:3000', { jsonp: false });
+    // this.socket.on('server_send_post_order', data => {
+    //   alert(data);
+    // });
   }
   componentWillMount() {
-    const { orderItem } = this.props.navigation.state.params;
-    console.log('orders', orderItem);
+    const { orderItem, socket } = this.props.navigation.state.params;
+    console.log('socket.props', socket);
     if (orderItem) {
       this.setState({ order: orderItem });
     }
@@ -44,8 +49,8 @@ class Detail extends PureComponent {
   onSavePress = () => {
     const { order } = this.state;
     console.log(this.props.user);
-
-    const { table, orderItem } = this.props.navigation.state.params;
+    // this.socket.emit('change_order', 'ahihi');
+    const { table, orderItem, socket } = this.props.navigation.state.params;
     // let listItem = [];
     if (
       orderItem === undefined &&
@@ -57,7 +62,7 @@ class Detail extends PureComponent {
       order.table = table._id;
       order.listitems = JSON.stringify(order.listitems);
       table.status = STATUS_TABLE.WAITING;
-      this.props.postOrder(order, table);
+      this.props.postOrder(order, socket);
       this.props.updateTable(table);
     } else if (order.listitems.length === 0) {
       Alert.alert('Thông báo', 'Không có gì để lưu');
@@ -72,17 +77,30 @@ class Detail extends PureComponent {
     this.props.navigation.goBack();
   };
   onPayPress = () => {
+    const { socket } = this.props.navigation.state.params;
     const { order } = this.state;
-    console.log('onPayPress', order);
+    // console.log('onPayPress', order);
     if (order.listitems && order.listitems.length > 0) {
-      order.status = true;
-      order.listitems = JSON.stringify(order.listitems);
-      this.props.updateOrder(order);
+      const orderObject = {
+        user: (order.user = this.props.user.id),
+        table: order.table.toString(),
+        listitems: JSON.stringify(order.listitems),
+        amount: order.amount.toString(),
+        discount: order.discount.toString(),
+        total: order.total.toString(),
+        custpaid: order.custpaid.toString(),
+        payback: order.payback.toString(),
+        status: true
+      };
+
+      // order.user = this.props.user.id;
+      this.props.updateOrder(orderObject, socket);
       this.props.navigation.goBack();
     } else if (order.listitems && order.listitems.length === 0) {
       Alert.alert('Thông báo', 'Bàn trống không thể thanh toán');
     }
   };
+  formatNumber = x => `${x.toLocaleString('vn-VI')}đ`;
   onSwipeRight(index) {
     const { order } = this.state;
     order.listitems.splice(index, 1);
@@ -200,7 +218,9 @@ class Detail extends PureComponent {
               }}
             >
               <Text style={{ color: COLOR.theme, fontSize: 23 }}>
-                {order.amount !== undefined ? order.amount : 0}đ
+                {order.amount !== undefined
+                  ? this.formatNumber(order.amount)
+                  : 0}
               </Text>
             </View>
           </View>
@@ -219,7 +239,7 @@ class Detail extends PureComponent {
 }
 const mapDispatchToProps = dispatch => ({
   postOrder: (order, table) => dispatch(postOrder(order, table)),
-  updateOrder: order => dispatch(updateOrder(order)),
+  updateOrder: (order, socket) => dispatch(updateOrder(order, socket)),
   updateTable: table => dispatch(updateTable(table))
 });
 const mapStateToProps = state => ({
