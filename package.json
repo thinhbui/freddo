@@ -8,6 +8,7 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "jwt-decode": "^2.2.0",
     "moment": "^2.22.1",
     "react": "16.3.1",
     "react-native": "0.55.3",
@@ -34,8 +35,6 @@
     "preset": "react-native"
   },
   "rnpm": {
-    "assets": [
-      "./src/ultils/assets/fonts/"
-    ]
+    "assets": ["./src/ultils/assets/fonts/"]
   }
 }

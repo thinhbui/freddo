@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Dimensions, TouchableHighlight } from 'react-native';
 import Icon from 'react-native-vector-icons/Ionicons';
+import { COLOR } from '../ultils/constants/color';
 
 const { width } = Dimensions.get('window');
 
@@ -33,7 +34,12 @@ const Table = ({ text, onPress, status, onLongPress, rootTable }) => (
           width: 6,
           height: 6,
           borderRadius: 3,
-          backgroundColor: status ? '#ff3f00' : '#00ff1d',
+          backgroundColor:
+            status === '0'
+              ? COLOR.green
+              : status === '1'
+                ? COLOR.yellow
+                : COLOR.red,
           position: 'absolute',
           top: 10,
           right: 10

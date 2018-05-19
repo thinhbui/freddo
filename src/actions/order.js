@@ -1,6 +1,5 @@
 import types from '../ultils/constants/actionType';
 import * as freedoAPI from '../services/freddoAPI';
-import { updateTable } from '.';
 
 const getOrderSuccess = item => ({ type: types.GET_ORDER, payload: item });
 
@@ -39,14 +38,19 @@ const deleteItemOrder = index => ({
   payload: index
 });
 
-const postOrder = (order, table) => async dispatch => {
+const postOrder = order => async dispatch => {
+  console.log('order', order);
+  // const orderPost = {
+  //   user: order.user,
+  //   table: order.table,
+  //   listitems: JSON.stringify(order.listitems),
+  //   amount: order.amount
+  // };
+  // console.log('orderPost', orderPost);
   const result = await freedoAPI.postOrder(order);
   if (result.status === 200) {
-    const orderResult = result.data;
-    console.log('postOrder orderResult', orderResult.id);
-    const tableUpdate = { ...table, orderid: orderResult.id, status: true };
-    dispatch(postOrderSuccess(orderResult));
-    dispatch(updateTable(tableUpdate));
+    console.log('postOrder', result.data);
+    dispatch(postOrderSuccess(result.data));
   } else {
     dispatch(error(result.response.data || result));
   }

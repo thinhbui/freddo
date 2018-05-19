@@ -1,17 +1,14 @@
-export const HOST = 'https://freddocf-cyberjunky.c9users.io/api';
+export const HOST = 'https://freddo-cyberjunky.c9users.io:8080';
 const API = {
-  LOGIN: '/accounts/login',
-  getUrlCheckToken: userid => `/accounts/${userid}/accessTokens`,
-  GET_TABLE: '/tables',
-  updateTable: id => `/tables/${id}`,
-  getToken: id => `/accounts/${id}/accessTokens`,
-  deleteOrder: id => `/orders/${id}`,
-  GET_MENU: '/menu_items',
-  GET_ORDER: '/orders?filter[where][status]=false',
-  GET_ORDER_ID: id => `/orders/${id}`,
-  POST_ORDER: '/orders',
-  updateOrder: id => `/orders/${id}`,
-  getHistory: (min, max) =>
-    `/orders?filter[where][status]=true&filter[limit]=${max}&filter[skip]=${min}`
+  LOGIN: `${HOST}/api/users/login`,
+  GET_TABLE: `${HOST}/api/table`,
+  updateTable: () => `${HOST}/api/table`,
+  deleteOrder: id => `${HOST}/api/order/${id}`,
+  GET_MENU: `${HOST}/api/menuitem`,
+  GET_ORDER: `${HOST}/api/order?status=false`,
+  GET_ORDER_ID: id => `${HOST}/api/order/${id}`,
+  POST_ORDER: `${HOST}/api/order`,
+  // updateOrder: id => `/api/order/${id}`,
+  getHistory: page => `${HOST}/orders?status=true&=page${page}`
 };
 export default API;

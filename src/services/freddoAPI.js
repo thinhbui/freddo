@@ -1,33 +1,34 @@
 import axios from 'axios';
-import url, { HOST } from '../ultils/constants/api';
+import url from '../ultils/constants/api';
 
-const freddo = axios.create({
-  baseURL: HOST,
-  timeout: 5000,
-  headers: {
-    'Content-Type': 'application/json'
-  }
-});
+// const freddo = axios.create({
+//   baseURL: HOST,
+//   timeout: 5000,
+//   headers: {
+//     'Content-Type': 'application/json'
+//   }
+// });
 
 const login = async (username, password) => {
+  console.log('login', { username, password });
   try {
-    const result = await freddo.post(url.LOGIN, {
-      username,
+    const result = await axios.post(url.LOGIN, {
+      email: username,
       password
     });
-    console.log('login', result);
     if (result.status === 200) {
-      freddo.defaults.headers.Authorization = result.data.id;
+      axios.defaults.headers.common.Authorization = result.data.token;
     }
     return result;
   } catch (error) {
+    console.log(error);
     return error;
   }
 };
 
 const getTables = async () => {
   try {
-    return await freddo.get(url.GET_TABLE);
+    return await axios.get(url.GET_TABLE);
   } catch (error) {
     return error;
   }
@@ -35,20 +36,15 @@ const getTables = async () => {
 
 const updateTables = async table => {
   try {
-    return await freddo.put(url.updateTable(table.id), {
-      orderid: table.orderid,
-      status: table.status,
-      name: table.name
-    });
+    return await axios.post(url.updateTable(), { ...table });
   } catch (error) {
     return error;
   }
 };
 
-const getMenus = async token => {
+const getMenus = async () => {
   try {
-    if (token) freddo.defaults.headers.Authorization = token;
-    return await freddo.get(url.GET_MENU);
+    return await axios.get(url.GET_MENU);
   } catch (error) {
     return error;
   }
@@ -56,40 +52,36 @@ const getMenus = async token => {
 
 const postOrder = async order => {
   try {
-    return await freddo.post(url.POST_ORDER, order);
+    return await axios.post(url.POST_ORDER, { ...order });
   } catch (error) {
     return error;
   }
 };
 const getOrders = async () => {
   try {
-    return await freddo.get(url.GET_ORDER);
+    return await axios.get(url.GET_ORDER);
   } catch (error) {
     return error;
   }
 };
 const getOrderById = async id => {
   try {
-    return await freddo.get(url.GET_ORDER_ID(id));
+    return await axios.get(url.GET_ORDER_ID(id));
   } catch (error) {
     return error;
   }
 };
 const getOldOrders = async (min, max) => {
   try {
-    return await freddo.get(url.getHistory(min, max));
+    return await axios.get(url.getHistory(min, max));
   } catch (error) {
     return error;
   }
 };
 const updateOrder = async order => {
-  const id = order.id;
-  const orderUpdate = order;
-  delete orderUpdate.id;
-  console.log(url.updateOrder(id));
   try {
-    return await freddo.put(url.updateOrder(id), {
-      ...orderUpdate
+    return await axios.post(url.POST_ORDER, {
+      ...order
     });
   } catch (error) {
     return error;
@@ -97,7 +89,7 @@ const updateOrder = async order => {
 };
 const deleteOrder = async id => {
   try {
-    return await freddo.delete(url.deleteOrder(id), { id });
+    return await axios.delete(url.deleteOrder(id), { id });
   } catch (error) {
     return error;
   }
@@ -109,7 +101,6 @@ export {
   getMenus,
   postOrder,
   getOrders,
-  freddo,
   getOldOrders,
   updateOrder,
   getOrderById,

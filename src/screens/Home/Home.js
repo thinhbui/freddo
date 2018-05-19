@@ -9,7 +9,7 @@ import {
   Alert
   // Dimensions
 } from 'react-native';
-import PushNotification from 'react-native-push-notification';
+// import PushNotification from 'react-native-push-notification';
 import Icon from 'react-native-vector-icons/Ionicons';
 import io from 'socket.io-client/dist/socket.io.js';
 import { connect } from 'react-redux';
@@ -24,6 +24,7 @@ import {
   updateOrder
 } from '../../actions';
 import Images from '../../ultils/constants/Images';
+import { STATUS_TABLE } from '../../ultils/constants/String';
 
 // const senderID = '711529978568';
 
@@ -50,17 +51,9 @@ class Home extends Component {
     };
   }
 
-  componentWillMount() {
-    console.log('WillMount Home');
-    this.props.getTable();
-    this.props.getOrders();
-  }
-
   componentDidMount() {
     const { tables } = this.props;
     console.log('componentDidMount Home', tables);
-
-    if (tables.length === 0) this.props.getTable();
     this.setState({ tables });
   }
 
@@ -72,7 +65,7 @@ class Home extends Component {
     if (this.state.sortById !== nextState.sortById) {
       if (nextState.sortById) {
         this.setState({
-          tables: tables.sort((a, b) => (a.id > b.id ? 1 : -1))
+          tables: tables.sort((a, b) => (a._id > b._id ? 1 : -1))
         });
       } else if (tables.findIndex(item => item.status === true) !== -1) {
         this.setState({
@@ -87,9 +80,9 @@ class Home extends Component {
     const { orders } = this.props;
     console.log('orders', rootTable);
 
-    const rootOrder = orders.find(element => element.id === rootTable.orderid);
-    const order = orders.find(element => element.id === table.orderid);
-    if (rootTable.id === undefined) {
+    const rootOrder = orders.find(element => element.table === rootTable._id);
+    const order = orders.find(element => element.table === table._id);
+    if (rootTable._id === undefined) {
       console.log('order', order);
       this.props.navigation.navigate('Detail', {
         table,
@@ -97,7 +90,7 @@ class Home extends Component {
         refresh: this.refresh
       });
     } else if (table === rootTable) this.setState({ rootTable: {} });
-    else if (rootTable.orderid !== '' && table.orderid !== '') {
+    else if (order !== undefined && rootOrder !== undefined) {
       Alert.alert(
         'Thông báo',
         'Bạn có muốn gộp 2 bàn lại không?',
@@ -115,12 +108,11 @@ class Home extends Component {
               );
               order.amount = amount;
               this.props.updateOrder(order);
-              rootTable.status = false;
-              rootTable.orderid = '';
+              rootTable.status = 0;
               this.props.updateTable(rootTable);
-              this.props.deleteOrder(rootTable.orderid);
+              this.props.deleteOrder(rootOrder.id);
               const index = orders.findIndex(
-                item => item.id === rootTable.orderid
+                item => item._id === rootOrder._id
               );
               orders.splice(index, 1);
             }
@@ -133,7 +125,7 @@ class Home extends Component {
         ],
         { cancelable: true }
       );
-    } else if (rootTable.orderid !== '' && table.orderid === '') {
+    } else if (rootOrder._id !== undefined && order._id === '') {
       Alert.alert(
         'Thông báo',
         'Bạn có muốn chuyển bàn không?',
@@ -141,9 +133,11 @@ class Home extends Component {
           {
             text: 'OK',
             onPress: () => {
-              table.orderid = rootTable.orderid;
-              this.props.updateTable(rootTable);
-              rootTable.orderid = '';
+              order.table = rootOrder.table;
+              this.props.updateOrder(order);
+              table.status = rootTable.status;
+              this.props.updateTable(table);
+              rootTable.status = STATUS_TABLE.EMPTY;
               this.props.updateTable(rootTable);
             }
           },
@@ -245,7 +239,7 @@ class Home extends Component {
             <FlatList
               data={tables}
               extraData={this.state}
-              keyExtractor={item => item.id}
+              keyExtractor={item => item._id} //eslint-disable-line
               renderItem={this.renderItem}
               numColumns={3}
             />

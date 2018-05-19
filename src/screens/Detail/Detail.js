@@ -15,6 +15,7 @@ import BillItem from '../../components/BillItems';
 import styles from './styles';
 import { postOrder, updateTable, updateOrder } from '../../actions';
 import { COLOR } from '../../ultils/constants/color';
+import { STATUS_TABLE } from '../../ultils/constants/String';
 
 class Detail extends PureComponent {
   constructor(props) {
@@ -42,34 +43,29 @@ class Detail extends PureComponent {
   }
   onSavePress = () => {
     const { order } = this.state;
-    const { table } = this.props.navigation.state.params;
-    let listItem = [];
-    if (table.orderid === '' && order.listItems.length > 0) {
-      order.username = 'thinhbd';
-      order.billdate = moment().format();
+    console.log(this.props.user);
+
+    const { table, orderItem } = this.props.navigation.state.params;
+    // let listItem = [];
+    if (
+      orderItem === undefined &&
+      order.listitems &&
+      order.listitems.length > 0
+    ) {
+      order.user = this.props.user.id;
       order.status = false;
-      order.tableid = table.name;
-      order.listItems.forEach(item => {
-        if (!item.status && !item.created) {
-          item.created = moment().unix();
-          listItem = [...listItem, item];
-        }
-      });
-      order.listItems = listItem;
+      order.table = table._id;
+      order.listitems = JSON.stringify(order.listitems);
+      table.status = STATUS_TABLE.WAITING;
       this.props.postOrder(order, table);
-    } else if (order.listItems.length === 0) {
+      this.props.updateTable(table);
+    } else if (order.listitems.length === 0) {
       Alert.alert('Thông báo', 'Không có gì để lưu');
     }
-    if (table.orderid !== '') {
-      if (order.listItems.length === 0) this.props.deleteOrder();
+    if (orderItem !== undefined) {
+      if (order.listitems.length === 0) this.props.deleteOrder();
       else {
-        order.listItems.forEach(item => {
-          if (!item.status && !item.created) {
-            item.created = moment().unix();
-          }
-          listItem = [...listItem, item];
-        });
-        order.listItems = listItem;
+        order.listitems = JSON.stringify(order.listitems);
         this.props.updateOrder(order);
       }
     }
@@ -77,44 +73,33 @@ class Detail extends PureComponent {
   };
   onPayPress = () => {
     const { order } = this.state;
-    const { table } = this.props.navigation.state.params;
     console.log('onPayPress', order);
-    let listItem = [];
-    if (order.listItems.length > 0) {
-      order.listItems.forEach(item => {
-        if (!item.status && !item.created) {
-          item.status = true;
-          console.log(item.created);
-          listItem = [...listItem, item];
-        }
-      });
+    if (order.listitems && order.listitems.length > 0) {
       order.status = true;
+      order.listitems = JSON.stringify(order.listitems);
       this.props.updateOrder(order);
-      table.status = false;
-      table.orderid = '';
-      this.props.updateTable(table);
       this.props.navigation.goBack();
-    } else if (order.listItems.length === 0) {
+    } else if (order.listitems && order.listitems.length === 0) {
       Alert.alert('Thông báo', 'Bàn trống không thể thanh toán');
     }
   };
   onSwipeRight(index) {
     const { order } = this.state;
-    order.listItems.splice(index, 1);
-    order.amount = this.calAmount(order.listItems);
+    order.listitems.splice(index, 1);
+    order.amount = this.calAmount(order.listitems);
     this.setState({ order, deleteKey: index });
   }
   onChangeQuantity = item => {
     const { order, refresh } = this.state;
-    const index = order.listItems.findIndex(i => i.id === item.id);
-    order.listItems.splice(index, 1, item);
-    order.amount = this.calAmount(order.listItems);
+    const index = order.listitems.findIndex(i => i.id === item.id);
+    order.listitems.splice(index, 1, item);
+    order.amount = this.calAmount(order.listitems);
 
     this.setState({ refresh: !refresh, order });
   };
   refresh = itemsSelected => {
     const { order, refresh } = this.state;
-    order.listItems = itemsSelected;
+    order.listitems = itemsSelected;
     order.amount = this.calAmount(itemsSelected);
     this.setState({ refresh: !refresh, order });
   };
@@ -124,12 +109,12 @@ class Detail extends PureComponent {
     list.forEach(item => {
       amount += item.price * item.quantity;
     });
-    return amount;
+    return amount + '';
   };
   navigationToMenu = () => {
     const { order } = this.state;
     this.props.navigation.navigate('MenuOrder', {
-      listItems: order.listItems !== undefined ? order.listItems : [],
+      listitems: order.listitems !== undefined ? order.listitems : [],
       username: '',
       refresh: this.refresh,
       detail: true
@@ -162,7 +147,6 @@ class Detail extends PureComponent {
   render() {
     const { table } = this.props.navigation.state.params;
     const { order } = this.state;
-    console.log('order', order.amount);
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <Header
@@ -174,12 +158,12 @@ class Detail extends PureComponent {
         />
         <View style={{ flex: 1, width: '100%' }}>
           {this.renderColumn()}
-          {order.listItems !== undefined &&
-            order.listItems.length > 0 && (
+          {order.listitems !== undefined &&
+            order.listitems.length > 0 && (
               <FlatList
-                data={order.listItems}
+                data={order.listitems}
                 extraData={this.state}
-                keyExtractor={item => item.code}
+                keyExtractor={item => item.item}
                 renderItem={this.renderItem}
               />
             )}
@@ -238,5 +222,7 @@ const mapDispatchToProps = dispatch => ({
   updateOrder: order => dispatch(updateOrder(order)),
   updateTable: table => dispatch(updateTable(table))
 });
-const mapStateToProps = () => ({});
+const mapStateToProps = state => ({
+  user: state.LoginReducer
+});
 export default connect(mapStateToProps, mapDispatchToProps)(Detail);

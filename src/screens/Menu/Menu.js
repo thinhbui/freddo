@@ -50,12 +50,12 @@ class Menu extends PureComponent {
   }
   componentWillMount() {
     const { user, menus } = this.props;
-    const { listItems } = this.props.navigation.state.params;
+    const { listitems } = this.props.navigation.state.params;
     if (menus.length === 0) {
       this.props.getMenu(user.id);
     } else this.setState({ data: menus });
-    if (listItems !== undefined) {
-      this.setState({ itemSelected: listItems });
+    if (listitems !== undefined) {
+      this.setState({ itemSelected: listitems });
     }
   }
 
@@ -69,24 +69,32 @@ class Menu extends PureComponent {
     const { quantity, itemSelected, currentItem } = this.state;
     let indexItem;
     const filter = itemSelected.filter((item, index) => {
-      if (item.code === currentItem.code) {
+      if (item.item === currentItem._id) {
+        //eslint-disable
         indexItem = index;
         return true;
       }
       return false;
     });
     if (filter.length === 0) {
-      currentItem.quantity = quantity;
+      currentItem.quantity = `${quantity}`;
       // itemSelected =
     } else {
-      currentItem.quantity =
+      const quantit1 =
         parseInt(filter[0].quantity, 10) + parseInt(quantity, 10);
+      currentItem.quantity = `${quantit1}`;
       itemSelected.splice(indexItem, 1);
     }
-
+    const item = {
+      item: currentItem._id,
+      name: currentItem.name,
+      price: currentItem.price.toString(),
+      discount: currentItem.discount.toString(),
+      quantity: currentItem.quantity
+    };
     this.setState({
       visible: false,
-      itemSelected: [...itemSelected, currentItem]
+      itemSelected: [...itemSelected, item]
     });
   };
   onChangeText = text => {
@@ -117,12 +125,12 @@ class Menu extends PureComponent {
 
   render() {
     const { data, visible } = this.state;
-    const { listItems } = this.props.navigation.state.params;
+    const { listitems } = this.props.navigation.state.params;
     // console.log('menu', this.props.order);
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <View style={styles.arrowLayout}>
-          {listItems !== undefined && (
+          {listitems !== undefined && (
             <TouchableOpacity
               style={{ marginLeft: 5 }}
               onPress={this.backToDetail}

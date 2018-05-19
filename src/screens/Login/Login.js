@@ -7,16 +7,18 @@ import {
   Animated,
   Platform,
   Alert,
-  StatusBar
+  StatusBar,
+  AsyncStorage
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
+import axios from 'axios';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
-
-// import { CONSTANST } from '../../ultils/constants/String';
+import moment from 'moment';
 import styles from './styles';
 import { CustomTextInput } from '../../components';
-import { login } from '../../actions';
+import { login, loginSuccess, getOrders, getTable } from '../../actions';
+import { CONSTANST } from '../../ultils/constants/String';
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const backgroundImage = require('../../ultils/images/cafe.png');
@@ -37,7 +39,6 @@ class Login extends PureComponent {
     };
   }
   componentWillMount() {
-    console.log('componentWillMount isLogin', this.props.user.isLogin);
     const arrAnimated = [];
     for (let i = 0; i < this.arr.length; i++) {
       arrAnimated.push(new Animated.Value(0));
@@ -45,18 +46,33 @@ class Login extends PureComponent {
     this.setState({ animations: [...arrAnimated] });
   }
   componentDidMount() {
-    const { user } = this.props;
-    this.startAnimation(user);
+    AsyncStorage.getItem(CONSTANST.USER, (err, res) => {
+      if (err) console.log(err);
+      else if (res !== null) {
+        const user = JSON.parse(res);
+        if (user.exp && user.exp > moment().unix()) {
+          console.log(user);
+          if (user.token) {
+            axios.defaults.headers.common.Authorization = user.token;
+          }
+          this.props.setUser(user);
+          this.navigationToMain();
+          this.props.getOrders();
+          this.props.getTable();
+        }
+      }
+    });
+    this.startAnimation();
   }
   componentWillReceiveProps(newProps) {
-    // console.log('componentWillReceiveProps', newProps);
     const { user } = newProps;
-    this.setState({ user });
-    // console.log(user);
-    if (user.userId === undefined || user.userId === '') {
-      Alert.alert('Lỗi đăng nhập', 'Sai tài khoản hoặc mật khẩu');
+    console.log('user', user);
+    if (user.id !== undefined) {
+      this.navigationToMain();
+      this.props.getOrders();
+      this.props.getTable();
     } else {
-      this.navigationToMain(newProps.user.userId);
+      Alert.alert('Thông báo', 'Đăng nhập không thành công');
     }
   }
 
@@ -65,7 +81,7 @@ class Login extends PureComponent {
     if (username === '' || password === '') {
       Alert.alert('Lỗi đăng nhập', 'Bạn phải nhập tài khoản và mật khẩu');
     } else {
-      this.props.onLogin(username, password);
+      this.props.onLogin(username.trim(), password);
     }
   };
   onChangePassword = password => {
@@ -74,7 +90,7 @@ class Login extends PureComponent {
   onChangeUsername = username => {
     this.setState({ username });
   };
-  startAnimation = user => {
+  startAnimation = () => {
     const { iconAnimations, animations } = this.state;
     const animationsArr = this.arr.map((item, i) =>
       Animated.timing(animations[i], {
@@ -88,23 +104,13 @@ class Login extends PureComponent {
       duration: 500,
       useNativeDriver: Platform.OS !== 'ios'
     }).start();
-    Animated.stagger(50, [...animationsArr]).start(() => {
-      if (user.userId !== undefined && user.isLogin) {
-        this.navigationToMain(user.userId);
-      }
-    });
+    Animated.stagger(50, [...animationsArr]).start();
   };
-  // checkAliveAccount = user => {
-  //   // console.log(userId);
-  //   // this.props.checkAlive(user);
-  //   // console.log('checkAliveAccount', isAlive);
-  // };
-  navigationToMain = userId => {
+
+  navigationToMain = () => {
     const resetAction = NavigationActions.reset({
       index: 0,
-      actions: [
-        NavigationActions.navigate({ routeName: 'Main', params: { userId } })
-      ]
+      actions: [NavigationActions.navigate({ routeName: 'Main', params: {} })]
     });
     this.props.navigation.dispatch(resetAction);
   };
@@ -160,11 +166,10 @@ class Login extends PureComponent {
 }
 
 const mapDispatchToProps = dispatch => ({
-  onLogin: (username, password) => dispatch(login(username, password))
-  // getOrders: () => dispatch(getOrders())
-
-  // checkAlive: (userId) => { dispatch(che(userId)); },
-  // getToken: (id) => { dispatch(getToken(id)); }
+  onLogin: (username, password) => dispatch(login(username, password)),
+  setUser: user => dispatch(loginSuccess(user)),
+  getOrders: () => dispatch(getOrders()),
+  getTable: () => dispatch(getTable())
 });
 
 const mapStateToProps = state => {
