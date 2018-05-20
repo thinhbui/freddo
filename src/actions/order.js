@@ -1,4 +1,3 @@
-import io from 'socket.io-client/dist/socket.io.js';
 import types from '../ultils/constants/actionType';
 import * as freedoAPI from '../services/freddoAPI';
 
@@ -43,8 +42,15 @@ const deleteItemOrder = index => ({
 
 const postOrder = (order, socket) => async dispatch => {
   console.log('order', order);
-  const result = await freedoAPI.postOrder(order);
+  const orderObject = {
+    ...order,
+    amount: order.amount.toString(),
+    listitems: JSON.stringify(order.listitems)
+  };
+  console.log('orderObject', orderObject);
+  const result = await freedoAPI.postOrder(orderObject);
   if (result.status === 200) {
+    result.data.tablename = order.tablename;
     console.log('postOrder', result.data);
     socket.emit('change_order', 'hihi');
     dispatch(postOrderSuccess(result.data));
@@ -62,16 +68,6 @@ const getHistory = (min, max) => async dispatch => {
     dispatch(error(result.response.data || result));
   }
 };
-const getNewHistory = (min, max) => async dispatch => {
-  const result = await freedoAPI.getOldOrders(min, max);
-  console.log('getHistories', result);
-
-  if (result.status === 200) {
-    dispatch(getNewHistorySuccess(result.data));
-  } else {
-    dispatch(error(result.response.data || result));
-  }
-};
 
 const getOrders = () => async dispatch => {
   const result = await freedoAPI.getOrders();
@@ -85,7 +81,17 @@ const getOrders = () => async dispatch => {
 };
 const updateOrder = (order, socket) => async dispatch => {
   console.log('updateOrder', order);
-  const result = await freedoAPI.updateOrder(order);
+  const orderObject = {
+    ...order,
+    table: order.table.toString(),
+    listitems: JSON.stringify(order.listitems),
+    amount: order.amount.toString(),
+    discount: order.discount.toString(),
+    total: order.total.toString(),
+    custpaid: order.custpaid.toString(),
+    payback: order.payback.toString()
+  };
+  const result = await freedoAPI.updateOrder(orderObject);
   if (result.status === 200) {
     if (socket) {
       console.log('thanhtoan', socket);
@@ -115,7 +121,6 @@ export {
   resetOrder,
   getHistory,
   changeQuantity,
-  getNewHistory,
   deleteOrder,
   addHistory
 };

@@ -28,6 +28,7 @@ class BillItem extends PureComponent {
   componentDidMount() {
     this.setState({ quantity: this.props.item.quantity });
   }
+  formatNumber = x => `${x.toLocaleString('vn-VI')}đ`;
   onPressUp = () => {
     const { item } = this.props;
     const { quantity } = this.state;
@@ -112,7 +113,9 @@ class BillItem extends PureComponent {
             <Text style={{ fontSize: 18 }}>{item.name}</Text>
           </View>
           <View style={{ flex: 1, alignItems: 'center' }}>
-            <Text style={{ fontSize: 18 }}>{item.price}</Text>
+            <Text style={{ fontSize: 18 }}>
+              {this.formatNumber(item.price)}
+            </Text>
           </View>
           <View
             style={{ flex: 1.5, flexDirection: 'row', alignItems: 'center' }}

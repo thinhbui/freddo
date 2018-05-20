@@ -9,6 +9,7 @@ const API = {
   GET_ORDER_ID: id => `${HOST}/api/order/${id}`,
   POST_ORDER: `${HOST}/api/order`,
   // updateOrder: id => `/api/order/${id}`,
-  getHistory: page => `${HOST}/orders?status=true&=page${page}`
+  getHistory: (page, perPage) =>
+    `${HOST}/order?status=true&page=${page}&perPage=${perPage}`
 };
 export default API;

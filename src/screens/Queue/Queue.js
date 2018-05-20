@@ -4,7 +4,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 // import styles from './styles';
 import { Header, QueueItem } from '../../components';
-
+/* eslint no-underscore-dangle: 0 */
 class Queue extends Component {
   static navigationOptions = {
     tabBarIcon: ({ focused }) => (
@@ -40,10 +40,7 @@ class Queue extends Component {
     this.setState({ orders });
   };
 
-  renderItem = ({ item, index }) => {
-    // console.log(index);
-    return <QueueItem item={item} index={index} />;
-  };
+  renderItem = ({ item, index }) => <QueueItem item={item} index={index} />;
   render() {
     const { orders } = this.state;
     return (
@@ -52,7 +49,7 @@ class Queue extends Component {
         <FlatList
           data={orders}
           renderItem={this.renderItem}
-          keyExtractor={item => item.id}
+          keyExtractor={item => item._id}
         />
       </View>
     );

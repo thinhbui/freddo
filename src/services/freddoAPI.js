@@ -71,9 +71,9 @@ const getOrderById = async id => {
     return error;
   }
 };
-const getOldOrders = async (min, max) => {
+const getOldOrders = async (page, perPage) => {
   try {
-    return await axios.get(url.getHistory(min, max));
+    return await axios.get(url.getHistory(page, perPage));
   } catch (error) {
     return error;
   }

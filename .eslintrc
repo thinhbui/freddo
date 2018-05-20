@@ -1,7 +1,6 @@
 {
   "extends": "rallycoding",
   "rules": {
-    "no-param-reassign": [2, { "props": false }],
-    "allowAfterSuper": true
+    "no-param-reassign": [2, { "props": false }]
   }
 }

@@ -10,6 +10,7 @@ import {
   StatusBar,
   AsyncStorage
 } from 'react-native';
+import io from 'socket.io-client/dist/socket.io.js';
 import { NavigationActions } from 'react-navigation';
 import axios from 'axios';
 import { connect } from 'react-redux';
@@ -19,7 +20,6 @@ import styles from './styles';
 import { CustomTextInput } from '../../components';
 import { login, loginSuccess, getOrders, getTable } from '../../actions';
 import { CONSTANST } from '../../ultils/constants/String';
-import io from 'socket.io-client/dist/socket.io.js';
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const backgroundImage = require('../../ultils/images/cafe.png');

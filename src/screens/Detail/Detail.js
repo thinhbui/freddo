@@ -1,23 +1,13 @@
 import React, { PureComponent } from 'react';
-import {
-  View,
-  FlatList,
-  Text,
-  TouchableOpacity,
-  Alert
-  // BackHandler
-} from 'react-native';
-// import Icon from 'react-native-vector-icons/Ionicons';
+import { View, FlatList, Text, TouchableOpacity, Alert } from 'react-native';
 import { connect } from 'react-redux';
-import io from 'socket.io-client/dist/socket.io.js';
-import moment from 'moment';
 import { Header } from '../../components';
 import BillItem from '../../components/BillItems';
 import styles from './styles';
 import { postOrder, updateTable, updateOrder } from '../../actions';
 import { COLOR } from '../../ultils/constants/color';
 import { STATUS_TABLE } from '../../ultils/constants/String';
-
+/* eslint no-underscore-dangle: 0 */
 class Detail extends PureComponent {
   constructor(props) {
     super(props);
@@ -27,10 +17,6 @@ class Detail extends PureComponent {
       refresh: true
     };
     this.amount = 0;
-    // this.socket = io('http://192.168.13.103:3000', { jsonp: false });
-    // this.socket.on('server_send_post_order', data => {
-    //   alert(data);
-    // });
   }
   componentWillMount() {
     const { orderItem, socket } = this.props.navigation.state.params;
@@ -49,9 +35,7 @@ class Detail extends PureComponent {
   onSavePress = () => {
     const { order } = this.state;
     console.log(this.props.user);
-    // this.socket.emit('change_order', 'ahihi');
     const { table, orderItem, socket } = this.props.navigation.state.params;
-    // let listItem = [];
     if (
       orderItem === undefined &&
       order.listitems &&
@@ -60,7 +44,7 @@ class Detail extends PureComponent {
       order.user = this.props.user.id;
       order.status = false;
       order.table = table._id;
-      order.listitems = JSON.stringify(order.listitems);
+      order.tablename = table.name;
       table.status = STATUS_TABLE.WAITING;
       this.props.postOrder(order, socket);
       this.props.updateTable(table);
@@ -70,37 +54,25 @@ class Detail extends PureComponent {
     if (orderItem !== undefined) {
       if (order.listitems.length === 0) this.props.deleteOrder();
       else {
-        order.listitems = JSON.stringify(order.listitems);
         this.props.updateOrder(order);
       }
     }
     this.props.navigation.goBack();
   };
   onPayPress = () => {
-    const { socket } = this.props.navigation.state.params;
+    const { socket, table } = this.props.navigation.state.params;
     const { order } = this.state;
     // console.log('onPayPress', order);
     if (order.listitems && order.listitems.length > 0) {
-      const orderObject = {
-        user: (order.user = this.props.user.id),
-        table: order.table.toString(),
-        listitems: JSON.stringify(order.listitems),
-        amount: order.amount.toString(),
-        discount: order.discount.toString(),
-        total: order.total.toString(),
-        custpaid: order.custpaid.toString(),
-        payback: order.payback.toString(),
-        status: true
-      };
-
-      // order.user = this.props.user.id;
-      this.props.updateOrder(orderObject, socket);
+      order.user = this.props.user.id;
+      order.status = true;
+      order.table = table._id;
+      this.props.updateOrder(order, socket);
       this.props.navigation.goBack();
     } else if (order.listitems && order.listitems.length === 0) {
       Alert.alert('Thông báo', 'Bàn trống không thể thanh toán');
     }
   };
-  formatNumber = x => `${x.toLocaleString('vn-VI')}đ`;
   onSwipeRight(index) {
     const { order } = this.state;
     order.listitems.splice(index, 1);
@@ -115,6 +87,7 @@ class Detail extends PureComponent {
 
     this.setState({ refresh: !refresh, order });
   };
+  formatNumber = x => `${x.toLocaleString('vn-VI')}đ`;
   refresh = itemsSelected => {
     const { order, refresh } = this.state;
     order.listitems = itemsSelected;
@@ -127,7 +100,7 @@ class Detail extends PureComponent {
     list.forEach(item => {
       amount += item.price * item.quantity;
     });
-    return amount + '';
+    return amount;
   };
   navigationToMenu = () => {
     const { order } = this.state;

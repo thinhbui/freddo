@@ -24,10 +24,15 @@ class QueueItem extends React.PureComponent {
     let count = 0;
     let max = 0;
     let data = [];
-    item.listItems.forEach(element => {
+    item.listitems.forEach(element => {
       if (!element.status) {
         count++;
-        const time = moment().unix() - element.created;
+        const time = moment().unix() - moment.utc(element.createAt).unix();
+        if (item.table.name === 'Bàn 1') {
+          console.log(moment().unix());
+          console.log(moment.utc(element.createAt).unix());
+          console.log(element.createAt);
+        }
         if (time > max) {
           max = time;
         }
@@ -48,15 +53,16 @@ class QueueItem extends React.PureComponent {
         <View
           style={{
             flex: 2,
-            paddingLeft: 15,
-            justifyContent: 'center'
+            padding: 15,
+            justifyContent: 'center',
+            borderTopColor: index % 2 === 0 ? 'black' : '#fff',
+            borderTopWidth: 0.5
           }}
         >
           <Text style={{ color: index % 2 === 0 ? 'black' : '#fff' }}>
             {item.name}
           </Text>
         </View>
-
         <View
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
@@ -72,7 +78,7 @@ class QueueItem extends React.PureComponent {
     const { item, index } = this.props;
     const { count, maxTime, open, data } = this.state;
 
-    console.log(item);
+    // console.log(item);
 
     return (
       <View
@@ -95,7 +101,7 @@ class QueueItem extends React.PureComponent {
                   color: index % 2 === 0 ? 'black' : '#fff'
                 }}
               >
-                {item.tableid}
+                {item.table.name || item.tablename}
               </Text>
               <Text style={{ color: index % 2 === 0 ? 'black' : '#fff' }}>
                 {count} món
@@ -125,7 +131,7 @@ class QueueItem extends React.PureComponent {
           <FlatList
             data={data}
             renderItem={this.renderItem}
-            keyExtractor={key => key.id}
+            keyExtractor={key => key._id}
           />
         )}
       </View>

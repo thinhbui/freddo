@@ -6,16 +6,15 @@ import {
   Text,
   TouchableWithoutFeedback,
   ActivityIndicator,
-  Alert
+  Alert,
+  PushNotificationIOS
   // Dimensions
 } from 'react-native';
-// import PushNotification from 'react-native-push-notification';
+import PushNotification from 'react-native-push-notification';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import { Table, Header } from '../../components';
 import styles from './styles';
-import PushNotification from 'react-native-push-notification';
-
 import {
   getTable,
   updateTable,
@@ -26,7 +25,7 @@ import {
 } from '../../actions';
 import Images from '../../ultils/constants/Images';
 import { STATUS_TABLE } from '../../ultils/constants/String';
-
+/* eslint no-underscore-dangle: 0 */
 // const senderID = '711529978568';
 
 class Home extends Component {
@@ -51,7 +50,8 @@ class Home extends Component {
     };
     this.props.navigation.state.params.socket.on('require_pay', message => {
       PushNotification.localNotification({
-        message: message // (required)
+        message, // (required)
+        title: 'OK la'
       });
     });
   }
@@ -61,17 +61,15 @@ class Home extends Component {
     console.log('componentDidMount Home', this.props);
     this.setState({ tables });
     PushNotification.configure({
-      onRegister: function(token) {
+      onRegister: token => {
         console.log('TOKEN:', token);
       },
       // (required) Called when a remote or local notification is opened or received
-      onNotification: function(notification) {
+      onNotification: notification => {
         console.log('NOTIFICATION:', notification);
         notification.finish(PushNotificationIOS.FetchResult.NoData);
       },
-      // ANDROID ONLY: GCM Sender ID (optional - not required for local notifications, but is need to receive remote push notifications)
       senderID: '711529978568',
-      // IOS ONLY (optional): default: all - Permissions to register.
       permissions: {
         alert: true,
         badge: true,
@@ -106,8 +104,10 @@ class Home extends Component {
     const { orders } = this.props;
     console.log('orders', rootTable);
 
-    const rootOrder = orders.find(element => element.table === rootTable._id);
-    const order = orders.find(element => element.table === table._id);
+    const rootOrder = orders.find(
+      element => element.table._id === rootTable._id
+    );
+    const order = orders.find(element => element.table._id === table._id);
     if (rootTable._id === undefined) {
       console.log('order', order);
       this.props.navigation.navigate('Detail', {
@@ -126,16 +126,16 @@ class Home extends Component {
             text: 'OK',
             onPress: () => {
               let amount = 0;
-              order.listItems = this.gatherArray(
-                order.listItems,
-                rootOrder.listItems
+              order.listitems = this.gatherArray(
+                order.listitems,
+                rootOrder.listitems
               );
-              order.listItems.forEach(
+              order.listitems.forEach(
                 item => (amount += item.price * item.quantity)
               );
               order.amount = amount;
               this.props.updateOrder(order);
-              rootTable.status = 0;
+              rootTable.status = STATUS_TABLE.EMPTY;
               this.props.updateTable(rootTable);
               this.props.deleteOrder(rootOrder.id);
               const index = orders.findIndex(
@@ -146,13 +146,13 @@ class Home extends Component {
           },
           {
             text: 'Cancel',
-            onPress: () => console.log('Cancel Pressed'),
+            onPress: () => this.setState({ rootTable: {} }),
             style: 'cancel'
           }
         ],
         { cancelable: true }
       );
-    } else if (rootOrder._id !== undefined && order._id === '') {
+    } else if (rootOrder._id !== undefined && order === undefined) {
       Alert.alert(
         'Thông báo',
         'Bạn có muốn chuyển bàn không?',
@@ -160,8 +160,8 @@ class Home extends Component {
           {
             text: 'OK',
             onPress: () => {
-              order.table = rootOrder.table;
-              this.props.updateOrder(order);
+              rootOrder.table = table._id;
+              this.props.updateOrder(rootOrder);
               table.status = rootTable.status;
               this.props.updateTable(table);
               rootTable.status = STATUS_TABLE.EMPTY;
@@ -170,7 +170,7 @@ class Home extends Component {
           },
           {
             text: 'Cancel',
-            onPress: () => console.log('Cancel Pressed'),
+            onPress: () => this.setState({ rootTable: {} }),
             style: 'cancel'
           }
         ],

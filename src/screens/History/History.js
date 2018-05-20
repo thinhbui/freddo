@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import styles from './styles';
 import { Header, HistoryItem } from '../../components';
-import { getHistory, getNewHistory } from '../../actions';
+import { getHistory } from '../../actions';
 
 class HistoryScreen extends Component {
   static navigationOptions = {
@@ -18,13 +18,11 @@ class HistoryScreen extends Component {
     )
   };
   state = {
-    min: 0,
-    max: 20,
-    data: []
+    data: [],
+    page: 1
   };
   componentWillMount() {
-    const { min, max } = this.state;
-    this.props.getNewHistory(min, max);
+    this.props.getHistory(this.state.page, 20);
   }
   componentDidMount() {
     const { history } = this.props;
@@ -69,8 +67,7 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getHistory: (min, max) => dispatch(getHistory(min, max)),
-  getNewHistory: (min, max) => dispatch(getNewHistory(min, max))
+  getHistory: (page, perPage) => dispatch(getHistory(page, perPage))
 });
 export default connect(mapStateToProps, mapDispatchToProps)(
   withNavigationFocus(HistoryScreen)
