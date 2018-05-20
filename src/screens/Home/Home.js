@@ -1,3 +1,4 @@
+/* eslint no-underscore-dangle: 0 */
 import React, { Component } from 'react';
 import {
   View,
@@ -25,7 +26,9 @@ import {
 } from '../../actions';
 import Images from '../../ultils/constants/Images';
 import { STATUS_TABLE } from '../../ultils/constants/String';
-/* eslint no-underscore-dangle: 0 */
+// import socket from '../../services/socket';
+// import socketInstance from '../../ultils/constants/socket';
+
 // const senderID = '711529978568';
 
 class Home extends Component {
@@ -48,12 +51,7 @@ class Home extends Component {
       changeTable: false,
       rootTable: {}
     };
-    this.props.navigation.state.params.socket.on('require_pay', message => {
-      PushNotification.localNotification({
-        message, // (required)
-        title: 'OK la'
-      });
-    });
+    // socket.on(SOCKET_EVENT.IOTESTDESK, data => Alert.alert(data));
   }
   // require_pay
   componentDidMount() {
@@ -102,14 +100,20 @@ class Home extends Component {
   onPressTable = table => {
     const { rootTable } = this.state;
     const { orders } = this.props;
-    console.log('orders', rootTable);
-
     const rootOrder = orders.find(
-      element => element.table._id === rootTable._id
+      element =>
+        element.table._id
+          ? element.table._id === rootTable._id
+          : element.table === rootTable._id
     );
-    const order = orders.find(element => element.table._id === table._id);
+    const order = orders.find(
+      element =>
+        element.table._id
+          ? element.table._id === table._id
+          : element.table === table._id
+    );
+
     if (rootTable._id === undefined) {
-      console.log('order', order);
       this.props.navigation.navigate('Detail', {
         table,
         orderItem: order,
@@ -134,14 +138,16 @@ class Home extends Component {
                 item => (amount += item.price * item.quantity)
               );
               order.amount = amount;
+              console.log('order', order);
+              // update new order
               this.props.updateOrder(order);
+              // update status root table
               rootTable.status = STATUS_TABLE.EMPTY;
+              console.log('rootTable', rootTable);
               this.props.updateTable(rootTable);
-              this.props.deleteOrder(rootOrder.id);
-              const index = orders.findIndex(
-                item => item._id === rootOrder._id
-              );
-              orders.splice(index, 1);
+              // delete root order
+              this.props.deleteOrder(rootOrder);
+              this.setState({ rootTable: {} });
             }
           },
           {
@@ -166,6 +172,7 @@ class Home extends Component {
               this.props.updateTable(table);
               rootTable.status = STATUS_TABLE.EMPTY;
               this.props.updateTable(rootTable);
+              this.setState({ rootTable: {} });
             }
           },
           {
@@ -195,11 +202,18 @@ class Home extends Component {
   gatherArray = (arr1, arr2) => {
     const temp1 = [...arr1];
     const temp2 = [...arr2];
+    console.log(arr1);
+    console.log(arr2);
     arr1.forEach((element, index) => {
-      arr2.forEach((item, index1) => {
-        if (item.id === element.id) {
+      arr2.forEach(item => {
+        console.log(item.item, element.item);
+
+        if (item.item === element.item) {
+          const index1 = temp2.indexOf(item);
           const temp = item;
           temp.quantity = item.quantity + element.quantity;
+          console.log(temp);
+
           temp1.splice(index, 1, temp);
           temp2.splice(index1, 1);
         }
@@ -282,7 +296,7 @@ const mapDispatchToProps = dispatch => ({
   updateOrder: order => dispatch(updateOrder(order)),
   resetOrder: () => dispatch(resetOrder()),
   getOrders: () => dispatch(getOrders()),
-  deleteOrder: id => dispatch(deleteOrder(id))
+  deleteOrder: order => dispatch(deleteOrder(order))
 });
 
 const mapStateToProps = state => ({

@@ -11,7 +11,7 @@ const HistoryItem = ({ item, index, navigation }) => {
   return (
     <TouchableOpacity
       style={{
-        height: 50,
+        height: 70,
         width,
         flexDirection: 'row',
         alignItems: 'center',
@@ -21,16 +21,18 @@ const HistoryItem = ({ item, index, navigation }) => {
       onPress={() => navigation.navigate('Detail', { orderItem: item })}
     >
       <View style={{ flex: 2 }}>
-        <Text style={{ fontSize: 16 }}>{item.tableid}</Text>
+        <Text style={{ fontSize: 16 }}>
+          {item.table.name || item.tablename}
+        </Text>
         <View style={{ flexDirection: 'row' }}>
           <Text>{time}</Text>
         </View>
       </View>
       <View>
-        <Text>{item.username}</Text>
+        <Text>{item.user.name || item.user}</Text>
       </View>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{}}>{item.amount}đ</Text>
+        <Text style={{}}>{item.amount.toLocaleString('vn-VI')}đ</Text>
       </View>
     </TouchableOpacity>
   );

@@ -9,7 +9,9 @@ const API = {
   GET_ORDER_ID: id => `${HOST}/api/order/${id}`,
   POST_ORDER: `${HOST}/api/order`,
   // updateOrder: id => `/api/order/${id}`,
-  getHistory: (page, perPage) =>
-    `${HOST}/order?status=true&page=${page}&perPage=${perPage}`
+  getHistory: (page, perPage, userId) =>
+    userId
+      ? `${HOST}/api/order?status=true&page=${page}&perPage=${perPage}&user=${userId}`
+      : `${HOST}/api/order?status=true&page=${page}&perPage=${perPage}`
 };
 export default API;

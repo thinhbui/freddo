@@ -1520,7 +1520,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   });
 
   exports.default = App;
-},12,[13,23,177,492,520,715],"src\\App.js");
+},12,[13,23,177,492,520,716],"src\\App.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   'use strict';
 
@@ -63163,6 +63163,14 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   var _RootNavigator2 = _interopRequireDefault(_RootNavigator);
 
+  var _socket = _require(_dependencyMap[7], "./services/socket");
+
+  var _socket2 = _interopRequireDefault(_socket);
+
+  var _String = _require(_dependencyMap[8], "./ultils/constants/String");
+
+  var _actions = _require(_dependencyMap[9], "./actions");
+
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
@@ -63222,7 +63230,49 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     _createClass(AppNavigatorState, [{
       key: "componentDidMount",
       value: function componentDidMount() {
+        var _props = this.props,
+            orders = _props.orders,
+            tables = _props.tables,
+            dispatch = _props.dispatch;
+
         _reactNative.BackHandler.addEventListener('hardwareBackPress', this.onBackButtonPressAndroid);
+
+        _socket2.default.on(_String.SOCKET_EVENT.INVOICE_UPDATE_DESK, function (data) {
+          var index = orders.findIndex(function (item) {
+            return item._id === data._id;
+          });
+          if (index === -1) dispatch((0, _actions.postOrderSuccess)(data));else dispatch((0, _actions.updateSuccess)(data));
+        });
+
+        _socket2.default.on(_String.SOCKET_EVENT.INVOICE_REQUEST_DESK, function (data) {
+          var table = tables.findIndex(function (item) {
+            return data.table === item._id;
+          });
+          if (table !== undefined) dispatch((0, _actions.updateTableSuccess)(data));else dispatch((0, _actions.getTable)());
+        });
+
+        _socket2.default.on(_String.SOCKET_EVENT.INVOICE_COMPLETE_DESK, function (data) {
+          console.log(_String.SOCKET_EVENT.INVOICE_COMPLETE_DESK, data);
+          var table = tables.findIndex(function (item) {
+            return data.table === item._id;
+          });
+          if (table !== undefined) dispatch((0, _actions.updateTableSuccess)(data));else dispatch((0, _actions.getTable)());
+          var index = orders.findIndex(function (item) {
+            return item.table._id ? item.table._id === data._id : item.table === data._id;
+          });
+          dispatch((0, _actions.deleteOrderSuccess)(orders[index]));
+        });
+
+        _socket2.default.on(_String.SOCKET_EVENT.TABLE_UPDATE_DESK, function (data) {
+          dispatch((0, _actions.updateTableSuccess)(data));
+        });
+
+        _reactNative.AsyncStorage.getItem(_String.STORAGE.MENU, function (err, res) {
+          if (err) console.log(err);else if (res !== null) {
+            var menu = JSON.parse(res);
+            dispatch((0, _actions.getItemSuccess)(menu));
+          }
+        });
       }
     }, {
       key: "componentWillUnmount",
@@ -63232,9 +63282,9 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     }, {
       key: "render",
       value: function render() {
-        var _props = this.props,
-            dispatch = _props.dispatch,
-            nav = _props.nav;
+        var _props2 = this.props,
+            dispatch = _props2.dispatch,
+            nav = _props2.nav;
         return _react3.default.createElement(_RootNavigator2.default, {
           navigation: (0, _reactNavigation.addNavigationHelpers)({
             dispatch: dispatch,
@@ -63243,7 +63293,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           }),
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 35
+            lineNumber: 83
           }
         });
       }
@@ -63254,12 +63304,14 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   var mapStateToProps = function mapStateToProps(state) {
     return {
-      nav: state.nav
+      nav: state.nav,
+      orders: state.OrderReducer,
+      tables: state.TableReducer
     };
   };
 
   exports.default = (0, _reactRedux.connect)(mapStateToProps)(AppNavigatorState);
-},520,[13,23,177,492,521,595,600],"src\\AppNavigatorState.js");
+},520,[13,23,177,492,521,595,600,699,696,662],"src\\AppNavigatorState.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   module.exports = {
     get createNavigationContainer() {
@@ -75412,7 +75464,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     headerMode: 'none',
     tabBarPosition: 'bottom',
     lazy: true,
-    swipeEnabled: false,
+    swipeEnabled: true,
     tabBarOptions: {
       showLabel: false,
       showIcon: true,
@@ -75438,12 +75490,15 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     MenuOrder: {
       screen: _Menu2.default,
       path: 'MenuOrder/:orderId'
+    },
+    HistoryPersonal: {
+      screen: _History2.default
     }
   }, {
     headerMode: 'none'
   });
   exports.default = RootNavigator;
-},600,[521,601,701,704,709,711,712,714,651],"src\\RootNavigator.js");
+},600,[521,601,702,705,710,712,713,715,651],"src\\RootNavigator.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -75480,6 +75535,10 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   var _color = _require(_dependencyMap[8], "../../ultils/constants/color");
 
   var _String = _require(_dependencyMap[9], "../../ultils/constants/String");
+
+  var _socket = _require(_dependencyMap[10], "../../services/socket");
+
+  var _socket2 = _interopRequireDefault(_socket);
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -75521,16 +75580,16 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         console.log(_this.props.user);
         var _this$props$navigatio = _this.props.navigation.state.params,
             table = _this$props$navigatio.table,
-            orderItem = _this$props$navigatio.orderItem,
-            socket = _this$props$navigatio.socket;
+            orderItem = _this$props$navigatio.orderItem;
 
         if (orderItem === undefined && order.listitems && order.listitems.length > 0) {
           order.user = _this.props.user.id;
           order.status = false;
           order.table = table._id;
+          order.tablename = table.name;
           table.status = _String.STATUS_TABLE.WAITING;
 
-          _this.props.postOrder(order, socket);
+          _this.props.postOrder(order);
 
           _this.props.updateTable(table);
         } else if (order.listitems.length === 0) {
@@ -75547,17 +75606,15 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       };
 
       _this.onPayPress = function () {
-        var _this$props$navigatio2 = _this.props.navigation.state.params,
-            socket = _this$props$navigatio2.socket,
-            table = _this$props$navigatio2.table;
+        var table = _this.props.navigation.state.params.table;
         var order = _this.state.order;
 
         if (order.listitems && order.listitems.length > 0) {
-          order.user = _this.props.user.id;
-          order.status = true;
-          order.table = table._id;
+          table.status = _String.STATUS_TABLE.REQUEST;
 
-          _this.props.updateOrder(order, socket);
+          _this.props.updateTable(table);
+
+          _socket2.default.emit(_String.SOCKET_EVENT.INVOICE_REQUEST, table);
 
           _this.props.navigation.goBack();
         } else if (order.listitems && order.listitems.length === 0) {
@@ -75630,7 +75687,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           },
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 114
+            lineNumber: 117
           }
         });
       };
@@ -75642,7 +75699,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             style: _styles2.default.header_column,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 123
+              lineNumber: 126
             }
           },
           _react3.default.createElement(
@@ -75650,31 +75707,6 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             {
               style: {
                 flex: 3,
-                alignItems: 'center',
-                justifyContent: 'center'
-              },
-              __source: {
-                fileName: _jsxFileName,
-                lineNumber: 124
-              }
-            },
-            _react3.default.createElement(
-              _reactNative.Text,
-              {
-                style: {},
-                __source: {
-                  fileName: _jsxFileName,
-                  lineNumber: 125
-                }
-              },
-              "T\xEAn"
-            )
-          ),
-          _react3.default.createElement(
-            _reactNative.View,
-            {
-              style: {
-                flex: 1,
                 alignItems: 'center',
                 justifyContent: 'center'
               },
@@ -75692,14 +75724,14 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   lineNumber: 128
                 }
               },
-              "\u0110\u01A1n gi\xE1"
+              "T\xEAn"
             )
           ),
           _react3.default.createElement(
             _reactNative.View,
             {
               style: {
-                flex: 1.5,
+                flex: 1,
                 alignItems: 'center',
                 justifyContent: 'center'
               },
@@ -75714,7 +75746,32 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 style: {},
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 133
+                  lineNumber: 131
+                }
+              },
+              "\u0110\u01A1n gi\xE1"
+            )
+          ),
+          _react3.default.createElement(
+            _reactNative.View,
+            {
+              style: {
+                flex: 1.5,
+                alignItems: 'center',
+                justifyContent: 'center'
+              },
+              __source: {
+                fileName: _jsxFileName,
+                lineNumber: 133
+              }
+            },
+            _react3.default.createElement(
+              _reactNative.Text,
+              {
+                style: {},
+                __source: {
+                  fileName: _jsxFileName,
+                  lineNumber: 136
                 }
               },
               "S\u1ED1 l\u01B0\u1EE3ng"
@@ -75735,10 +75792,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     _createClass(Detail, [{
       key: "componentWillMount",
       value: function componentWillMount() {
-        var _props$navigation$sta = this.props.navigation.state.params,
-            orderItem = _props$navigation$sta.orderItem,
-            socket = _props$navigation$sta.socket;
-        console.log('socket.props', socket);
+        var orderItem = this.props.navigation.state.params.orderItem;
 
         if (orderItem) {
           this.setState({
@@ -75783,7 +75837,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 141
+              lineNumber: 144
             }
           },
           _react3.default.createElement(_components2.Header, {
@@ -75794,7 +75848,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 142
+              lineNumber: 145
             }
           }),
           _react3.default.createElement(
@@ -75806,7 +75860,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 149
+                lineNumber: 152
               }
             },
             this.renderColumn(),
@@ -75819,7 +75873,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               renderItem: this.renderItem,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 153
+                lineNumber: 156
               }
             })
           ),
@@ -75829,7 +75883,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               style: _styles2.default.add_button_layout,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 163
+                lineNumber: 166
               }
             },
             _react3.default.createElement(
@@ -75839,7 +75893,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 onPress: this.navigationToMenu,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 164
+                  lineNumber: 167
                 }
               },
               _react3.default.createElement(
@@ -75850,7 +75904,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 168
+                    lineNumber: 171
                   }
                 },
                 " Th\xEAm \u0111\u1ED3 "
@@ -75865,7 +75919,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 onPress: this.onSavePress,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 170
+                  lineNumber: 173
                 }
               },
               _react3.default.createElement(
@@ -75876,7 +75930,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 177
+                    lineNumber: 180
                   }
                 },
                 " L\u01B0u l\u1EA1i "
@@ -75889,7 +75943,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               style: _styles2.default.button,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 181
+                lineNumber: 184
               }
             },
             _react3.default.createElement(
@@ -75901,7 +75955,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 },
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 182
+                  lineNumber: 185
                 }
               },
               _react3.default.createElement(
@@ -75909,7 +75963,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 {
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 183
+                    lineNumber: 186
                   }
                 },
                 _react3.default.createElement(
@@ -75921,7 +75975,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 184
+                      lineNumber: 187
                     }
                   },
                   "T\u1ED5ng ti\u1EC1n"
@@ -75936,7 +75990,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 186
+                    lineNumber: 189
                   }
                 },
                 _react3.default.createElement(
@@ -75948,7 +76002,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 192
+                      lineNumber: 195
                     }
                   },
                   order.amount !== undefined ? this.formatNumber(order.amount) : 0
@@ -75962,7 +76016,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 onPress: this.onPayPress,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 200
+                  lineNumber: 203
                 }
               },
               _react3.default.createElement(
@@ -75973,7 +76027,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 204
+                    lineNumber: 207
                   }
                 },
                 "Thanh to\xE1n"
@@ -75989,11 +76043,11 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     return {
-      postOrder: function postOrder(order, table) {
-        return dispatch((0, _actions.postOrder)(order, table));
+      postOrder: function postOrder(order) {
+        return dispatch((0, _actions.postOrder)(order));
       },
-      updateOrder: function updateOrder(order, socket) {
-        return dispatch((0, _actions.updateOrder)(order, socket));
+      updateOrder: function updateOrder(order) {
+        return dispatch((0, _actions.updateOrder)(order));
       },
       updateTable: function updateTable(table) {
         return dispatch((0, _actions.updateTable)(table));
@@ -76008,7 +76062,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   };
 
   exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Detail);
-},601,[13,23,177,492,602,654,661,662,651,696],"src\\screens\\Detail\\Detail.js");
+},601,[13,23,177,492,602,654,661,662,651,696,699],"src\\screens\\Detail\\Detail.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -76201,7 +76255,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             width: 6,
             height: 6,
             borderRadius: 3,
-            backgroundColor: status === '0' ? _color.COLOR.green : status === '1' ? _color.COLOR.yellow : _color.COLOR.red,
+            backgroundColor: status === '0' ? _color.COLOR.green : status === '1' ? _color.COLOR.yellow : status === '2' ? _color.COLOR.red : '#fff',
             position: 'absolute',
             top: 10,
             right: 10
@@ -78749,111 +78803,111 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   };
 },651,[],"src\\ultils\\constants\\color.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
-    Object.defineProperty(exports, "__esModule", {
-        value: true
-    });
-    exports.Header = undefined;
-    var _jsxFileName = "d:\\ReactNative\\freddo\\src\\components\\Header.js";
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+  exports.Header = undefined;
+  var _jsxFileName = "d:\\ReactNative\\freddo\\src\\components\\Header.js";
 
-    var _react = _require(_dependencyMap[0], "react");
+  var _react = _require(_dependencyMap[0], "react");
 
-    var _react2 = _interopRequireDefault(_react);
+  var _react2 = _interopRequireDefault(_react);
 
-    var _reactNative = _require(_dependencyMap[1], "react-native");
+  var _reactNative = _require(_dependencyMap[1], "react-native");
 
-    var _Ionicons = _require(_dependencyMap[2], "react-native-vector-icons/Ionicons");
+  var _Ionicons = _require(_dependencyMap[2], "react-native-vector-icons/Ionicons");
 
-    var _Ionicons2 = _interopRequireDefault(_Ionicons);
+  var _Ionicons2 = _interopRequireDefault(_Ionicons);
 
-    var _color = _require(_dependencyMap[3], "../ultils/constants/color");
+  var _color = _require(_dependencyMap[3], "../ultils/constants/color");
 
-    function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-    var _Dimensions$get = _reactNative.Dimensions.get('window'),
-        width = _Dimensions$get.width;
+  var _Dimensions$get = _reactNative.Dimensions.get('window'),
+      width = _Dimensions$get.width;
 
-    var Header = function Header(_ref) {
-        var title = _ref.title,
-            arrow = _ref.arrow,
-            onArrowPress = _ref.onArrowPress;
-        return _react2.default.createElement(
-            _reactNative.View,
-            {
-                style: {
-                    paddingTop: _reactNative.Platform.OS === 'ios' ? 20 : 0,
-                    height: _reactNative.Platform.OS === 'ios' ? 70 : 50,
-                    width: width,
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    backgroundColor: _color.COLOR.theme
-                },
-                __source: {
-                    fileName: _jsxFileName,
-                    lineNumber: 18
-                }
+  var Header = function Header(_ref) {
+    var title = _ref.title,
+        arrow = _ref.arrow,
+        onArrowPress = _ref.onArrowPress;
+    return _react2.default.createElement(
+      _reactNative.View,
+      {
+        style: {
+          paddingTop: _reactNative.Platform.OS === 'ios' ? 20 : 0,
+          height: _reactNative.Platform.OS === 'ios' ? 80 : 60,
+          width: width,
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          backgroundColor: _color.COLOR.theme
+        },
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 17
+        }
+      },
+      arrow && _react2.default.createElement(
+        _reactNative.TouchableOpacity,
+        {
+          style: {
+            marginLeft: 15
+          },
+          onPress: onArrowPress,
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 29
+          }
+        },
+        _react2.default.createElement(_Ionicons2.default, {
+          name: "ios-arrow-back-outline",
+          size: 35,
+          color: "#fff",
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 30
+          }
+        })
+      ),
+      _react2.default.createElement(_reactNative.StatusBar, {
+        barStyle: "light-content",
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 33
+        }
+      }),
+      _react2.default.createElement(
+        _reactNative.View,
+        {
+          style: {
+            flex: 1,
+            justifyContent: 'center',
+            alignItems: 'center'
+          },
+          __source: {
+            fileName: _jsxFileName,
+            lineNumber: 34
+          }
+        },
+        _react2.default.createElement(
+          _reactNative.Text,
+          {
+            style: {
+              color: '#fff',
+              fontSize: 16
             },
-            arrow && _react2.default.createElement(
-                _reactNative.TouchableOpacity,
-                {
-                    style: {
-                        marginLeft: 5
-                    },
-                    onPress: onArrowPress,
-                    __source: {
-                        fileName: _jsxFileName,
-                        lineNumber: 29
-                    }
-                },
-                _react2.default.createElement(_Ionicons2.default, {
-                    name: "ios-arrow-back-outline",
-                    size: 30,
-                    color: "#fff",
-                    __source: {
-                        fileName: _jsxFileName,
-                        lineNumber: 30
-                    }
-                })
-            ),
-            _react2.default.createElement(_reactNative.StatusBar, {
-                barStyle: "light-content",
-                __source: {
-                    fileName: _jsxFileName,
-                    lineNumber: 32
-                }
-            }),
-            _react2.default.createElement(
-                _reactNative.View,
-                {
-                    style: {
-                        flex: 1,
-                        justifyContent: 'center',
-                        alignItems: 'center'
-                    },
-                    __source: {
-                        fileName: _jsxFileName,
-                        lineNumber: 35
-                    }
-                },
-                _react2.default.createElement(
-                    _reactNative.Text,
-                    {
-                        style: {
-                            color: '#fff',
-                            fontSize: 16
-                        },
-                        __source: {
-                            fileName: _jsxFileName,
-                            lineNumber: 36
-                        }
-                    },
-                    title
-                )
-            )
-        );
-    };
+            __source: {
+              fileName: _jsxFileName,
+              lineNumber: 35
+            }
+          },
+          title
+        )
+      )
+    );
+  };
 
-    exports.Header = Header;
+  exports.Header = Header;
 },652,[13,177,604,651],"src\\components\\Header.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
     Object.defineProperty(exports, "__esModule", {
@@ -80173,7 +80227,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       _reactNative.TouchableOpacity,
       {
         style: {
-          height: 50,
+          height: 70,
           width: width,
           flexDirection: 'row',
           alignItems: 'center',
@@ -80212,7 +80266,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               lineNumber: 24
             }
           },
-          item.tableid
+          item.table.name || item.tablename
         ),
         _react2.default.createElement(
           _reactNative.View,
@@ -80222,7 +80276,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 25
+              lineNumber: 27
             }
           },
           _react2.default.createElement(
@@ -80230,7 +80284,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             {
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 26
+                lineNumber: 28
               }
             },
             time
@@ -80242,7 +80296,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         {
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 29
+            lineNumber: 31
           }
         },
         _react2.default.createElement(
@@ -80250,10 +80304,10 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           {
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 30
+              lineNumber: 32
             }
           },
-          item.username
+          item.user.name || item.user
         )
       ),
       _react2.default.createElement(
@@ -80266,7 +80320,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           },
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 32
+            lineNumber: 34
           }
         },
         _react2.default.createElement(
@@ -80275,10 +80329,10 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             style: {},
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 33
+              lineNumber: 35
             }
           },
-          item.amount,
+          item.amount.toLocaleString('vn-VI'),
           "\u0111"
         )
       )
@@ -84498,7 +84552,9 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             style: {
               flexDirection: 'row',
               marginLeft: 15,
-              marginRight: 15
+              marginRight: 15,
+              borderTopColor: index % 2 === 0 ? 'black' : '#fff',
+              borderTopWidth: 0.5
             },
             __source: {
               fileName: _jsxFileName,
@@ -84511,13 +84567,11 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               style: {
                 flex: 2,
                 padding: 15,
-                justifyContent: 'center',
-                borderTopColor: index % 2 === 0 ? 'black' : '#fff',
-                borderTopWidth: 0.5
+                justifyContent: 'center'
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 48
+                lineNumber: 56
               }
             },
             _react3.default.createElement(
@@ -84528,7 +84582,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 },
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 57
+                  lineNumber: 63
                 }
               },
               item.name
@@ -84544,7 +84598,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 61
+                lineNumber: 67
               }
             },
             _react3.default.createElement(
@@ -84555,7 +84609,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 },
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 64
+                  lineNumber: 70
                 }
               },
               _moment2.default.utc(item.rangeTime * 1000).format('HH:mm')
@@ -84606,7 +84660,6 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             maxTime = _state.maxTime,
             open = _state.open,
             data = _state.data;
-        console.log(item);
         return _react3.default.createElement(
           _reactNative.View,
           {
@@ -84615,7 +84668,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 79
+              lineNumber: 85
             }
           },
           _react3.default.createElement(
@@ -84634,7 +84687,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 82
+                lineNumber: 88
               }
             },
             _react3.default.createElement(
@@ -84645,7 +84698,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 },
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 91
+                  lineNumber: 97
                 }
               },
               _react3.default.createElement(
@@ -84657,7 +84710,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 92
+                    lineNumber: 98
                   }
                 },
                 _react3.default.createElement(
@@ -84669,10 +84722,10 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 93
+                      lineNumber: 99
                     }
                   },
-                  item.table.name
+                  item.table.name || item.tablename
                 ),
                 _react3.default.createElement(
                   _reactNative.Text,
@@ -84682,7 +84735,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 101
+                      lineNumber: 107
                     }
                   },
                   count,
@@ -84699,7 +84752,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 105
+                    lineNumber: 111
                   }
                 },
                 _react3.default.createElement(
@@ -84710,7 +84763,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     },
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 112
+                      lineNumber: 118
                     }
                   },
                   maxTime
@@ -84725,7 +84778,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 116
+                    lineNumber: 122
                   }
                 },
                 _react3.default.createElement(_Ionicons2.default, {
@@ -84734,7 +84787,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   color: index % 2 === 0 ? 'black' : '#fff',
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 117
+                    lineNumber: 123
                   }
                 })
               )
@@ -84748,7 +84801,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 126
+              lineNumber: 132
             }
           })
         );
@@ -85293,7 +85346,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       }
     });
   });
-},662,[663,697,698,700],"src\\actions\\index.js");
+},662,[663,697,698,701],"src\\actions\\index.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -85363,7 +85416,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 decode = (0, _jwtDecode2.default)(result.data.token);
                 decode.token = result.data.token;
 
-                _reactNative.AsyncStorage.setItem(_String.CONSTANST.USER, JSON.stringify(decode), function (err, res) {
+                _reactNative.AsyncStorage.setItem(_String.STORAGE.USER, JSON.stringify(decode), function (err, res) {
                   if (err) console.log(err);else console.log(res);
                 });
 
@@ -85501,11 +85554,13 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     GET_ORDER: 'GET_ORDER',
     UPDATE_ORDER: 'UPDATE_ORDER',
     DELETE_ORDER_ITEM: 'DELETE_ORDER_ITEM',
+    DELETE_ORDER: 'DELETE_ORDER',
     RESET_ORDER: 'RESET_ORDER',
     GET_HISTORY: 'GET_HISTORY',
     CHANGE_ORDER_QUANTITY: 'CHANGE_ORDER_QUANTITY',
     GET_NEW_HISTORY: 'GET_NEW_HISTORY',
-    ADD_HISTORY: 'ADD_HISTORY'
+    ADD_HISTORY: 'ADD_HISTORY',
+    GET_HISTORY_PERSONAL: 'GET_HISTORY_PERSONAL'
   };
   exports.default = types;
 },667,[],"src\\ultils\\constants\\actionType.js");
@@ -85719,29 +85774,30 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     }, null, _this, [[0, 6]]);
   };
 
-  var getOldOrders = function getOldOrders(min, max) {
+  var getOldOrders = function getOldOrders(page, perPage, userId) {
     return regeneratorRuntime.async(function getOldOrders$(_context8) {
       while (1) {
         switch (_context8.prev = _context8.next) {
           case 0:
-            _context8.prev = 0;
-            _context8.next = 3;
-            return regeneratorRuntime.awrap(_axios2.default.get(_api2.default.getHistory(min, max)));
+            console.log('getHistories', _api2.default.getHistory(page, perPage, userId));
+            _context8.prev = 1;
+            _context8.next = 4;
+            return regeneratorRuntime.awrap(_axios2.default.get(_api2.default.getHistory(page, perPage, userId)));
 
-          case 3:
+          case 4:
             return _context8.abrupt("return", _context8.sent);
 
-          case 6:
-            _context8.prev = 6;
-            _context8.t0 = _context8["catch"](0);
+          case 7:
+            _context8.prev = 7;
+            _context8.t0 = _context8["catch"](1);
             return _context8.abrupt("return", _context8.t0);
 
-          case 9:
+          case 10:
           case "end":
             return _context8.stop();
         }
       }
-    }, null, _this, [[0, 6]]);
+    }, null, _this, [[1, 7]]);
   };
 
   var updateOrder = function updateOrder(order) {
@@ -86804,8 +86860,8 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       return HOST + "/api/order/" + id;
     },
     POST_ORDER: HOST + "/api/order",
-    getHistory: function getHistory(page) {
-      return HOST + "/orders?status=true&=page" + page;
+    getHistory: function getHistory(page, perPage, userId) {
+      return userId ? HOST + "/api/order?status=true&page=" + page + "&perPage=" + perPage + "&user=" + userId : HOST + "/api/order?status=true&page=" + page + "&perPage=" + perPage;
     }
   };
   exports.default = API;
@@ -86814,28 +86870,46 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  var CONSTANST = exports.CONSTANST = {
-    USER: 'user id'
+  var STORAGE = exports.STORAGE = {
+    USER: 'user id',
+    MENU: 'menu'
   };
   var STATUS_TABLE = exports.STATUS_TABLE = {
     EMPTY: '0',
     SERVED: '2',
-    WAITING: '1'
+    WAITING: '1',
+    REQUEST: '3'
+  };
+  var SOCKET_EVENT = exports.SOCKET_EVENT = {
+    IOTEST: 'io-test',
+    IOTESTDESK: 'io-test-desk',
+    INVOICE_UPDATE: 'invoice-update',
+    INVOICE_UPDATE_DESK: 'invoice-update-desk',
+    INVOICE_COMPLETE: 'invoice-complete',
+    INVOICE_COMPLETE_DESK: 'invoice-complete-desk',
+    INVOICE_REQUEST: 'invoice-request',
+    INVOICE_REQUEST_DESK: 'invoice-request-desk',
+    TABLE_UPDATE: 'table-update',
+    TABLE_UPDATE_DESK: 'table-update-desk'
   };
 },696,[],"src\\ultils\\constants\\String.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.getMenu = undefined;
+  exports.getItemSuccess = exports.getMenu = undefined;
 
   var _this = this;
 
-  var _actionType = _require(_dependencyMap[0], "../ultils/constants/actionType");
+  var _reactNative = _require(_dependencyMap[0], "react-native");
+
+  var _actionType = _require(_dependencyMap[1], "../ultils/constants/actionType");
 
   var _actionType2 = _interopRequireDefault(_actionType);
 
-  var _freddoAPI = _require(_dependencyMap[1], "../services/freddoAPI");
+  var _freddoAPI = _require(_dependencyMap[2], "../services/freddoAPI");
+
+  var _String = _require(_dependencyMap[3], "../ultils/constants/String");
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -86853,7 +86927,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     };
   };
 
-  var getMenu = function getMenu(id) {
+  var getMenu = function getMenu() {
     return function _callee(dispatch) {
       var result;
       return regeneratorRuntime.async(function _callee$(_context) {
@@ -86861,14 +86935,17 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           switch (_context.prev = _context.next) {
             case 0:
               _context.next = 2;
-              return regeneratorRuntime.awrap((0, _freddoAPI.getMenus)(id));
+              return regeneratorRuntime.awrap((0, _freddoAPI.getMenus)());
 
             case 2:
               result = _context.sent;
               console.log(result);
 
               if (result.status === 200) {
+                _reactNative.AsyncStorage.setItem(_String.STORAGE.MENU, JSON.stringify(result.data));
+
                 dispatch(getItemSuccess(result.data));
+                As;
               } else {
                 dispatch(error(result.response.data || result));
               }
@@ -86883,28 +86960,31 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   };
 
   exports.getMenu = getMenu;
-},697,[667,668],"src\\actions\\menu.js");
+  exports.getItemSuccess = getItemSuccess;
+},697,[177,667,668,696],"src\\actions\\menu.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.addHistory = exports.deleteOrder = exports.getNewHistory = exports.changeQuantity = exports.getHistory = exports.resetOrder = exports.deleteItemOrder = exports.postOrder = exports.addOrderItem = exports.addNewOrder = exports.updateOrder = exports.getOrders = undefined;
+  exports.getHistoryByUser = exports.updateSuccess = exports.addHistory = exports.deleteOrder = exports.deleteOrderSuccess = exports.changeQuantity = exports.getHistory = exports.resetOrder = exports.deleteItemOrder = exports.postOrder = exports.addOrderItem = exports.postOrderSuccess = exports.updateOrder = exports.getOrders = undefined;
 
   var _this = this;
 
   var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
-  var _socketIo = _require(_dependencyMap[0], "socket.io-client/dist/socket.io.js");
-
-  var _socketIo2 = _interopRequireDefault(_socketIo);
-
-  var _actionType = _require(_dependencyMap[1], "../ultils/constants/actionType");
+  var _actionType = _require(_dependencyMap[0], "../ultils/constants/actionType");
 
   var _actionType2 = _interopRequireDefault(_actionType);
 
-  var _freddoAPI = _require(_dependencyMap[2], "../services/freddoAPI");
+  var _freddoAPI = _require(_dependencyMap[1], "../services/freddoAPI");
 
   var freedoAPI = _interopRequireWildcard(_freddoAPI);
+
+  var _socket = _require(_dependencyMap[2], "../services/socket");
+
+  var _socket2 = _interopRequireDefault(_socket);
+
+  var _String = _require(_dependencyMap[3], "../ultils/constants/String");
 
   function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } else { var newObj = {}; if (obj != null) { for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) newObj[key] = obj[key]; } } newObj.default = obj; return newObj; } }
 
@@ -86952,16 +87032,10 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     };
   };
 
-  var getNewHistorySuccess = function getNewHistorySuccess(item) {
+  var getHistoryPersonal = function getHistoryPersonal(item) {
     return {
-      type: _actionType2.default.GET_NEW_HISTORY,
+      type: _actionType2.default.GET_HISTORY_PERSONAL,
       payload: item
-    };
-  };
-
-  var addNewOrder = function addNewOrder() {
-    return {
-      type: _actionType2.default.ADD_NEW_ORDER
     };
   };
 
@@ -86999,7 +87073,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     };
   };
 
-  var postOrder = function postOrder(order, socket) {
+  var postOrder = function postOrder(order) {
     return function _callee(dispatch) {
       var orderObject, result;
       return regeneratorRuntime.async(function _callee$(_context) {
@@ -87008,23 +87082,28 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             case 0:
               console.log('order', order);
               orderObject = _extends({}, order, {
+                amount: order.amount.toString(),
                 listitems: JSON.stringify(order.listitems)
               });
-              _context.next = 4;
+              console.log('orderObject', orderObject);
+              _context.next = 5;
               return regeneratorRuntime.awrap(freedoAPI.postOrder(orderObject));
 
-            case 4:
+            case 5:
               result = _context.sent;
 
               if (result.status === 200) {
+                result.data.tablename = order.tablename;
                 console.log('postOrder', result.data);
-                socket.emit('change_order', 'hihi');
+
+                _socket2.default.emit(_String.SOCKET_EVENT.INVOICE_UPDATE, result.data);
+
                 dispatch(postOrderSuccess(result.data));
               } else {
                 dispatch(error(result.response.data || result));
               }
 
-            case 6:
+            case 7:
             case "end":
               return _context.stop();
           }
@@ -87033,7 +87112,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     };
   };
 
-  var getHistory = function getHistory(min, max) {
+  var getHistory = function getHistory(page, perPage, userId) {
     return function _callee2(dispatch) {
       var result;
       return regeneratorRuntime.async(function _callee2$(_context2) {
@@ -87041,7 +87120,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           switch (_context2.prev = _context2.next) {
             case 0:
               _context2.next = 2;
-              return regeneratorRuntime.awrap(freedoAPI.getOldOrders(min, max));
+              return regeneratorRuntime.awrap(freedoAPI.getOldOrders(page, perPage, userId));
 
             case 2:
               result = _context2.sent;
@@ -87062,7 +87141,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     };
   };
 
-  var getNewHistory = function getNewHistory(min, max) {
+  var getHistoryByUser = function getHistoryByUser(page, perPage, userId) {
     return function _callee3(dispatch) {
       var result;
       return regeneratorRuntime.async(function _callee3$(_context3) {
@@ -87070,14 +87149,14 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           switch (_context3.prev = _context3.next) {
             case 0:
               _context3.next = 2;
-              return regeneratorRuntime.awrap(freedoAPI.getOldOrders(min, max));
+              return regeneratorRuntime.awrap(freedoAPI.getOldOrders(page, perPage, userId));
 
             case 2:
               result = _context3.sent;
               console.log('getHistories', result);
 
               if (result.status === 200) {
-                dispatch(getNewHistorySuccess(result.data));
+                dispatch(getHistoryPersonal(result.data));
               } else {
                 dispatch(error(result.response.data || result));
               }
@@ -87120,7 +87199,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     };
   };
 
-  var updateOrder = function updateOrder(order, socket) {
+  var updateOrder = function updateOrder(order) {
     return function _callee5(dispatch) {
       var orderObject, result;
       return regeneratorRuntime.async(function _callee5$(_context5) {
@@ -87144,10 +87223,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               result = _context5.sent;
 
               if (result.status === 200) {
-                if (socket) {
-                  console.log('thanhtoan', socket);
-                  socket.emit('thanhtoan', 'ahihi');
-                }
+                _socket2.default.emit(_String.SOCKET_EVENT.INVOICE_UPDATE, result.data);
 
                 dispatch(updateSuccess(result.data));
               } else {
@@ -87163,22 +87239,22 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     };
   };
 
-  var deleteOrder = function deleteOrder(id) {
+  var deleteOrder = function deleteOrder(order) {
     return function _callee6(dispatch) {
       var result;
       return regeneratorRuntime.async(function _callee6$(_context6) {
         while (1) {
           switch (_context6.prev = _context6.next) {
             case 0:
-              console.log('deleteOrder', id);
+              console.log('deleteOrder', order);
               _context6.next = 3;
-              return regeneratorRuntime.awrap(freedoAPI.deleteOrder(id));
+              return regeneratorRuntime.awrap(freedoAPI.deleteOrder(order._id));
 
             case 3:
               result = _context6.sent;
 
               if (result.status === 200) {
-                dispatch(deleteOrderSuccess(result.data));
+                dispatch(deleteOrderSuccess(order));
               } else {
                 dispatch(error(result.response.data || result));
               }
@@ -87194,17 +87270,37 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   exports.getOrders = getOrders;
   exports.updateOrder = updateOrder;
-  exports.addNewOrder = addNewOrder;
+  exports.postOrderSuccess = postOrderSuccess;
   exports.addOrderItem = addOrderItem;
   exports.postOrder = postOrder;
   exports.deleteItemOrder = deleteItemOrder;
   exports.resetOrder = resetOrder;
   exports.getHistory = getHistory;
   exports.changeQuantity = changeQuantity;
-  exports.getNewHistory = getNewHistory;
+  exports.deleteOrderSuccess = deleteOrderSuccess;
   exports.deleteOrder = deleteOrder;
   exports.addHistory = addHistory;
-},698,[699,667,668],"src\\actions\\order.js");
+  exports.updateSuccess = updateSuccess;
+  exports.getHistoryByUser = getHistoryByUser;
+},698,[667,668,699,696],"src\\actions\\order.js");
+__d(function (global, _require, module, exports, _dependencyMap) {
+  Object.defineProperty(exports, "__esModule", {
+    value: true
+  });
+
+  var _socketIo = _require(_dependencyMap[0], "socket.io-client/dist/socket.io.js");
+
+  var _socketIo2 = _interopRequireDefault(_socketIo);
+
+  var _api = _require(_dependencyMap[1], "../ultils/constants/api");
+
+  function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+  var socket = (0, _socketIo2.default)(_api.HOST, {
+    jsonp: false
+  });
+  exports.default = socket;
+},699,[700,695],"src\\services\\socket.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   !function (t, e) {
     "object" == typeof exports && "object" == typeof module ? module.exports = e() : "function" == typeof define && define.amd ? define([], e) : "object" == typeof exports ? exports.io = e() : t.io = e();
@@ -89665,12 +89761,12 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       };
     }]);
   });
-},699,[],"node_modules\\socket.io-client\\dist\\socket.io.js");
+},700,[],"node_modules\\socket.io-client\\dist\\socket.io.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
-  exports.updateTable = exports.getTable = undefined;
+  exports.updateTableSuccess = exports.updateTable = exports.getTable = undefined;
 
   var _this = this;
 
@@ -89679,6 +89775,12 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   var _actionType2 = _interopRequireDefault(_actionType);
 
   var _freddoAPI = _require(_dependencyMap[1], "../services/freddoAPI");
+
+  var _socket = _require(_dependencyMap[2], "../services/socket");
+
+  var _socket2 = _interopRequireDefault(_socket);
+
+  var _String = _require(_dependencyMap[3], "../ultils/constants/String");
 
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -89689,7 +89791,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     };
   };
 
-  var update = function update(item) {
+  var updateTableSuccess = function updateTableSuccess(item) {
     return {
       type: _actionType2.default.UPDATE_TABLE,
       payload: item
@@ -89747,7 +89849,9 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               console.log('updateTable', result);
 
               if (result.status === 200) {
-                dispatch(update(result.data));
+                _socket2.default.emit(_String.SOCKET_EVENT.TABLE_UPDATE, result.data);
+
+                dispatch(updateTableSuccess(result.data));
               } else {
                 dispatch(error(result.response.data || result));
               }
@@ -89763,7 +89867,8 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   exports.getTable = getTable;
   exports.updateTable = updateTable;
-},700,[667,668],"src\\actions\\table.js");
+  exports.updateTableSuccess = updateTableSuccess;
+},701,[667,668,699,696],"src\\actions\\table.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -89809,10 +89914,6 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   var _String = _require(_dependencyMap[11], "../../ultils/constants/String");
 
-  var _socketIo = _require(_dependencyMap[12], "socket.io-client/dist/socket.io.js");
-
-  var _socketIo2 = _interopRequireDefault(_socketIo);
-
   function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
   function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
@@ -89844,7 +89945,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   var AnimatedIcon = _reactNative.Animated.createAnimatedComponent(_Ionicons2.default);
 
-  var backgroundImage = _require(_dependencyMap[13], '../../ultils/images/cafe.png');
+  var backgroundImage = _require(_dependencyMap[12], '../../ultils/images/cafe.png');
 
   var Login = _wrapComponent("Login")(function (_PureComponent) {
     _inherits(Login, _PureComponent);
@@ -89905,11 +90006,11 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           index: 0,
           actions: [_reactNavigation.NavigationActions.navigate({
             routeName: 'Main',
-            params: {
-              socket: _this.socket
-            }
+            params: {}
           })]
         });
+
+        console.log(_this.props.navigation);
 
         _this.props.navigation.dispatch(resetAction);
       };
@@ -89922,9 +90023,6 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         password: '',
         user: {}
       };
-      _this.socket = (0, _socketIo2.default)('http://192.168.13.103:3000', {
-        jsonp: false
-      });
       return _this;
     }
 
@@ -89946,7 +90044,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       value: function componentDidMount() {
         var _this2 = this;
 
-        _reactNative.AsyncStorage.getItem(_String.CONSTANST.USER, function (err, res) {
+        _reactNative.AsyncStorage.getItem(_String.STORAGE.USER, function (err, res) {
           if (err) console.log(err);else if (res !== null) {
             var user = JSON.parse(res);
 
@@ -89960,10 +90058,6 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               _this2.props.setUser(user);
 
               _this2.navigationToMain();
-
-              _this2.props.getOrders();
-
-              _this2.props.getTable();
             }
           }
         });
@@ -89998,14 +90092,14 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             style: _styles2.default.container,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 127
+              lineNumber: 126
             }
           },
           _react3.default.createElement(_reactNative.StatusBar, {
             barStyle: "light-content",
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 128
+              lineNumber: 127
             }
           }),
           _react3.default.createElement(_reactNative.Image, {
@@ -90013,7 +90107,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             style: _styles2.default.background_image,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 129
+              lineNumber: 128
             }
           }),
           _react3.default.createElement(_reactNative.View, {
@@ -90022,7 +90116,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 130
+              lineNumber: 129
             }
           }),
           _react3.default.createElement(
@@ -90031,7 +90125,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               style: _styles2.default.content,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 132
+                lineNumber: 131
               }
             },
             _react3.default.createElement(
@@ -90043,7 +90137,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 },
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 133
+                  lineNumber: 132
                 }
               },
               _react3.default.createElement(AnimatedIcon, {
@@ -90055,7 +90149,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 },
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 134
+                  lineNumber: 133
                 }
               })
             ),
@@ -90065,7 +90159,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 style: _styles2.default.freddo_layout,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 141
+                  lineNumber: 140
                 }
               },
               this.arr.map(function (value, index) {
@@ -90078,7 +90172,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     }],
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 143
+                      lineNumber: 142
                     }
                   },
                   value
@@ -90091,7 +90185,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 style: _styles2.default.input_layout,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 151
+                  lineNumber: 150
                 }
               },
               _react3.default.createElement(_components2.CustomTextInput, {
@@ -90101,7 +90195,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 onTextChange: this.onChangeUsername,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 152
+                  lineNumber: 151
                 }
               }),
               _react3.default.createElement(_components2.CustomTextInput, {
@@ -90111,7 +90205,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 onTextChange: this.onChangePassword,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 158
+                  lineNumber: 157
                 }
               }),
               _react3.default.createElement(
@@ -90121,7 +90215,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   onPress: this.onLogin,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 164
+                    lineNumber: 163
                   }
                 },
                 _react3.default.createElement(
@@ -90130,7 +90224,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     style: _styles2.default.text_button,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 165
+                      lineNumber: 164
                     }
                   },
                   "\u0110\u0103ng nh\u1EADp"
@@ -90144,7 +90238,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 169
+              lineNumber: 168
             }
           })
         );
@@ -90179,7 +90273,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   };
 
   exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Login);
-},701,[13,23,177,521,669,492,604,657,702,602,662,696,699,703],"src\\screens\\Login\\Login.js");
+},702,[13,23,177,521,669,492,604,657,703,602,662,696,704],"src\\screens\\Login\\Login.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
     Object.defineProperty(exports, "__esModule", {
         value: true
@@ -90237,7 +90331,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     });
 
     exports.default = styles;
-},702,[177],"src\\screens\\Login\\styles.js");
+},703,[177],"src\\screens\\Login\\styles.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   module.exports = _require(_dependencyMap[0], "react-native/Libraries/Image/AssetRegistry").registerAsset({
     "__packager_asset": true,
@@ -90249,7 +90343,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     "name": "cafe",
     "type": "png"
   });
-},703,[319],"src\\ultils\\images\\cafe.png");
+},704,[319],"src\\ultils\\images\\cafe.png");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -90335,17 +90429,14 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       _this.onPressTable = function (table) {
         var rootTable = _this.state.rootTable;
         var orders = _this.props.orders;
-        console.log('orders', rootTable);
         var rootOrder = orders.find(function (element) {
-          return element.table._id === rootTable._id;
+          return element.table._id ? element.table._id === rootTable._id : element.table === rootTable._id;
         });
         var order = orders.find(function (element) {
-          return element.table._id === table._id;
+          return element.table._id ? element.table._id === table._id : element.table === table._id;
         });
 
         if (rootTable._id === undefined) {
-          console.log('order', order);
-
           _this.props.navigation.navigate('Detail', {
             table: table,
             orderItem: order,
@@ -90359,24 +90450,30 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             text: 'OK',
             onPress: function onPress() {
               var amount = 0;
-              order.listItems = _this.gatherArray(order.listItems, rootOrder.listItems);
-              order.listItems.forEach(function (item) {
+              order.listitems = _this.gatherArray(order.listitems, rootOrder.listitems);
+              order.listitems.forEach(function (item) {
                 return amount += item.price * item.quantity;
               });
               order.amount = amount;
+              console.log('order', order);
 
               _this.props.updateOrder(order);
 
               rootTable.status = _String.STATUS_TABLE.EMPTY;
+              console.log('rootTable', rootTable);
 
               _this.props.updateTable(rootTable);
-
-              _this.props.deleteOrder(rootOrder.id);
 
               var index = orders.findIndex(function (item) {
                 return item._id === rootOrder._id;
               });
               orders.splice(index, 1);
+
+              _this.props.deleteOrder(rootOrder);
+
+              _this.setState({
+                rootTable: {}
+              });
             }
           }, {
             text: 'Cancel',
@@ -90404,6 +90501,10 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               rootTable.status = _String.STATUS_TABLE.EMPTY;
 
               _this.props.updateTable(rootTable);
+
+              _this.setState({
+                rootTable: {}
+              });
             }
           }, {
             text: 'Cancel',
@@ -90451,8 +90552,11 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         var temp1 = [].concat(_toConsumableArray(arr1));
         var temp2 = [].concat(_toConsumableArray(arr2));
         arr1.forEach(function (element, index) {
-          arr2.forEach(function (item, index1) {
-            if (item.id === element.id) {
+          arr2.forEach(function (item) {
+            if (item._id === element._id) {
+              var index1 = temp2.findIndex(function (i) {
+                return i._id === item._id;
+              });
               var temp = item;
               temp.quantity = item.quantity + element.quantity;
               temp1.splice(index, 1, temp);
@@ -90483,7 +90587,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           },
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 214
+            lineNumber: 224
           }
         });
       };
@@ -90495,14 +90599,6 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         changeTable: false,
         rootTable: {}
       };
-
-      _this.props.navigation.state.params.socket.on('require_pay', function (message) {
-        _reactNativePushNotification2.default.localNotification({
-          message: message,
-          title: 'OK la'
-        });
-      });
-
       return _this;
     }
 
@@ -90580,14 +90676,14 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 226
+              lineNumber: 236
             }
           },
           _react3.default.createElement(_components2.Header, {
             title: "Danh s\xE1ch b\xE0n",
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 227
+              lineNumber: 237
             }
           }),
           _react3.default.createElement(
@@ -90598,7 +90694,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 228
+                lineNumber: 238
               }
             },
             _react3.default.createElement(_reactNative.Image, {
@@ -90610,7 +90706,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 229
+                lineNumber: 239
               }
             }),
             _react3.default.createElement(
@@ -90619,7 +90715,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 style: _styles2.default.change_sort_bar,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 233
+                  lineNumber: 243
                 }
               },
               _react3.default.createElement(
@@ -90631,7 +90727,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 234
+                    lineNumber: 244
                   }
                 },
                 "S\u1EAFp x\u1EBFp"
@@ -90645,7 +90741,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   }],
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 235
+                    lineNumber: 245
                   }
                 },
                 _react3.default.createElement(
@@ -90656,7 +90752,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     }],
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 239
+                      lineNumber: 249
                     }
                   },
                   _react3.default.createElement(
@@ -90668,7 +90764,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                       },
                       __source: {
                         fileName: _jsxFileName,
-                        lineNumber: 245
+                        lineNumber: 255
                       }
                     },
                     "Th\u1EE9 t\u1EF1"
@@ -90679,7 +90775,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     color: "#fff",
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 246
+                      lineNumber: 256
                     }
                   })
                 )
@@ -90690,7 +90786,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   onPress: this.onPressState,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 249
+                    lineNumber: 259
                   }
                 },
                 _react3.default.createElement(
@@ -90701,7 +90797,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     }],
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 250
+                      lineNumber: 260
                     }
                   },
                   _react3.default.createElement(
@@ -90713,7 +90809,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                       },
                       __source: {
                         fileName: _jsxFileName,
-                        lineNumber: 256
+                        lineNumber: 266
                       }
                     },
                     "Tr\u1EA1ng th\xE1i"
@@ -90724,7 +90820,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     color: "#fff",
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 259
+                      lineNumber: 269
                     }
                   })
                 )
@@ -90735,7 +90831,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               color: "#fff",
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 264
+                lineNumber: 274
               }
             }) : _react3.default.createElement(_reactNative.FlatList, {
               data: tables,
@@ -90747,7 +90843,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               numColumns: 3,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 266
+                lineNumber: 276
               }
             })
           )
@@ -90765,7 +90861,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         color: "#fff",
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 34
+          lineNumber: 37
         }
       });
     },
@@ -90789,8 +90885,8 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       getOrders: function getOrders() {
         return dispatch((0, _actions.getOrders)());
       },
-      deleteOrder: function deleteOrder(id) {
-        return dispatch((0, _actions.deleteOrder)(id));
+      deleteOrder: function deleteOrder(order) {
+        return dispatch((0, _actions.deleteOrder)(order));
       }
     };
   };
@@ -90803,7 +90899,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   };
 
   exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Home);
-},704,[13,23,177,705,604,492,602,707,662,708,696],"src\\screens\\Home\\Home.js");
+},705,[13,23,177,706,604,492,602,708,662,709,696],"src\\screens\\Home\\Home.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
 	'use strict';
 
@@ -91088,7 +91184,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 	};
 
 	module.exports = Notifications;
-},705,[706,177],"node_modules\\react-native-push-notification\\index.js");
+},706,[707,177],"node_modules\\react-native-push-notification\\index.js");
 __d(function (global, _require2, module, exports, _dependencyMap) {
 	'use strict';
 
@@ -91194,7 +91290,7 @@ __d(function (global, _require2, module, exports, _dependencyMap) {
 		state: false,
 		component: new NotificationsComponent()
 	};
-},706,[177],"node_modules\\react-native-push-notification\\component\\index.android.js");
+},707,[177],"node_modules\\react-native-push-notification\\component\\index.android.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
     Object.defineProperty(exports, "__esModule", {
         value: true
@@ -91228,7 +91324,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     });
 
     exports.default = styles;
-},707,[177,651],"src\\screens\\Home\\styles.js");
+},708,[177,651],"src\\screens\\Home\\styles.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -91237,7 +91333,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     background: _require(_dependencyMap[0], '../images/cafe.png')
   };
   exports.default = Images;
-},708,[703],"src\\ultils\\constants\\Images.js");
+},709,[704],"src\\ultils\\constants\\Images.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -91386,7 +91482,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           },
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 112
+            lineNumber: 115
           }
         });
       };
@@ -91406,13 +91502,11 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     _createClass(Menu, [{
       key: "componentWillMount",
       value: function componentWillMount() {
-        var _props = this.props,
-            user = _props.user,
-            menus = _props.menus;
+        var menus = this.props.menus;
         var listitems = this.props.navigation.state.params.listitems;
 
         if (menus.length === 0) {
-          this.props.getMenu(user.id);
+          this.props.getMenu();
         } else this.setState({
           data: menus
         });
@@ -91426,9 +91520,11 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     }, {
       key: "componentWillReceiveProps",
       value: function componentWillReceiveProps(newProps) {
-        if (this.state.data.length === 0) this.setState({
-          data: newProps.menus
-        });
+        if (this.state.data.length === 0) {
+          this.setState({
+            data: newProps.menus
+          });
+        }
       }
     }, {
       key: "componentDidUpdate",
@@ -91453,7 +91549,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 125
+              lineNumber: 128
             }
           },
           _react3.default.createElement(
@@ -91462,19 +91558,19 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               style: _styles2.default.arrowLayout,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 126
+                lineNumber: 129
               }
             },
             listitems !== undefined && _react3.default.createElement(
               _reactNative.TouchableOpacity,
               {
                 style: {
-                  marginLeft: 5
+                  marginLeft: 15
                 },
                 onPress: this.backToDetail,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 128
+                  lineNumber: 131
                 }
               },
               _react3.default.createElement(_Ionicons2.default, {
@@ -91483,7 +91579,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 color: "#fff",
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 132
+                  lineNumber: 135
                 }
               })
             ),
@@ -91493,7 +91589,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 style: [_styles2.default.textLayout],
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 135
+                  lineNumber: 138
                 }
               },
               _react3.default.createElement(_reactNative.TextInput, {
@@ -91504,7 +91600,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 onChangeText: this.onChangeText,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 136
+                  lineNumber: 139
                 }
               }),
               _react3.default.createElement(
@@ -91515,7 +91611,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 143
+                    lineNumber: 146
                   }
                 },
                 _react3.default.createElement(_Ionicons2.default, {
@@ -91524,7 +91620,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   size: 25,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 144
+                    lineNumber: 147
                   }
                 })
               )
@@ -91538,7 +91634,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 148
+                lineNumber: 151
               }
             },
             _react3.default.createElement(_reactNative.Image, {
@@ -91550,7 +91646,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 149
+                lineNumber: 152
               }
             }),
             data.length === 0 ? _react3.default.createElement(_reactNative.ActivityIndicator, {
@@ -91558,7 +91654,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               color: "#fff",
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 168
+                lineNumber: 171
               }
             }) : _react3.default.createElement(_reactNative.FlatList, {
               data: data,
@@ -91568,7 +91664,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               renderItem: this.renderItem,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 170
+                lineNumber: 173
               }
             })
           ),
@@ -91583,7 +91679,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               style: _styles2.default.modal_layout,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 179
+                lineNumber: 182
               }
             },
             _react3.default.createElement(
@@ -91592,7 +91688,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 style: _styles2.default.quantity_layout,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 183
+                  lineNumber: 186
                 }
               },
               _react3.default.createElement(
@@ -91604,7 +91700,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 184
+                    lineNumber: 187
                   }
                 },
                 _react3.default.createElement(
@@ -91612,7 +91708,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   {
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 185
+                      lineNumber: 188
                     }
                   },
                   "S\u1ED1 l\u01B0\u1EE3ng"
@@ -91630,7 +91726,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   autoFocus: true,
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 186
+                    lineNumber: 189
                   }
                 })
               ),
@@ -91642,7 +91738,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                   },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 193
+                    lineNumber: 196
                   }
                 },
                 _react3.default.createElement(
@@ -91652,7 +91748,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     style: _styles2.default.button,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 194
+                      lineNumber: 197
                     }
                   },
                   _react3.default.createElement(
@@ -91660,7 +91756,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     {
                       __source: {
                         fileName: _jsxFileName,
-                        lineNumber: 195
+                        lineNumber: 198
                       }
                     },
                     "X\xE1c nh\u1EADn"
@@ -91677,7 +91773,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     style: _styles2.default.button,
                     __source: {
                       fileName: _jsxFileName,
-                      lineNumber: 197
+                      lineNumber: 200
                     }
                   },
                   _react3.default.createElement(
@@ -91685,7 +91781,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                     {
                       __source: {
                         fileName: _jsxFileName,
-                        lineNumber: 201
+                        lineNumber: 204
                       }
                     },
                     "H\u1EE7y"
@@ -91708,7 +91804,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         color: "#fff",
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 25
+          lineNumber: 26
         }
       });
     },
@@ -91717,8 +91813,8 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     return {
-      getMenu: function getMenu(id) {
-        dispatch((0, _actions.getMenu)(id));
+      getMenu: function getMenu() {
+        dispatch((0, _actions.getMenu)());
       },
       addOrderItem: function addOrderItem(item) {
         dispatch((0, _actions.addOrderItem)(item));
@@ -91734,7 +91830,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   };
 
   exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)(Menu);
-},709,[13,23,177,492,604,710,602,662,703],"src\\screens\\Menu\\Menu.js");
+},710,[13,23,177,492,604,711,602,662,704],"src\\screens\\Menu\\Menu.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
     Object.defineProperty(exports, "__esModule", {
         value: true
@@ -91809,7 +91905,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     });
 
     exports.default = styles;
-},710,[177,651],"src\\screens\\Menu\\styles.js");
+},711,[177,651],"src\\screens\\Menu\\styles.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -91894,7 +91990,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           index: index,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 45
+            lineNumber: 43
           }
         });
       }, _temp), _possibleConstructorReturn(_this, _ret);
@@ -91938,14 +92034,14 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 50
+              lineNumber: 47
             }
           },
           _react3.default.createElement(_components2.Header, {
             title: "H\xE0ng \u0111\u1EE3i",
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 51
+              lineNumber: 48
             }
           }),
           _react3.default.createElement(_reactNative.FlatList, {
@@ -91956,7 +92052,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 52
+              lineNumber: 49
             }
           })
         );
@@ -91988,7 +92084,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   };
 
   exports.default = (0, _reactRedux.connect)(mapStateToProps)(Queue);
-},711,[13,23,177,604,492,602],"src\\screens\\Queue\\Queue.js");
+},712,[13,23,177,604,492,602],"src\\screens\\Queue\\Queue.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -92068,9 +92164,17 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       }
 
       return _ret = (_temp = (_this = _possibleConstructorReturn(this, (_ref = HistoryScreen.__proto__ || Object.getPrototypeOf(HistoryScreen)).call.apply(_ref, [this].concat(args))), _this), _this.state = {
-        min: 0,
-        max: 20,
-        data: []
+        data: [],
+        page: 0,
+        refresh: false
+      }, _this._onEndReaced = function () {
+        var user = _this.props.navigation.state.params.user;
+        if (user) _this.props.getHistoryByUser(_this.state.page + 1, 15, user._id);else _this.props.getHistory(_this.state.page + 1, 15);
+
+        _this.setState({
+          refresh: true,
+          page: _this.state.page + 1
+        });
       }, _this.renderItem = function (_ref2) {
         var item = _ref2.item,
             index = _ref2.index;
@@ -92080,7 +92184,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           navigation: _this.props.navigation,
           __source: {
             fileName: _jsxFileName,
-            lineNumber: 46
+            lineNumber: 72
           }
         });
       }, _temp), _possibleConstructorReturn(_this, _ret);
@@ -92089,28 +92193,44 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     _createClass(HistoryScreen, [{
       key: "componentWillMount",
       value: function componentWillMount() {
-        var _state = this.state,
-            min = _state.min,
-            max = _state.max;
-        this.props.getNewHistory(min, max);
+        var user = this.props.navigation.state.params.user;
+        console.log(user);
+        if (user) this.props.getHistoryByUser(this.state.page, 15, user._id);else this.props.getHistory(this.state.page, 15);
       }
     }, {
       key: "componentDidMount",
       value: function componentDidMount() {
         var history = this.props.history;
-        this.setState({
-          data: history
-        });
+        var user = this.props.navigation.state.params.user;
+
+        if (user) {
+          this.setState({
+            data: history.personal
+          });
+        } else {
+          this.setState({
+            data: history.history
+          });
+        }
       }
     }, {
       key: "shouldComponentUpdate",
       value: function shouldComponentUpdate(nextProps) {
         console.log(nextProps);
+        var user = this.props.navigation.state.params.user;
 
         if (nextProps !== this.props) {
-          this.setState({
-            data: nextProps.history
-          });
+          if (user) {
+            this.setState({
+              data: nextProps.history.personal,
+              refresh: false
+            });
+          } else {
+            this.setState({
+              data: nextProps.history.history,
+              refresh: false
+            });
+          }
         }
 
         return true;
@@ -92128,29 +92248,28 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             style: _styles2.default.container,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 51
+              lineNumber: 77
             }
           },
           _react3.default.createElement(_components2.Header, {
             title: "L\u1ECBch s\u1EED thanh to\xE1n",
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 52
+              lineNumber: 78
             }
           }),
           data.length > 0 && _react3.default.createElement(_reactNative.FlatList, {
             data: data,
             renderItem: this.renderItem,
             keyExtractor: function keyExtractor(item) {
-              return item.id;
+              return item._id;
             },
-            onEndReached: function onEndReached() {
-              return console.log('onEndReached');
-            },
-            onEndReachedThreshold: 0.7,
+            refreshing: this.state.refresh,
+            onEndReached: this._onEndReaced,
+            onEndReachedThreshold: 0.9,
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 54
+              lineNumber: 80
             }
           })
         );
@@ -92182,17 +92301,17 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   var mapDispatchToProps = function mapDispatchToProps(dispatch) {
     return {
-      getHistory: function getHistory(min, max) {
-        return dispatch((0, _actions.getHistory)(min, max));
+      getHistory: function getHistory(page, perPage) {
+        return dispatch((0, _actions.getHistory)(page, perPage));
       },
-      getNewHistory: function getNewHistory(min, max) {
-        return dispatch((0, _actions.getNewHistory)(min, max));
+      getHistoryByUser: function getHistoryByUser(page, perPage, userId) {
+        return dispatch((0, _actions.getHistoryByUser)(page, perPage, userId));
       }
     };
   };
 
   exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDispatchToProps)((0, _reactNavigation.withNavigationFocus)(HistoryScreen));
-},712,[13,23,177,521,604,492,713,602,662],"src\\screens\\History\\History.js");
+},713,[13,23,177,521,604,492,714,602,662],"src\\screens\\History\\History.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
     Object.defineProperty(exports, "__esModule", {
         value: true
@@ -92207,7 +92326,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     });
 
     exports.default = styles;
-},713,[177],"src\\screens\\History\\styles.js");
+},714,[177],"src\\screens\\History\\styles.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -92306,6 +92425,10 @@ __d(function (global, _require, module, exports, _dependencyMap) {
           },
           style: 'cancel'
         }]);
+      }, _this.onPressHistory = function () {
+        _this.props.navigation.navigate('HistoryPersonal', {
+          user: _this.props.user
+        });
       }, _temp), _possibleConstructorReturn(_this, _ret);
     }
 
@@ -92315,6 +92438,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     }, {
       key: "render",
       value: function render() {
+        var user = this.props.user;
         return _react3.default.createElement(
           _reactNative.View,
           {
@@ -92323,14 +92447,14 @@ __d(function (global, _require, module, exports, _dependencyMap) {
             },
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 45
+              lineNumber: 50
             }
           },
           _react3.default.createElement(_components2.Header, {
             title: "Tu\u1EF3 ch\u1ECDn",
             __source: {
               fileName: _jsxFileName,
-              lineNumber: 46
+              lineNumber: 51
             }
           }),
           _react3.default.createElement(
@@ -92344,7 +92468,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 47
+                lineNumber: 52
               }
             },
             _react3.default.createElement(_Ionicons2.default, {
@@ -92353,7 +92477,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               size: 100,
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 55
+                lineNumber: 60
               }
             }),
             _react3.default.createElement(
@@ -92361,10 +92485,10 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               {
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 56
+                  lineNumber: 61
                 }
               },
-              "ASALDKJASKJLD"
+              user.name
             )
           ),
           _react3.default.createElement(
@@ -92375,7 +92499,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
               },
               __source: {
                 fileName: _jsxFileName,
-                lineNumber: 58
+                lineNumber: 63
               }
             },
             _react3.default.createElement(
@@ -92384,36 +92508,147 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 style: {
                   height: 40,
                   width: '100%',
-                  borderWidth: 1,
-                  alignItems: 'center',
-                  flexDirection: 'row'
+                  marginRight: 15
+                },
+                onPress: this.onPressHistory,
+                __source: {
+                  fileName: _jsxFileName,
+                  lineNumber: 64
+                }
+              },
+              _react3.default.createElement(
+                _reactNative.View,
+                {
+                  style: {
+                    alignItems: 'center',
+                    flexDirection: 'row'
+                  },
+                  __source: {
+                    fileName: _jsxFileName,
+                    lineNumber: 72
+                  }
+                },
+                _react3.default.createElement(
+                  _reactNative.View,
+                  {
+                    style: {
+                      width: 50,
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    },
+                    __source: {
+                      fileName: _jsxFileName,
+                      lineNumber: 73
+                    }
+                  },
+                  _react3.default.createElement(_Ionicons2.default, {
+                    name: "ios-clipboard-outline",
+                    size: 30,
+                    __source: {
+                      fileName: _jsxFileName,
+                      lineNumber: 80
+                    }
+                  })
+                ),
+                _react3.default.createElement(
+                  _reactNative.View,
+                  {
+                    style: {
+                      justifyContent: 'center',
+                      flex: 1,
+                      borderBottomWidth: 1,
+                      height: '100%'
+                    },
+                    __source: {
+                      fileName: _jsxFileName,
+                      lineNumber: 82
+                    }
+                  },
+                  _react3.default.createElement(
+                    _reactNative.Text,
+                    {
+                      __source: {
+                        fileName: _jsxFileName,
+                        lineNumber: 90
+                      }
+                    },
+                    "L\u1ECBch s\u1EED c\xE1 nh\xE2n"
+                  )
+                )
+              )
+            ),
+            _react3.default.createElement(
+              _reactNative.TouchableOpacity,
+              {
+                style: {
+                  height: 40,
+                  width: '100%'
                 },
                 onPress: this.logout,
                 __source: {
                   fileName: _jsxFileName,
-                  lineNumber: 59
+                  lineNumber: 94
                 }
               },
-              _react3.default.createElement(_Ionicons2.default, {
-                name: "ios-exit-outline",
-                size: 30,
-                style: {
-                  margin: 5
-                },
-                __source: {
-                  fileName: _jsxFileName,
-                  lineNumber: 69
-                }
-              }),
               _react3.default.createElement(
-                _reactNative.Text,
+                _reactNative.View,
                 {
+                  style: {
+                    alignItems: 'center',
+                    flexDirection: 'row'
+                  },
                   __source: {
                     fileName: _jsxFileName,
-                    lineNumber: 70
+                    lineNumber: 101
                   }
                 },
-                "\u0110\u0103ng xu\u1EA5t"
+                _react3.default.createElement(
+                  _reactNative.View,
+                  {
+                    style: {
+                      width: 50,
+                      justifyContent: 'center',
+                      alignItems: 'center'
+                    },
+                    __source: {
+                      fileName: _jsxFileName,
+                      lineNumber: 102
+                    }
+                  },
+                  _react3.default.createElement(_Ionicons2.default, {
+                    name: "ios-exit-outline",
+                    size: 30,
+                    __source: {
+                      fileName: _jsxFileName,
+                      lineNumber: 109
+                    }
+                  })
+                ),
+                _react3.default.createElement(
+                  _reactNative.View,
+                  {
+                    style: {
+                      justifyContent: 'center',
+                      flex: 1,
+                      borderBottomWidth: 1,
+                      height: '100%'
+                    },
+                    __source: {
+                      fileName: _jsxFileName,
+                      lineNumber: 111
+                    }
+                  },
+                  _react3.default.createElement(
+                    _reactNative.Text,
+                    {
+                      __source: {
+                        fileName: _jsxFileName,
+                        lineNumber: 119
+                      }
+                    },
+                    "\u0110\u0103ng xu\u1EA5t"
+                  )
+                )
               )
             )
           )
@@ -92453,7 +92688,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   };
 
   exports.default = (0, _reactRedux.connect)(mapStateToProps, mapDisPatchToProps)(Options);
-},714,[13,23,177,492,521,604,602,651,662],"src\\screens\\Options\\Options.js");
+},715,[13,23,177,492,521,604,602,651,662],"src\\screens\\Options\\Options.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -92474,7 +92709,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   var middleWare = [_reduxThunk2.default];
   var store = (0, _redux.createStore)(_reducers2.default, undefined, (0, _redux.compose)(_redux.applyMiddleware.apply(undefined, middleWare)));
   exports.default = store;
-},715,[503,716,717],"src\\store.js");
+},716,[503,717,718],"src\\store.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   'use strict';
 
@@ -92499,7 +92734,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
   var thunk = createThunkMiddleware();
   thunk.withExtraArgument = createThunkMiddleware;
   exports['default'] = thunk;
-},716,[],"node_modules\\redux-thunk\\lib\\index.js");
+},717,[],"node_modules\\redux-thunk\\lib\\index.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -92547,7 +92782,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     MenuReducer: _MenuReducer2.default,
     HistoryReducer: _HistoryReducer2.default
   });
-},717,[503,600,718,719,720,721,722],"src\\reducers\\index.js");
+},718,[503,600,719,720,721,722,723],"src\\reducers\\index.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -92585,7 +92820,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         return state;
     }
   };
-},718,[667],"src\\reducers\\LoginReducer.js");
+},719,[667],"src\\reducers\\LoginReducer.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -92612,7 +92847,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
       case _actionType2.default.UPDATE_TABLE:
         {
           var index = state.findIndex(function (item) {
-            return item.id === action.payload.id;
+            return item._id === action.payload._id;
           });
           state.splice(index, 1, action.payload);
           return [].concat(_toConsumableArray(state));
@@ -92627,7 +92862,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         return state;
     }
   };
-},719,[667],"src\\reducers\\TableReducer.js");
+},720,[667],"src\\reducers\\TableReducer.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
@@ -92656,9 +92891,20 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         {
           console.log('UPDATE_ORDER', state);
           var index = state.findIndex(function (item) {
-            return item.id === action.payload.id;
+            return item._id === action.payload._id;
           });
           state.splice(index, 1, action.payload);
+          return [].concat(_toConsumableArray(state));
+        }
+
+      case _actionType2.default.DELETE_ORDER:
+        {
+          var _index = state.findIndex(function (item) {
+            return item._id === action.payload._id;
+          });
+
+          state.splice(_index, 1);
+          console.log('DELETE_ORDER', state);
           return [].concat(_toConsumableArray(state));
         }
 
@@ -92671,7 +92917,7 @@ __d(function (global, _require, module, exports, _dependencyMap) {
         return state;
     }
   };
-},720,[667],"src\\reducers\\OrderReducer.js");
+},721,[667],"src\\reducers\\OrderReducer.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
     Object.defineProperty(exports, "__esModule", {
         value: true
@@ -92702,11 +92948,13 @@ __d(function (global, _require, module, exports, _dependencyMap) {
                 return state;
         }
     };
-},721,[667],"src\\reducers\\MenuReducer.js");
+},722,[667],"src\\reducers\\MenuReducer.js");
 __d(function (global, _require, module, exports, _dependencyMap) {
   Object.defineProperty(exports, "__esModule", {
     value: true
   });
+
+  var _extends = Object.assign || function (target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i]; for (var key in source) { if (Object.prototype.hasOwnProperty.call(source, key)) { target[key] = source[key]; } } } return target; };
 
   var _actionType = _require(_dependencyMap[0], "../ultils/constants/actionType");
 
@@ -92716,7 +92964,10 @@ __d(function (global, _require, module, exports, _dependencyMap) {
 
   function _toConsumableArray(arr) { if (Array.isArray(arr)) { for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) { arr2[i] = arr[i]; } return arr2; } else { return Array.from(arr); } }
 
-  var initialState = [];
+  var initialState = {
+    history: [],
+    personal: []
+  };
 
   exports.default = function () {
     var state = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : initialState;
@@ -92725,23 +92976,35 @@ __d(function (global, _require, module, exports, _dependencyMap) {
     switch (action.type) {
       case _actionType2.default.GET_NEW_HISTORY:
         {
-          return [].concat(_toConsumableArray(action.payload));
+          return _extends({}, state, {
+            history: [].concat(_toConsumableArray(action.payload))
+          });
         }
 
       case _actionType2.default.ADD_HISTORY:
         {
           console.log('ADD_HISTORY', action.payload);
-          return [action.payload].concat(_toConsumableArray(state));
+          return {
+            personal: [action.payload].concat(_toConsumableArray(state.personal)),
+            history: [action.payload].concat(_toConsumableArray(state.history))
+          };
         }
 
+      case _actionType2.default.GET_HISTORY_PERSONAL:
+        return _extends({}, state, {
+          personal: [].concat(_toConsumableArray(state.personal), _toConsumableArray(action.payload))
+        });
+
       case _actionType2.default.GET_HISTORY:
-        return [].concat(_toConsumableArray(state), _toConsumableArray(action.payload));
+        return _extends({}, state, {
+          history: [].concat(_toConsumableArray(state.history), _toConsumableArray(action.payload))
+        });
 
       default:
         return state;
     }
   };
-},722,[667],"src\\reducers\\HistoryReducer.js");
+},723,[667],"src\\reducers\\HistoryReducer.js");
 require(206);
 require(11);
 //# sourceMappingURL=index.map

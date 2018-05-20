@@ -6,7 +6,8 @@ import BillItem from '../../components/BillItems';
 import styles from './styles';
 import { postOrder, updateTable, updateOrder } from '../../actions';
 import { COLOR } from '../../ultils/constants/color';
-import { STATUS_TABLE } from '../../ultils/constants/String';
+import { STATUS_TABLE, SOCKET_EVENT } from '../../ultils/constants/String';
+import socket from '../../services/socket';
 /* eslint no-underscore-dangle: 0 */
 class Detail extends PureComponent {
   constructor(props) {
@@ -19,8 +20,8 @@ class Detail extends PureComponent {
     this.amount = 0;
   }
   componentWillMount() {
-    const { orderItem, socket } = this.props.navigation.state.params;
-    console.log('socket.props', socket);
+    const { orderItem } = this.props.navigation.state.params;
+    // console.log('socket.props', socket);
     if (orderItem) {
       this.setState({ order: orderItem });
     }
@@ -35,7 +36,7 @@ class Detail extends PureComponent {
   onSavePress = () => {
     const { order } = this.state;
     console.log(this.props.user);
-    const { table, orderItem, socket } = this.props.navigation.state.params;
+    const { table, orderItem } = this.props.navigation.state.params;
     if (
       orderItem === undefined &&
       order.listitems &&
@@ -46,28 +47,30 @@ class Detail extends PureComponent {
       order.table = table._id;
       order.tablename = table.name;
       table.status = STATUS_TABLE.WAITING;
-      this.props.postOrder(order, socket);
+      this.props.postOrder(order);
       this.props.updateTable(table);
     } else if (order.listitems.length === 0) {
       Alert.alert('Thông báo', 'Không có gì để lưu');
     }
     if (orderItem !== undefined) {
-      if (order.listitems.length === 0) this.props.deleteOrder();
-      else {
+      if (order.listitems.length === 0) {
+        Alert.alert('Không thể lưu bàn trống');
+      } else {
         this.props.updateOrder(order);
       }
     }
     this.props.navigation.goBack();
   };
   onPayPress = () => {
-    const { socket, table } = this.props.navigation.state.params;
+    const { table } = this.props.navigation.state.params;
     const { order } = this.state;
     // console.log('onPayPress', order);
     if (order.listitems && order.listitems.length > 0) {
-      order.user = this.props.user.id;
-      order.status = true;
-      order.table = table._id;
-      this.props.updateOrder(order, socket);
+      // order.user = this.props.user.id;
+      table.status = STATUS_TABLE.REQUEST;
+      // order.table = table._id;
+      this.props.updateTable(table);
+      socket.emit(SOCKET_EVENT.INVOICE_REQUEST, table);
       this.props.navigation.goBack();
     } else if (order.listitems && order.listitems.length === 0) {
       Alert.alert('Thông báo', 'Bàn trống không thể thanh toán');
@@ -154,7 +157,7 @@ class Detail extends PureComponent {
               <FlatList
                 data={order.listitems}
                 extraData={this.state}
-                keyExtractor={item => item.item}
+                keyExtractor={item => item._id || item.iem}
                 renderItem={this.renderItem}
               />
             )}
@@ -211,8 +214,8 @@ class Detail extends PureComponent {
   }
 }
 const mapDispatchToProps = dispatch => ({
-  postOrder: (order, table) => dispatch(postOrder(order, table)),
-  updateOrder: (order, socket) => dispatch(updateOrder(order, socket)),
+  postOrder: order => dispatch(postOrder(order)),
+  updateOrder: order => dispatch(updateOrder(order)),
   updateTable: table => dispatch(updateTable(table))
 });
 const mapStateToProps = state => ({

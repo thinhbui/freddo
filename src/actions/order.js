@@ -1,5 +1,7 @@
 import types from '../ultils/constants/actionType';
 import * as freedoAPI from '../services/freddoAPI';
+import socket from '../services/socket';
+import { SOCKET_EVENT } from '../ultils/constants/String';
 
 // this.socket = io('http://192.168.13.103:3000', { jsonp: false });
 
@@ -15,12 +17,9 @@ const deleteOrderSuccess = item => ({
 });
 const addHistory = item => ({ type: types.ADD_HISTORY, payload: item });
 const getHistorySuccess = item => ({ type: types.GET_HISTORY, payload: item });
-const getNewHistorySuccess = item => ({
-  type: types.GET_NEW_HISTORY,
+const getHistoryPersonal = item => ({
+  type: types.GET_HISTORY_PERSONAL,
   payload: item
-});
-const addNewOrder = () => ({
-  type: types.ADD_NEW_ORDER
 });
 const addOrderItem = payload => ({
   type: types.ADD_NEW_ITEM_ORDER,
@@ -40,7 +39,7 @@ const deleteItemOrder = index => ({
   payload: index
 });
 
-const postOrder = (order, socket) => async dispatch => {
+const postOrder = order => async dispatch => {
   console.log('order', order);
   const orderObject = {
     ...order,
@@ -52,18 +51,28 @@ const postOrder = (order, socket) => async dispatch => {
   if (result.status === 200) {
     result.data.tablename = order.tablename;
     console.log('postOrder', result.data);
-    socket.emit('change_order', 'hihi');
+    socket.emit(SOCKET_EVENT.INVOICE_UPDATE, result.data);
     dispatch(postOrderSuccess(result.data));
   } else {
     dispatch(error(result.response.data || result));
   }
 };
-const getHistory = (min, max) => async dispatch => {
-  const result = await freedoAPI.getOldOrders(min, max);
+const getHistory = (page, perPage, userId) => async dispatch => {
+  const result = await freedoAPI.getOldOrders(page, perPage, userId);
   console.log('getHistories', result);
 
   if (result.status === 200) {
     dispatch(getHistorySuccess(result.data));
+  } else {
+    dispatch(error(result.response.data || result));
+  }
+};
+const getHistoryByUser = (page, perPage, userId) => async dispatch => {
+  const result = await freedoAPI.getOldOrders(page, perPage, userId);
+  console.log('getHistories', result);
+
+  if (result.status === 200) {
+    dispatch(getHistoryPersonal(result.data));
   } else {
     dispatch(error(result.response.data || result));
   }
@@ -79,7 +88,7 @@ const getOrders = () => async dispatch => {
     dispatch(error(result.response.data || result));
   }
 };
-const updateOrder = (order, socket) => async dispatch => {
+const updateOrder = order => async dispatch => {
   console.log('updateOrder', order);
   const orderObject = {
     ...order,
@@ -93,20 +102,18 @@ const updateOrder = (order, socket) => async dispatch => {
   };
   const result = await freedoAPI.updateOrder(orderObject);
   if (result.status === 200) {
-    if (socket) {
-      console.log('thanhtoan', socket);
-      socket.emit('thanhtoan', 'ahihi');
-    }
+    socket.emit(SOCKET_EVENT.INVOICE_UPDATE, result.data);
     dispatch(updateSuccess(result.data));
   } else {
     dispatch(error(result.response.data || result));
   }
 };
-const deleteOrder = id => async dispatch => {
-  console.log('deleteOrder', id);
-  const result = await freedoAPI.deleteOrder(id);
+const deleteOrder = order => async dispatch => {
+  console.log('deleteOrder', order);
+  const result = await freedoAPI.deleteOrder(order._id);
   if (result.status === 200) {
-    dispatch(deleteOrderSuccess(result.data));
+    console.log('deleteOrder', result);
+    dispatch(deleteOrderSuccess(order));
   } else {
     dispatch(error(result.response.data || result));
   }
@@ -114,13 +121,16 @@ const deleteOrder = id => async dispatch => {
 export {
   getOrders,
   updateOrder,
-  addNewOrder,
+  postOrderSuccess,
   addOrderItem,
   postOrder,
   deleteItemOrder,
   resetOrder,
   getHistory,
   changeQuantity,
+  deleteOrderSuccess,
   deleteOrder,
-  addHistory
+  addHistory,
+  updateSuccess,
+  getHistoryByUser
 };

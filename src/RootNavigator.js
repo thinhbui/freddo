@@ -20,7 +20,7 @@ const MainNavigator = TabNavigator(
     headerMode: 'none',
     tabBarPosition: 'bottom',
     lazy: true,
-    swipeEnabled: false,
+    swipeEnabled: true,
     tabBarOptions: {
       showLabel: false,
       showIcon: true,
@@ -43,6 +43,9 @@ const RootNavigator = StackNavigator(
     MenuOrder: {
       screen: Menu,
       path: 'MenuOrder/:orderId'
+    },
+    HistoryPersonal: {
+      screen: HistoryScreen
     }
   },
   {

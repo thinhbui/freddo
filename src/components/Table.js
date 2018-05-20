@@ -39,7 +39,9 @@ const Table = ({ text, onPress, status, onLongPress, rootTable }) => (
               ? COLOR.green
               : status === '1'
                 ? COLOR.yellow
-                : COLOR.red,
+                : status === '2'
+                  ? COLOR.red
+                  : '#fff',
           position: 'absolute',
           top: 10,
           right: 10

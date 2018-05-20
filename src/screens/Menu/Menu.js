@@ -1,3 +1,4 @@
+/* eslint no-underscore-dangle: 0 */
 import React, { PureComponent } from 'react';
 import {
   View,
@@ -43,10 +44,10 @@ class Menu extends PureComponent {
     };
   }
   componentWillMount() {
-    const { user, menus } = this.props;
+    const { menus } = this.props;
     const { listitems } = this.props.navigation.state.params;
     if (menus.length === 0) {
-      this.props.getMenu(user.id);
+      this.props.getMenu();
     } else this.setState({ data: menus });
     if (listitems !== undefined) {
       this.setState({ itemSelected: listitems });
@@ -54,7 +55,9 @@ class Menu extends PureComponent {
   }
 
   componentWillReceiveProps(newProps) {
-    if (this.state.data.length === 0) this.setState({ data: newProps.menus });
+    if (this.state.data.length === 0) {
+      this.setState({ data: newProps.menus });
+    }
   }
   componentDidUpdate() {
     console.log('itemSelected', this.state.itemSelected);
@@ -126,7 +129,7 @@ class Menu extends PureComponent {
         <View style={styles.arrowLayout}>
           {listitems !== undefined && (
             <TouchableOpacity
-              style={{ marginLeft: 5 }}
+              style={{ marginLeft: 15 }}
               onPress={this.backToDetail}
             >
               <Icon name="ios-arrow-back-outline" size={30} color="#fff" />
@@ -209,8 +212,8 @@ class Menu extends PureComponent {
   }
 }
 const mapDispatchToProps = dispatch => ({
-  getMenu: id => {
-    dispatch(getMenu(id));
+  getMenu: () => {
+    dispatch(getMenu());
   },
   addOrderItem: item => {
     dispatch(addOrderItem(item));

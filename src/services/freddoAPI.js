@@ -71,9 +71,11 @@ const getOrderById = async id => {
     return error;
   }
 };
-const getOldOrders = async (page, perPage) => {
+const getOldOrders = async (page, perPage, userId) => {
+  console.log('getHistories', url.getHistory(page, perPage, userId));
+
   try {
-    return await axios.get(url.getHistory(page, perPage));
+    return await axios.get(url.getHistory(page, perPage, userId));
   } catch (error) {
     return error;
   }

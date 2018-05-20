@@ -39,8 +39,13 @@ class Options extends Component {
       }
     ]);
   };
+  onPressHistory = () => {
+    this.props.navigation.navigate('HistoryPersonal', {
+      user: this.props.user
+    });
+  };
   render() {
-    // const { user } = this.props;
+    const { user } = this.props;
     return (
       <View style={{ flex: 1 }}>
         <Header title="Tuỳ chọn" />
@@ -53,21 +58,67 @@ class Options extends Component {
           }}
         >
           <Icon name="ios-contact" color={COLOR.theme} size={100} />
-          <Text>ASALDKJASKJLD</Text>
+          <Text>{user.name}</Text>
         </View>
         <View style={{ flex: 1 }}>
           <TouchableOpacity
             style={{
               height: 40,
               width: '100%',
-              borderWidth: 1,
-              alignItems: 'center',
-              flexDirection: 'row'
+              marginRight: 15
+            }}
+            onPress={this.onPressHistory}
+          >
+            <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+              <View
+                style={{
+                  width: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <Icon name="ios-clipboard-outline" size={30} />
+              </View>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  flex: 1,
+                  borderBottomWidth: 1,
+                  height: '100%'
+                }}
+              >
+                <Text>Lịch sử cá nhân</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              height: 40,
+              width: '100%'
             }}
             onPress={this.logout}
           >
-            <Icon name="ios-exit-outline" size={30} style={{ margin: 5 }} />
-            <Text>Đăng xuất</Text>
+            <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+              <View
+                style={{
+                  width: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <Icon name="ios-exit-outline" size={30} />
+              </View>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  flex: 1,
+                  borderBottomWidth: 1,
+                  height: '100%'
+                }}
+              >
+                <Text>Đăng xuất</Text>
+              </View>
+            </View>
           </TouchableOpacity>
         </View>
       </View>

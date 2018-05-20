@@ -1,19 +1,32 @@
 import types from '../ultils/constants/actionType';
 
-const initialState = [];
+const initialState = {
+  history: [],
+  personal: []
+};
 
 export default (state = initialState, action) => {
   switch (action.type) {
     case types.GET_NEW_HISTORY: {
-      return [...action.payload];
+      return { ...state, history: [...action.payload] };
     }
     case types.ADD_HISTORY: {
       console.log('ADD_HISTORY', action.payload);
-
-      return [action.payload, ...state];
+      return {
+        personal: [action.payload, ...state.personal],
+        history: [action.payload, ...state.history]
+      };
     }
+    case types.GET_HISTORY_PERSONAL:
+      return {
+        ...state,
+        personal: [...state.personal, ...action.payload]
+      };
     case types.GET_HISTORY:
-      return [...state, ...action.payload];
+      return {
+        ...state,
+        history: [...state.history, ...action.payload]
+      };
     default:
       return state;
   }

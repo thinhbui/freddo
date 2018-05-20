@@ -28,11 +28,6 @@ class QueueItem extends React.PureComponent {
       if (!element.status) {
         count++;
         const time = moment().unix() - moment.utc(element.createAt).unix();
-        if (item.table.name === 'Bàn 1') {
-          console.log(moment().unix());
-          console.log(moment.utc(element.createAt).unix());
-          console.log(element.createAt);
-        }
         if (time > max) {
           max = time;
         }
@@ -49,14 +44,20 @@ class QueueItem extends React.PureComponent {
     const { index } = this.props;
 
     return (
-      <View style={{ flexDirection: 'row', marginLeft: 15, marginRight: 15 }}>
+      <View
+        style={{
+          flexDirection: 'row',
+          marginLeft: 15,
+          marginRight: 15,
+          borderTopColor: index % 2 === 0 ? 'black' : '#fff',
+          borderTopWidth: 0.5
+        }}
+      >
         <View
           style={{
             flex: 2,
             padding: 15,
-            justifyContent: 'center',
-            borderTopColor: index % 2 === 0 ? 'black' : '#fff',
-            borderTopWidth: 0.5
+            justifyContent: 'center'
           }}
         >
           <Text style={{ color: index % 2 === 0 ? 'black' : '#fff' }}>

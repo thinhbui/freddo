@@ -5,7 +5,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import styles from './styles';
 import { Header, HistoryItem } from '../../components';
-import { getHistory } from '../../actions';
+import { getHistory, getHistoryByUser } from '../../actions';
 
 class HistoryScreen extends Component {
   static navigationOptions = {
@@ -19,27 +19,55 @@ class HistoryScreen extends Component {
   };
   state = {
     data: [],
-    page: 1
+    page: 0,
+    refresh: false
   };
   componentWillMount() {
-    this.props.getHistory(this.state.page, 20);
+    const { user } = this.props.navigation.state.params;
+    console.log(user);
+    if (user) this.props.getHistoryByUser(this.state.page, 15, user._id);
+    else this.props.getHistory(this.state.page, 15);
   }
   componentDidMount() {
     const { history } = this.props;
-    this.setState({
-      data: history
-    });
+    const { user } = this.props.navigation.state.params;
+    if (user) {
+      this.setState({
+        data: history.personal
+      });
+    } else {
+      this.setState({
+        data: history.history
+      });
+    }
   }
   shouldComponentUpdate(nextProps) {
     console.log(nextProps);
-
+    const { user } = this.props.navigation.state.params;
     if (nextProps !== this.props) {
-      this.setState({ data: nextProps.history });
+      if (user) {
+        this.setState({
+          data: nextProps.history.personal,
+          refresh: false
+        });
+      } else {
+        this.setState({
+          data: nextProps.history.history,
+          refresh: false
+        });
+      }
     }
     return true;
   }
 
   componentWillUnmount() {}
+  _onEndReaced = () => {
+    const { user } = this.props.navigation.state.params;
+    if (user) this.props.getHistoryByUser(this.state.page + 1, 15, user._id);
+    else this.props.getHistory(this.state.page + 1, 15);
+    this.setState({ refresh: true, page: this.state.page + 1 });
+  };
+
   renderItem = ({ item, index }) => (
     <HistoryItem item={item} index={index} navigation={this.props.navigation} />
   );
@@ -52,9 +80,10 @@ class HistoryScreen extends Component {
           <FlatList
             data={data}
             renderItem={this.renderItem}
-            keyExtractor={item => item.id}
-            onEndReached={() => console.log('onEndReached')}
-            onEndReachedThreshold={0.7}
+            keyExtractor={item => item._id}
+            refreshing={this.state.refresh}
+            onEndReached={this._onEndReaced}
+            onEndReachedThreshold={0.9}
           />
         )}
       </View>
@@ -67,7 +96,9 @@ const mapStateToProps = state => ({
 });
 
 const mapDispatchToProps = dispatch => ({
-  getHistory: (page, perPage) => dispatch(getHistory(page, perPage))
+  getHistory: (page, perPage) => dispatch(getHistory(page, perPage)),
+  getHistoryByUser: (page, perPage, userId) =>
+    dispatch(getHistoryByUser(page, perPage, userId))
 });
 export default connect(mapStateToProps, mapDispatchToProps)(
   withNavigationFocus(HistoryScreen)
