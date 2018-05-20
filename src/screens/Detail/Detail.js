@@ -148,7 +148,7 @@ class Detail extends PureComponent {
   render() {
     const { table } = this.props.navigation.state.params;
     const { order } = this.state;
-    console.log(order.listitems);
+    console.log(order);
 
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>

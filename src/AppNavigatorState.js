@@ -51,6 +51,7 @@ class AppNavigatorState extends Component {
           item.table ? item.table._id === data._id : item.table === data._id
       );
       dispatch(deleteOrderSuccess(orders[index]));
+      // dispatch(updateSuccess(data));
     });
     // listen tavle changes
     socket.on(SOCKET_EVENT.TABLE_UPDATE_DESK, data => {
@@ -58,7 +59,7 @@ class AppNavigatorState extends Component {
     });
     socket.on(SOCKET_EVENT.INVOICE_LEAVE_QUEUE_DESK, data => {
       // const index = tables.findIndex(item => item._id === data._id);
-      console.log('INVOICE_LEAVE_QUEUE_DESK', data.table);
+      console.log('INVOICE_LEAVE_QUEUE_DESK', data);
       data.table.status = STATUS_TABLE.SERVED;
       PushNotification.localNotification({
         message: `${data.table.name} đã hoàn thành`

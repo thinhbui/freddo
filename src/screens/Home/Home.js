@@ -122,10 +122,17 @@ class Home extends Component {
               console.log('order', order);
               // update new order
               this.props.updateOrder(order);
+
+              table.status =
+                rootTable.status === STATUS_TABLE.WAITING
+                  ? STATUS_TABLE.WAITING
+                  : table.status;
+              this.props.updateTable(table);
               // update status root table
               rootTable.status = STATUS_TABLE.EMPTY;
               console.log('rootTable', rootTable);
               this.props.updateTable(rootTable);
+
               // delete root order
               this.props.deleteOrder(rootOrder);
               this.setState({ rootTable: {} });

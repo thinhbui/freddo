@@ -25,9 +25,13 @@ class Queue extends Component {
     this.setOrder(orders);
   }
   shouldComponentUpdate(nextProps, nextState) {
-    console.log('nextProps', nextProps);
-    console.log('nextState', nextState);
     if (this.props !== nextProps) {
+      console.log(
+        nextProps.orders.filter(
+          item => item.tablename || item.table.status === STATUS_TABLE.WAITING
+        )
+      );
+
       this.setState({
         orders: nextProps.orders.filter(
           item => item.tablename || item.table.status === STATUS_TABLE.WAITING
@@ -47,7 +51,6 @@ class Queue extends Component {
   renderItem = ({ item, index }) => <QueueItem item={item} index={index} />;
   render() {
     const { orders } = this.state;
-    console.log(orders);
 
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>

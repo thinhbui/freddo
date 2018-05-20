@@ -9,7 +9,7 @@ export default (state = [], action) => {
       return [action.payload, ...state];
     }
     case types.UPDATE_ORDER: {
-      console.log('UPDATE_ORDER', state);
+      console.log('UPDATE_ORDER', action.payload);
       const index = state.findIndex(item => item._id === action.payload._id);
       state.splice(index, 1, action.payload);
       return [...state];
