@@ -63,6 +63,7 @@ class AppNavigatorState extends Component {
       PushNotification.localNotification({
         message: `${data.table.name} đã hoàn thành`
       });
+      dispatch(updateSuccess(data));
       dispatch(updateTableSuccess(data.table));
     });
     AsyncStorage.getItem(STORAGE.MENU, (err, res) => {
