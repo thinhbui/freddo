@@ -17,9 +17,9 @@ export default (state = [], action) => {
     case types.DELETE_ORDER: {
       const index = state.indexOf(action.payload);
       console.log('index', index);
-      console.log('DELETE_ORDER', state);
+      console.log('DELETE_ORDER', action.payload);
       state.splice(index, 1);
-      console.log('DELETE_ORDER', state);
+      // console.log('DELETE_ORDER', state);
 
       return [...state];
     }

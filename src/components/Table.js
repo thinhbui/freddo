@@ -31,17 +31,17 @@ const Table = ({ text, onPress, status, onLongPress, rootTable }) => (
       <Icon name="ios-cafe-outline" size={50} color="#fff" />
       <View
         style={{
-          width: 6,
-          height: 6,
-          borderRadius: 3,
+          width: 8,
+          height: 8,
+          borderRadius: 4,
           backgroundColor:
             status === '0'
               ? COLOR.green
               : status === '1'
                 ? COLOR.yellow
                 : status === '2'
-                  ? COLOR.red
-                  : '#fff',
+                  ? '#61b2e8'
+                  : COLOR.red,
           position: 'absolute',
           top: 10,
           right: 10

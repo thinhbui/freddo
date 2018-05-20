@@ -89,10 +89,9 @@ const getOrders = () => async dispatch => {
   }
 };
 const updateOrder = order => async dispatch => {
-  console.log('updateOrder', order);
   const orderObject = {
     ...order,
-    table: order.table.toString(),
+    id: order._id,
     listitems: JSON.stringify(order.listitems),
     amount: order.amount.toString(),
     discount: order.discount.toString(),
@@ -100,8 +99,11 @@ const updateOrder = order => async dispatch => {
     custpaid: order.custpaid.toString(),
     payback: order.payback.toString()
   };
+  console.log('orderObject', orderObject);
+
   const result = await freedoAPI.updateOrder(orderObject);
   if (result.status === 200) {
+    console.log('updateOrder', result.data);
     socket.emit(SOCKET_EVENT.INVOICE_UPDATE, result.data);
     dispatch(updateSuccess(result.data));
   } else {

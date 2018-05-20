@@ -25,7 +25,6 @@ const updateTable = table => async dispatch => {
   console.log('updateTable', result);
 
   if (result.status === 200) {
-    socket.emit(SOCKET_EVENT.TABLE_UPDATE, result.data);
     dispatch(updateTableSuccess(result.data));
   } else {
     dispatch(error(result.response.data || result));

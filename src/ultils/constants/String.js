@@ -18,5 +18,7 @@ export const SOCKET_EVENT = {
   INVOICE_REQUEST: 'invoice-request',
   INVOICE_REQUEST_DESK: 'invoice-request-desk',
   TABLE_UPDATE: 'table-update',
-  TABLE_UPDATE_DESK: 'table-update-desk'
+  TABLE_UPDATE_DESK: 'table-update-desk',
+  INVOICE_LEAVE_QUEUE: 'invoice-leave-queue',
+  INVOICE_LEAVE_QUEUE_DESK: 'invoice-leave-queue-desk'
 };

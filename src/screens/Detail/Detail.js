@@ -35,7 +35,7 @@ class Detail extends PureComponent {
   }
   onSavePress = () => {
     const { order } = this.state;
-    console.log(this.props.user);
+    console.log(order);
     const { table, orderItem } = this.props.navigation.state.params;
     if (
       orderItem === undefined &&
@@ -56,7 +56,14 @@ class Detail extends PureComponent {
       if (order.listitems.length === 0) {
         Alert.alert('Không thể lưu bàn trống');
       } else {
+        // order.id = order._id;
+        order.user = this.props.user.id;
+        order.status = false;
+        order.table = table._id;
+        order.tablename = table.name;
+        table.status = STATUS_TABLE.WAITING;
         this.props.updateOrder(order);
+        this.props.updateTable(table);
       }
     }
     this.props.navigation.goBack();
@@ -84,7 +91,7 @@ class Detail extends PureComponent {
   }
   onChangeQuantity = item => {
     const { order, refresh } = this.state;
-    const index = order.listitems.findIndex(i => i.id === item.id);
+    const index = order.listitems.findIndex(i => i._id === item._id);
     order.listitems.splice(index, 1, item);
     order.amount = this.calAmount(order.listitems);
 
@@ -141,6 +148,8 @@ class Detail extends PureComponent {
   render() {
     const { table } = this.props.navigation.state.params;
     const { order } = this.state;
+    console.log(order.listitems);
+
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <Header
@@ -157,7 +166,7 @@ class Detail extends PureComponent {
               <FlatList
                 data={order.listitems}
                 extraData={this.state}
-                keyExtractor={item => item._id || item.iem}
+                keyExtractor={item => item.item || item._id}
                 renderItem={this.renderItem}
               />
             )}

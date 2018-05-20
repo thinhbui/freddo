@@ -24,8 +24,10 @@ class HistoryScreen extends Component {
   };
   componentWillMount() {
     const { user } = this.props.navigation.state.params;
+    const { history } = this.props;
     console.log(user);
-    if (user) this.props.getHistoryByUser(this.state.page, 15, user._id);
+    if (user && history.personal.length === 0)
+      this.props.getHistoryByUser(this.state.page, 15, user._id);
     else this.props.getHistory(this.state.page, 15);
   }
   componentDidMount() {
@@ -73,9 +75,10 @@ class HistoryScreen extends Component {
   );
   render() {
     const { data } = this.state;
+    const { user } = this.props;
     return (
       <View style={styles.container}>
-        <Header title="Lịch sử thanh toán" />
+        <Header title="Lịch sử thanh toán" arrow={user ? false : true} />
         {data.length > 0 && (
           <FlatList
             data={data}

@@ -11,7 +11,6 @@ import {
   PushNotificationIOS
   // Dimensions
 } from 'react-native';
-import PushNotification from 'react-native-push-notification';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import { Table, Header } from '../../components';
@@ -58,25 +57,6 @@ class Home extends Component {
     const { tables } = this.props;
     console.log('componentDidMount Home', this.props);
     this.setState({ tables });
-    PushNotification.configure({
-      onRegister: token => {
-        console.log('TOKEN:', token);
-      },
-      // (required) Called when a remote or local notification is opened or received
-      onNotification: notification => {
-        console.log('NOTIFICATION:', notification);
-        notification.finish(PushNotificationIOS.FetchResult.NoData);
-      },
-      senderID: '711529978568',
-      permissions: {
-        alert: true,
-        badge: true,
-        sound: true
-      },
-
-      popInitialNotification: true,
-      requestPermissions: true
-    });
   }
 
   componentWillReceiveProps(newProps) {
@@ -89,9 +69,9 @@ class Home extends Component {
         this.setState({
           tables: tables.sort((a, b) => (a._id > b._id ? 1 : -1))
         });
-      } else if (tables.findIndex(item => item.status === true) !== -1) {
+      } else {
         this.setState({
-          tables: tables.sort(a => (a.state ? 1 : -1))
+          tables: tables.sort((a, b) => (a.status > b.status ? 1 : -1))
         });
       }
     }
@@ -138,6 +118,7 @@ class Home extends Component {
                 item => (amount += item.price * item.quantity)
               );
               order.amount = amount;
+              order.table = table._id;
               console.log('order', order);
               // update new order
               this.props.updateOrder(order);
