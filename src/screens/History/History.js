@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { View, FlatList } from 'react-native';
+import { View, FlatList, ActivityIndicator } from 'react-native';
 import { withNavigationFocus } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
@@ -44,7 +44,6 @@ class HistoryScreen extends Component {
     }
   }
   shouldComponentUpdate(nextProps) {
-    console.log(nextProps);
     const { user } = this.props.navigation.state.params;
     if (nextProps !== this.props) {
       if (user) {
@@ -75,11 +74,18 @@ class HistoryScreen extends Component {
   );
   render() {
     const { data } = this.state;
-    const { user } = this.props;
+    const { user } = this.props.navigation.state.params;
+    // console.log(user);
     return (
       <View style={styles.container}>
-        <Header title="Lịch sử thanh toán" arrow={user ? false : true} />
-        {data.length > 0 && (
+        <Header
+          title="Lịch sử thanh toán"
+          arrow={user !== undefined}
+          onArrowPress={() => {
+            this.props.navigation.goBack();
+          }}
+        />
+        {data.length > 0 ? (
           <FlatList
             data={data}
             renderItem={this.renderItem}
@@ -88,6 +94,8 @@ class HistoryScreen extends Component {
             onEndReached={this._onEndReaced}
             onEndReachedThreshold={0.9}
           />
+        ) : (
+          <ActivityIndicator size="large" style={{ marginTop: 30 }} />
         )}
       </View>
     );

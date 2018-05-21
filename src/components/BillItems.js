@@ -114,7 +114,7 @@ class BillItem extends PureComponent {
           </View>
           <View style={{ flex: 1, alignItems: 'center' }}>
             <Text style={{ fontSize: 18 }}>
-              {this.formatNumber(item.price)}
+              {item.price.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
             </Text>
           </View>
           <View

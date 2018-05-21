@@ -1,5 +1,12 @@
 import React, { PureComponent } from 'react';
-import { View, FlatList, Text, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  FlatList,
+  Text,
+  TouchableOpacity,
+  Alert,
+  Keyboard
+} from 'react-native';
 import { connect } from 'react-redux';
 import { Header } from '../../components';
 import BillItem from '../../components/BillItems';
@@ -77,7 +84,7 @@ class Detail extends PureComponent {
       table.status = STATUS_TABLE.REQUEST;
       // order.table = table._id;
       this.props.updateTable(table);
-      socket.emit(SOCKET_EVENT.INVOICE_REQUEST, table);
+      // socket.emit(SOCKET_EVENT.INVOICE_REQUEST, table);
       this.props.navigation.goBack();
     } else if (order.listitems && order.listitems.length === 0) {
       Alert.alert('Thông báo', 'Bàn trống không thể thanh toán');
@@ -156,6 +163,7 @@ class Detail extends PureComponent {
           title={table === undefined ? 'Chi tiết hoá đơn' : 'Chi tiết bàn'}
           arrow
           onArrowPress={() => {
+            Keyboard.dismiss();
             this.props.navigation.goBack();
           }}
         />
@@ -204,8 +212,10 @@ class Detail extends PureComponent {
             >
               <Text style={{ color: COLOR.theme, fontSize: 23 }}>
                 {order.amount !== undefined
-                  ? this.formatNumber(order.amount)
-                  : 0}
+                  ? `${order.amount
+                      .toString()
+                      .replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`
+                  : 0}đ
               </Text>
             </View>
           </View>

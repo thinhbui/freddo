@@ -12,6 +12,7 @@
     "moment": "^2.22.1",
     "react": "16.3.1",
     "react-native": "0.55.3",
+    "react-native-keyboard-aware-scroll-view": "^0.5.0",
     "react-native-push-notification": "^3.0.2",
     "react-native-socket.io-client": "^1.4.8",
     "react-native-swipeable": "^0.6.0",
@@ -35,6 +36,8 @@
     "preset": "react-native"
   },
   "rnpm": {
-    "assets": ["./src/ultils/assets/fonts/"]
+    "assets": [
+      "./src/ultils/assets/fonts/"
+    ]
   }
 }

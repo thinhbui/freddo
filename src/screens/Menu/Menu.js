@@ -7,7 +7,8 @@ import {
   TextInput,
   TouchableOpacity,
   FlatList,
-  ActivityIndicator
+  ActivityIndicator,
+  KeyboardAvoidingView
   // Modal
 } from 'react-native';
 // import { NavigationActions } from 'react-navigation';
@@ -125,35 +126,36 @@ class Menu extends PureComponent {
     const { listitems } = this.props.navigation.state.params;
     // console.log('menu', this.props.order);
     return (
-      <View style={{ flex: 1, backgroundColor: '#fff' }}>
-        <View style={styles.arrowLayout}>
-          {listitems !== undefined && (
-            <TouchableOpacity
-              style={{ marginLeft: 15 }}
-              onPress={this.backToDetail}
-            >
-              <Icon name="ios-arrow-back-outline" size={30} color="#fff" />
-            </TouchableOpacity>
-          )}
-          <View style={[styles.textLayout]}>
-            <TextInput
-              style={styles.textInput}
-              underlineColorAndroid="transparent"
-              placeholder="Tìm kiếm"
-              placeholderTextColor="#fff"
-              onChangeText={this.onChangeText}
-            />
-            <TouchableOpacity style={{ marginRight: 5 }}>
-              <Icon name="ios-search" color="#fff" size={25} />
-            </TouchableOpacity>
+      <KeyboardAvoidingView style={{ flex: 1 }}>
+        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+          <View style={styles.arrowLayout}>
+            {listitems !== undefined && (
+              <TouchableOpacity
+                style={{ marginLeft: 15 }}
+                onPress={this.backToDetail}
+              >
+                <Icon name="ios-arrow-back-outline" size={30} color="#fff" />
+              </TouchableOpacity>
+            )}
+            <View style={[styles.textLayout]}>
+              <TextInput
+                style={styles.textInput}
+                underlineColorAndroid="transparent"
+                placeholder="Tìm kiếm"
+                placeholderTextColor="#fff"
+                onChangeText={this.onChangeText}
+              />
+              <TouchableOpacity style={{ marginRight: 5 }}>
+                <Icon name="ios-search" color="#fff" size={25} />
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
-        <View style={{ flex: 1 }}>
-          <Image
-            source={background}
-            style={{ position: 'absolute', width: '100%', height: '100%' }}
-          />
-          {/* <SectionList
+          <View style={{ flex: 1 }}>
+            <Image
+              source={background}
+              style={{ position: 'absolute', width: '100%', height: '100%' }}
+            />
+            {/* <SectionList
                         sections={data}
                         initialNumToRender={10}
                         keyExtractor={(item, index) => index.toString()}
@@ -167,47 +169,53 @@ class Menu extends PureComponent {
                             </View>
                         )}
                     /> */}
-          {data.length === 0 ? (
-            <ActivityIndicator size="large" color="#fff" />
-          ) : (
-            <FlatList
-              data={data}
-              keyExtractor={item => item.code}
-              renderItem={this.renderItem}
-            />
+            {data.length === 0 ? (
+              <ActivityIndicator size="large" color="#fff" />
+            ) : (
+              <FlatList
+                data={data}
+                keyExtractor={item => item.code}
+                renderItem={this.renderItem}
+              />
+            )}
+          </View>
+
+          {visible && (
+            <TouchableOpacity
+              onPress={() => this.setState({ visible: false })}
+              style={styles.modal_layout}
+            >
+              <View style={styles.quantity_layout}>
+                <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                  <Text>Số lượng</Text>
+                  <TextInput
+                    style={{ width: 80 }}
+                    defaultValue={'1'}
+                    keyboardType="numeric"
+                    autoCorrect
+                    onChangeText={text => this.setState({ quantity: text })}
+                    autoFocus
+                  />
+                </View>
+                <View style={{ flexDirection: 'row' }}>
+                  <TouchableOpacity
+                    onPress={this.onSubmit}
+                    style={styles.button}
+                  >
+                    <Text>Xác nhận</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    onPress={() => this.setState({ visible: false })}
+                    style={styles.button}
+                  >
+                    <Text>Hủy</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </TouchableOpacity>
           )}
         </View>
-
-        {visible && (
-          <TouchableOpacity
-            onPress={() => this.setState({ visible: false })}
-            style={styles.modal_layout}
-          >
-            <View style={styles.quantity_layout}>
-              <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                <Text>Số lượng</Text>
-                <TextInput
-                  style={{ width: 80 }}
-                  defaultValue={'1'}
-                  onChangeText={text => this.setState({ quantity: text })}
-                  autoFocus
-                />
-              </View>
-              <View style={{ flexDirection: 'row' }}>
-                <TouchableOpacity onPress={this.onSubmit} style={styles.button}>
-                  <Text>Xác nhận</Text>
-                </TouchableOpacity>
-                <TouchableOpacity
-                  onPress={() => this.setState({ visible: false })}
-                  style={styles.button}
-                >
-                  <Text>Hủy</Text>
-                </TouchableOpacity>
-              </View>
-            </View>
-          </TouchableOpacity>
-        )}
-      </View>
+      </KeyboardAvoidingView>
     );
   }
 }

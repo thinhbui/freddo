@@ -36,7 +36,7 @@ const getTables = async () => {
 
 const updateTables = async table => {
   try {
-    return await axios.post(url.updateTable(), { ...table });
+    return await axios.post(url.updateTable(table._id, table.status));
   } catch (error) {
     return error;
   }

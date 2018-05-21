@@ -5,9 +5,9 @@ import moment from 'moment';
 // import { COLOR } from '../ultils/constants/color';
 
 const { width } = Dimensions.get('window');
-
 const HistoryItem = ({ item, index, navigation }) => {
   const time = moment(item.billdate).format('DD-MM-YYYY HH:mm');
+  // const amount = `${item.amount.toLocaleString('vn-VI')}đ`;
   return (
     <TouchableOpacity
       style={{
@@ -28,11 +28,13 @@ const HistoryItem = ({ item, index, navigation }) => {
           <Text>{time}</Text>
         </View>
       </View>
-      <View>
+      <View style={{ flex: 2 }}>
         <Text>{item.user.name || item.user}</Text>
       </View>
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{}}>{item.amount.toLocaleString('vn-VI')}đ</Text>
+        <Text style={{}}>
+          {item.amount.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}đ
+        </Text>
       </View>
     </TouchableOpacity>
   );

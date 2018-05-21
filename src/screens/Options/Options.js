@@ -1,11 +1,18 @@
 import React, { Component } from 'react';
-import { View, Text, TouchableOpacity, Alert } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  Alert,
+  AsyncStorage
+} from 'react-native';
 import { connect } from 'react-redux';
 import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Header } from '../../components';
 import { COLOR } from '../../ultils/constants/color';
 import { logout } from '../../actions';
+import { STORAGE } from '../../ultils/constants/String';
 
 class Options extends Component {
   static navigationOptions = {
@@ -28,6 +35,7 @@ class Options extends Component {
             index: 0,
             actions: [NavigationActions.navigate({ routeName: 'Login' })]
           });
+          AsyncStorage.removeItem(STORAGE.USER);
           this.props.logout();
           this.props.navigation.dispatch(resetAction);
         }

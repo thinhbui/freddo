@@ -263,7 +263,11 @@ class Home extends Component {
             </TouchableWithoutFeedback>
           </View>
           {tables.length === 0 ? (
-            <ActivityIndicator size="large" color="#fff" />
+            <ActivityIndicator
+              size="large"
+              color="#fff"
+              style={{ marginTop: 30 }}
+            />
           ) : (
             <FlatList
               data={tables}

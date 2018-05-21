@@ -8,9 +8,12 @@ import {
   Platform,
   Alert,
   StatusBar,
-  AsyncStorage
+  AsyncStorage,
+  TextInput,
+  Dimensions
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
+
 import axios from 'axios';
 import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
@@ -19,13 +22,13 @@ import styles from './styles';
 import { CustomTextInput } from '../../components';
 import { login, loginSuccess, getOrders, getTable } from '../../actions';
 import { STORAGE } from '../../ultils/constants/String';
-
+// import { width } from 'window-size';
 // import socket from '../../services/socket';
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const backgroundImage = require('../../ultils/images/cafe.png');
-
 // const senderID = '711529978568';
+const { width, height } = Dimensions.get('window');
 
 class Login extends PureComponent {
   constructor(props) {
@@ -36,8 +39,10 @@ class Login extends PureComponent {
       iconAnimations: new Animated.Value(0),
       username: '',
       password: '',
-      user: {}
+      user: {},
+      isFocus: false
     };
+    // this.imageHeight = new Animated.Value(IMAGE_HEIGHT);
   }
   componentWillMount() {
     const arrAnimated = [];
@@ -57,11 +62,11 @@ class Login extends PureComponent {
             axios.defaults.headers.common.Authorization = user.token;
           }
           this.props.setUser(user);
-          this.navigationToMain();
         }
+        this.startAnimation(user);
       }
     });
-    this.startAnimation();
+    // this.startAnimation(user);
   }
   componentWillReceiveProps(newProps) {
     const { user } = newProps;
@@ -74,7 +79,28 @@ class Login extends PureComponent {
       Alert.alert('Thông báo', 'Đăng nhập không thành công');
     }
   }
-
+  componentDidUpdate() {
+    const { iconAnimations, animations } = this.state;
+    if (this.state.isFocus) {
+      Animated.timing(iconAnimations, {
+        toValue: 0,
+        duration: 500,
+        useNativeDriver: Platform.OS !== 'ios'
+      }).start();
+    } else {
+      Animated.timing(iconAnimations, {
+        toValue: 1,
+        duration: 500,
+        useNativeDriver: Platform.OS !== 'ios'
+      }).start();
+    }
+  }
+  onFocus = () => {
+    this.setState({ isFocus: true });
+  };
+  onBLur = () => {
+    this.setState({ isFocus: false });
+  };
   onLogin = () => {
     const { username, password } = this.state;
     if (username === '' || password === '') {
@@ -87,9 +113,11 @@ class Login extends PureComponent {
     this.setState({ password });
   };
   onChangeUsername = username => {
+    console.log(username);
+
     this.setState({ username });
   };
-  startAnimation = () => {
+  startAnimation = user => {
     const { iconAnimations, animations } = this.state;
     const animationsArr = this.arr.map((item, i) =>
       Animated.timing(animations[i], {
@@ -103,7 +131,9 @@ class Login extends PureComponent {
       duration: 500,
       useNativeDriver: Platform.OS !== 'ios'
     }).start();
-    Animated.stagger(50, [...animationsArr]).start();
+    Animated.stagger(50, [...animationsArr]).start(() => {
+      if (user.id !== undefined) this.navigationToMain();
+    });
   };
 
   navigationToMain = () => {
@@ -122,22 +152,22 @@ class Login extends PureComponent {
   };
   render() {
     const { animations, iconAnimations, username, password } = this.state;
+    const heightIcon = iconAnimations.interpolate({
+      inputRange: [0, 1],
+      outputRange: [0, 100]
+    });
     return (
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
         <Image source={backgroundImage} style={styles.background_image} />
         <View style={{ flex: 1 }} />
-
-        <View style={styles.content}>
-          <View style={{ flex: 1, justifyContent: 'flex-end' }}>
-            <AnimatedIcon
-              name="ios-cafe"
-              color="#fff"
-              size={90}
-              style={{ opacity: iconAnimations }}
-            />
+        <View style={[styles.content]}>
+          <View style={{ justifyContent: 'flex-end' }}>
+            <AnimatedIcon name="ios-cafe" color="#fff" size={90} style={{}} />
           </View>
-          <View style={styles.freddo_layout}>
+          <Animated.View
+            style={[styles.freddo_layout, { opacity: iconAnimations }]}
+          >
             {this.arr.map((value, index) => (
               <Animated.Text
                 key={index}
@@ -146,20 +176,36 @@ class Login extends PureComponent {
                 {value}
               </Animated.Text>
             ))}
-          </View>
+          </Animated.View>
           <View style={styles.input_layout}>
-            <CustomTextInput
-              label="Tài khoản"
+            <TextInput
+              style={styles.text_input}
               placeholder="Tài khoản"
-              text={username}
-              onTextChange={this.onChangeUsername}
+              placeholderTextColor="#fff"
+              onFocus={this.onFocus}
+              onBlur={this.onBLur}
+              underlineColorAndroid="transparent"
+              onChangeText={this.onChangeUsername}
             />
-            <CustomTextInput
-              label="Mật khẩu"
-              type="pass"
-              text={password}
-              onTextChange={this.onChangePassword}
+            <TextInput
+              style={styles.text_input}
+              placeholder="Mật khẩu"
+              placeholderTextColor="#fff"
+              secureTextEntry
+              underlineColorAndroid="transparent"
+              onFocus={this.onFocus}
+              onBlur={this.onBLur}
+              onChangeText={this.onChangePassword}
             />
+          </View>
+          <View
+            style={{
+              height: 60,
+              width: '100%',
+              justifyContent: 'flex-start',
+              alignItems: 'center'
+            }}
+          >
             <TouchableOpacity style={styles.button} onPress={this.onLogin}>
               <Text style={styles.text_button}>Đăng nhập</Text>
             </TouchableOpacity>

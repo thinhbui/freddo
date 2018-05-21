@@ -12,7 +12,7 @@ import Icon from 'react-native-vector-icons/Ionicons';
 
 const { width } = Dimensions.get('window');
 
-class QueueItem extends React.PureComponent {
+class QueueItem extends React.Component {
   state = {
     open: false,
     count: 0,
@@ -21,6 +21,9 @@ class QueueItem extends React.PureComponent {
   };
   componentDidMount() {
     const { item } = this.props;
+    this.setData(item);
+  }
+  setData = item => {
     let count = 0;
     let max = 0;
     let data = [];
@@ -39,9 +42,35 @@ class QueueItem extends React.PureComponent {
       maxTime: moment.utc(max * 1000).format('HH:mm'),
       data
     });
+  };
+  componentWillReceiveProps(newProps) {
+    console.log('QueueItem', newProps);
+    this.setData(newProps.item);
   }
+  // shouldComponentUpdate(nextProps, nextStates) {
+  //   console.log(nextProps);
+  //   if (nextProps !== this.props || nextStates !== this.state) {
+  //     let data = [];
+  //     let count = 0;
+  //     let max = 0;
+  //     nextProps.item.listitems.forEach(element => {
+  //       if (!element.status) {
+  //         count++;
+  //         const time = moment().unix() - moment.utc(element.createAt).unix();
+  //         if (time > max) {
+  //           max = time;
+  //         }
+  //         data = [...data, { ...element, rangeTime: time }];
+  //       }
+  //     });
+  //     this.setState({ data });
+  //     return true;
+  //   }
+  //   return false;
+  // }
   renderItem = ({ item }) => {
     const { index } = this.props;
+    // console.log(item);
 
     return (
       <View
@@ -68,7 +97,7 @@ class QueueItem extends React.PureComponent {
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
           <Text style={{ color: index % 2 === 0 ? 'black' : '#fff' }}>
-            {moment.utc(item.rangeTime * 1000).format('HH:mm')}
+            {moment.utc(item.rangeTime * 1000).format('mm')}
           </Text>
         </View>
       </View>
@@ -131,6 +160,7 @@ class QueueItem extends React.PureComponent {
         {open && (
           <FlatList
             data={data}
+            extraData={this.state}
             renderItem={this.renderItem}
             keyExtractor={key => key._id}
           />

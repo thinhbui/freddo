@@ -124,12 +124,7 @@ class AppNavigatorState extends Component {
     );
   }
 }
-// const mapDispatchToProps = dispatch => ({
-//   updateOrder: order => dispatch(updateSuccess(order)),
-//   addOrder: order => dispatch(postOrderSuccess(order)),
-//   updateTable: table => dispatch(updateTableSuccess(table)),
-//   getTables: () => dispatch(getTable())
-// });
+
 const mapStateToProps = state => ({
   nav: state.nav,
   orders: state.OrderReducer,

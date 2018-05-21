@@ -105,6 +105,7 @@ const updateOrder = order => async dispatch => {
   if (result.status === 200) {
     console.log('updateOrder', result.data);
     socket.emit(SOCKET_EVENT.INVOICE_UPDATE, result.data);
+    result.data.tablename = order.tablename;
     dispatch(updateSuccess(result.data));
   } else {
     dispatch(error(result.response.data || result));

@@ -18,30 +18,56 @@ class Queue extends Component {
     header: null
   };
   state = {
-    orders: []
+    orders: [],
+    refresh: true
   };
   componentDidMount() {
     const { orders } = this.props;
     this.setOrder(orders);
   }
-  shouldComponentUpdate(nextProps, nextState) {
-    if (this.props !== nextProps) {
-      console.log(
-        nextProps.orders.filter(
-          item => item.tablename || item.table.status === STATUS_TABLE.WAITING
-        )
-      );
+  componentWillReceiveProps(newProps) {
+    console.log('componentWillReceiveProps', newProps);
 
+    if (newProps.orders.length > 0) {
+      const orders = newProps.orders.filter(
+        item =>
+          item.tablename
+            ? item.tablename
+            : item.table.status === STATUS_TABLE.WAITING
+      );
+      console.log('componentWillReceiveProps', orders);
       this.setState({
-        orders: nextProps.orders.filter(
-          item => item.tablename || item.table.status === STATUS_TABLE.WAITING
-        )
+        orders,
+        refresh: !this.state.refresh
       });
-      return true;
     }
-    if (this.state !== nextState) return true;
-    return false;
   }
+
+  // shouldComponentUpdate(nextProps, nextState) {
+  //   if (this.props !== nextProps) {
+  //     console.log(
+  //       'shouldComponentUpdate',
+  //       nextProps.orders.filter(
+  //         item =>
+  //           item.tablename
+  //             ? item.tablename
+  //             : item.table.status === STATUS_TABLE.WAITING
+  //       )
+  //     );
+
+  //     this.setState({
+  //       orders: nextProps.orders.filter(
+  //         item =>
+  //           item.tablename
+  //             ? item.tablename
+  //             : item.table.status === STATUS_TABLE.WAITING
+  //       )
+  //     });
+  //     return true;
+  //   }
+  //   if (this.state !== nextState) return true;
+  //   return false;
+  // }
   setOrder = orders => {
     this.setState({
       orders: orders.filter(item => item.table.status === STATUS_TABLE.WAITING)
@@ -51,7 +77,6 @@ class Queue extends Component {
   renderItem = ({ item, index }) => <QueueItem item={item} index={index} />;
   render() {
     const { orders } = this.state;
-
     return (
       <View style={{ flex: 1, backgroundColor: '#fff' }}>
         <Header title="Hàng đợi" />
@@ -63,8 +88,9 @@ class Queue extends Component {
         ) : (
           <FlatList
             data={orders}
+            extraData={this.state}
             renderItem={this.renderItem}
-            keyExtractor={item => item._id}
+            keyExtractor={item => item._id || item.item}
           />
         )}
       </View>
