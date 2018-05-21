@@ -14,7 +14,8 @@ import {
   updateTableSuccess,
   getTable,
   getItemSuccess,
-  deleteOrderSuccess
+  deleteOrderSuccess,
+  addHistory
 } from './actions';
 
 class AppNavigatorState extends Component {
@@ -47,9 +48,6 @@ class AppNavigatorState extends Component {
     // listen invoice complele
     socket.on(SOCKET_EVENT.INVOICE_COMPLETE_DESK, data => {
       const { orders, tables } = this.props;
-      console.log(SOCKET_EVENT.INVOICE_COMPLETE_DESK, data);
-      console.log('orders', orders);
-      console.log('tables', tables);
       const table = tables.findIndex(item => data._id === item._id);
       if (table !== undefined) dispatch(updateTableSuccess(data));
       else dispatch(getTable());
@@ -63,7 +61,10 @@ class AppNavigatorState extends Component {
       });
       console.log(index, orders[index]);
 
-      if (index !== -1) dispatch(deleteOrderSuccess(orders[index]));
+      if (index !== -1) {
+        dispatch(deleteOrderSuccess(orders[index]));
+        dispatch(addHistory({ ...orders[index], status: true }));
+      }
       // dispatch(updateSuccess(data));
     });
     // listen tavle changes
