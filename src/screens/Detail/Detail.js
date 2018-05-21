@@ -44,19 +44,18 @@ class Detail extends PureComponent {
     const { order } = this.state;
     console.log(order);
     const { table, orderItem } = this.props.navigation.state.params;
-    if (
-      orderItem === undefined &&
-      order.listitems &&
-      order.listitems.length > 0
-    ) {
-      order.user = this.props.user.id;
-      order.status = false;
-      order.table = table._id;
-      order.tablename = table.name;
-      table.status = STATUS_TABLE.WAITING;
-      this.props.postOrder(order);
-      this.props.updateTable(table);
-    } else if (order.listitems.length === 0) {
+    if (orderItem === undefined && order.listitems !== undefined) {
+      if (order.listitems.length > 0) {
+        order.user = this.props.user.id;
+        order.status = false;
+        order.table = table._id;
+        order.tablename = table.name;
+        table.status = STATUS_TABLE.WAITING;
+        this.props.postOrder(order);
+        this.props.updateTable(table);
+        this.props.navigation.goBack();
+      }
+    } else {
       Alert.alert('Thông báo', 'Không có gì để lưu');
     }
     if (orderItem !== undefined) {
@@ -71,9 +70,9 @@ class Detail extends PureComponent {
         table.status = STATUS_TABLE.WAITING;
         this.props.updateOrder(order);
         this.props.updateTable(table);
+        this.props.navigation.goBack();
       }
     }
-    this.props.navigation.goBack();
   };
   onPayPress = () => {
     const { table } = this.props.navigation.state.params;

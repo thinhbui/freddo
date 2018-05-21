@@ -1,6 +1,6 @@
 import axios from 'axios';
 import url from '../ultils/constants/api';
-
+/* eslint no-underscore-dangle: 0 */
 // const freddo = axios.create({
 //   baseURL: HOST,
 //   timeout: 5000,

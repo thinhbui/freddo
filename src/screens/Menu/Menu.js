@@ -127,7 +127,7 @@ class Menu extends PureComponent {
     // console.log('menu', this.props.order);
     return (
       <KeyboardAvoidingView style={{ flex: 1 }}>
-        <View style={{ flex: 1, backgroundColor: '#fff' }}>
+        <View style={{ flex: 1 }}>
           <View style={styles.arrowLayout}>
             {listitems !== undefined && (
               <TouchableOpacity
@@ -155,20 +155,6 @@ class Menu extends PureComponent {
               source={background}
               style={{ position: 'absolute', width: '100%', height: '100%' }}
             />
-            {/* <SectionList
-                        sections={data}
-                        initialNumToRender={10}
-                        keyExtractor={(item, index) => index.toString()}
-                        renderItem={this.renderItem}
-                        renderSectionHeader={({ section, index }) => (
-                            <View key={index} 
-                            style={{ backgroundColor: COLOR.light_theme, h
-                                eight: 30, justifyContent: 'center' }}>
-                                <Text style={{ c
-                                    olor: '#fff', paddingLeft: 5 }}>{section.title}</Text>
-                            </View>
-                        )}
-                    /> */}
             {data.length === 0 ? (
               <ActivityIndicator size="large" color="#fff" />
             ) : (

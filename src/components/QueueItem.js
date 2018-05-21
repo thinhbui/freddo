@@ -23,6 +23,11 @@ class QueueItem extends React.Component {
     const { item } = this.props;
     this.setData(item);
   }
+
+  componentWillReceiveProps(newProps) {
+    console.log('QueueItem', newProps);
+    this.setData(newProps.item);
+  }
   setData = item => {
     let count = 0;
     let max = 0;
@@ -39,39 +44,14 @@ class QueueItem extends React.Component {
     });
     this.setState({
       count,
-      maxTime: moment.utc(max * 1000).format('HH:mm'),
+      maxTime: moment.utc(max * 1000).format('mm'),
       data
     });
   };
-  componentWillReceiveProps(newProps) {
-    console.log('QueueItem', newProps);
-    this.setData(newProps.item);
-  }
-  // shouldComponentUpdate(nextProps, nextStates) {
-  //   console.log(nextProps);
-  //   if (nextProps !== this.props || nextStates !== this.state) {
-  //     let data = [];
-  //     let count = 0;
-  //     let max = 0;
-  //     nextProps.item.listitems.forEach(element => {
-  //       if (!element.status) {
-  //         count++;
-  //         const time = moment().unix() - moment.utc(element.createAt).unix();
-  //         if (time > max) {
-  //           max = time;
-  //         }
-  //         data = [...data, { ...element, rangeTime: time }];
-  //       }
-  //     });
-  //     this.setState({ data });
-  //     return true;
-  //   }
-  //   return false;
-  // }
   renderItem = ({ item }) => {
     const { index } = this.props;
     // console.log(item);
-
+    const time = moment.utc(item.rangeTime * 1000).format('mm');
     return (
       <View
         style={{
@@ -97,7 +77,7 @@ class QueueItem extends React.Component {
           style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}
         >
           <Text style={{ color: index % 2 === 0 ? 'black' : '#fff' }}>
-            {moment.utc(item.rangeTime * 1000).format('mm')}
+            {time > '00' ? `${time} phút trước` : 'Vài giây trước'}
           </Text>
         </View>
       </View>
@@ -145,7 +125,7 @@ class QueueItem extends React.Component {
               }}
             >
               <Text style={{ color: index % 2 === 0 ? 'black' : '#fff' }}>
-                {maxTime}
+                {maxTime > '00' ? `${maxTime} phút trước` : 'Vài giây trước'}
               </Text>
             </View>
             <View style={{ paddingRight: 15, justifyContent: 'center' }}>

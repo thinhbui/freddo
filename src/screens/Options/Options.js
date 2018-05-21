@@ -11,7 +11,7 @@ import { NavigationActions } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { Header } from '../../components';
 import { COLOR } from '../../ultils/constants/color';
-import { logout } from '../../actions';
+import { logout, getMenu } from '../../actions';
 import { STORAGE } from '../../ultils/constants/String';
 
 class Options extends Component {
@@ -31,6 +31,9 @@ class Options extends Component {
     this.props.navigation.navigate('HistoryPersonal', {
       user: this.props.user
     });
+  };
+  onReload = () => {
+    this.props.getMenu();
   };
   logout = () => {
     Alert.alert('Thông báo', 'Bạn có chắc chắn muốn đăng xuất không?', [
@@ -105,6 +108,35 @@ class Options extends Component {
               height: 40,
               width: '100%'
             }}
+            onPress={this.onReload}
+          >
+            <View style={{ alignItems: 'center', flexDirection: 'row' }}>
+              <View
+                style={{
+                  width: 50,
+                  justifyContent: 'center',
+                  alignItems: 'center'
+                }}
+              >
+                <Icon name="ios-refresh-outline" size={30} />
+              </View>
+              <View
+                style={{
+                  justifyContent: 'center',
+                  flex: 1,
+                  borderBottomWidth: 1,
+                  height: '100%'
+                }}
+              >
+                <Text>Cập nhật menu</Text>
+              </View>
+            </View>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={{
+              height: 40,
+              width: '100%'
+            }}
             onPress={this.logout}
           >
             <View style={{ alignItems: 'center', flexDirection: 'row' }}>
@@ -135,7 +167,8 @@ class Options extends Component {
   }
 }
 const mapDisPatchToProps = dispatch => ({
-  logout: () => dispatch(logout())
+  logout: () => dispatch(logout()),
+  getMenu: () => dispatch(getMenu())
 });
 const mapStateToProps = state => ({
   user: state.LoginReducer
