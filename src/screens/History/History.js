@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
-import { View, FlatList, ActivityIndicator } from 'react-native';
+import { View, FlatList, ActivityIndicator, Text } from 'react-native';
 import { withNavigationFocus } from 'react-navigation';
 import Icon from 'react-native-vector-icons/Ionicons';
 import { connect } from 'react-redux';
 import styles from './styles';
 import { Header, HistoryItem } from '../../components';
 import { getHistory, getHistoryByUser } from '../../actions';
-
+/* eslint no-underscore-dangle: 0 */
 class HistoryScreen extends Component {
   static navigationOptions = {
     tabBarIcon: ({ focused }) => (
@@ -20,26 +20,29 @@ class HistoryScreen extends Component {
   state = {
     data: [],
     page: 0,
-    refresh: false
+    refresh: false,
+    isload: true
   };
   componentWillMount() {
     const { user } = this.props.navigation.state.params;
     const { history } = this.props;
-    console.log(user);
-    if (user && history.personal.length === 0)
-      this.props.getHistoryByUser(this.state.page, 15, user._id);
-    else this.props.getHistory(this.state.page, 15);
+    console.log('user', user);
+    if (user && history.personal.length === 0) {
+      this.props.getHistoryByUser(this.state.page, 15, user.id);
+    } else this.props.getHistory(this.state.page, 15);
   }
   componentDidMount() {
     const { history } = this.props;
     const { user } = this.props.navigation.state.params;
     if (user) {
       this.setState({
-        data: history.personal
+        data: history.personal,
+        isload: false
       });
     } else {
       this.setState({
-        data: history.history
+        data: history.history,
+        isload: false
       });
     }
   }
@@ -64,7 +67,7 @@ class HistoryScreen extends Component {
   componentWillUnmount() {}
   _onEndReaced = () => {
     const { user } = this.props.navigation.state.params;
-    if (user) this.props.getHistoryByUser(this.state.page + 1, 15, user._id);
+    if (user) this.props.getHistoryByUser(this.state.page + 1, 15, user.id);
     else this.props.getHistory(this.state.page + 1, 15);
     this.setState({ refresh: true, page: this.state.page + 1 });
   };
@@ -85,7 +88,17 @@ class HistoryScreen extends Component {
             this.props.navigation.goBack();
           }}
         />
-        {data.length > 0 ? (
+        {this.state.isload ? (
+          <ActivityIndicator size="large" style={{ marginTop: 30 }} />
+        ) : (
+          data.length === 0 && (
+            <Text style={{ fontSize: 16, marginTop: 15, alignSelf: 'center' }}>
+              Chưa có thanh toán nào
+            </Text>
+          )
+        )}
+
+        {data.length > 0 && (
           <FlatList
             data={data}
             renderItem={this.renderItem}
@@ -94,8 +107,6 @@ class HistoryScreen extends Component {
             onEndReached={this._onEndReaced}
             onEndReachedThreshold={0.9}
           />
-        ) : (
-          <ActivityIndicator size="large" style={{ marginTop: 30 }} />
         )}
       </View>
     );

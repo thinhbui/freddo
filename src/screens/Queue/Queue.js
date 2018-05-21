@@ -43,31 +43,6 @@ class Queue extends Component {
     }
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  //   if (this.props !== nextProps) {
-  //     console.log(
-  //       'shouldComponentUpdate',
-  //       nextProps.orders.filter(
-  //         item =>
-  //           item.tablename
-  //             ? item.tablename
-  //             : item.table.status === STATUS_TABLE.WAITING
-  //       )
-  //     );
-
-  //     this.setState({
-  //       orders: nextProps.orders.filter(
-  //         item =>
-  //           item.tablename
-  //             ? item.tablename
-  //             : item.table.status === STATUS_TABLE.WAITING
-  //       )
-  //     });
-  //     return true;
-  //   }
-  //   if (this.state !== nextState) return true;
-  //   return false;
-  // }
   setOrder = orders => {
     this.setState({
       orders: orders.filter(item => item.table.status === STATUS_TABLE.WAITING)
@@ -82,7 +57,7 @@ class Queue extends Component {
         <Header title="Hàng đợi" />
 
         {orders.length === 0 ? (
-          <Text style={{ fontSize: 16, alignSelf: 'center' }}>
+          <Text style={{ fontSize: 16, alignSelf: 'center', marginTop: 15 }}>
             Không có bàn nào đang đợi
           </Text>
         ) : (
@@ -97,10 +72,6 @@ class Queue extends Component {
     );
   }
 }
-const mapStateToProps = state => {
-  console.log(state);
-
-  return { orders: state.OrderReducer };
-};
+const mapStateToProps = state => ({ orders: state.OrderReducer });
 
 export default connect(mapStateToProps)(Queue);

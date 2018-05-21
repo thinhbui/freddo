@@ -26,6 +26,12 @@ class Options extends Component {
     header: null
   };
   componentDidMount() {}
+
+  onPressHistory = () => {
+    this.props.navigation.navigate('HistoryPersonal', {
+      user: this.props.user
+    });
+  };
   logout = () => {
     Alert.alert('Thông báo', 'Bạn có chắc chắn muốn đăng xuất không?', [
       {
@@ -46,11 +52,6 @@ class Options extends Component {
         style: 'cancel'
       }
     ]);
-  };
-  onPressHistory = () => {
-    this.props.navigation.navigate('HistoryPersonal', {
-      user: this.props.user
-    });
   };
   render() {
     const { user } = this.props;

@@ -3,7 +3,7 @@ import * as freedoAPI from '../services/freddoAPI';
 import socket from '../services/socket';
 import { SOCKET_EVENT } from '../ultils/constants/String';
 
-// this.socket = io('http://192.168.13.103:3000', { jsonp: false });
+/* eslint no-underscore-dangle: 0 */
 
 const getOrderSuccess = item => ({ type: types.GET_ORDER, payload: item });
 
@@ -57,8 +57,8 @@ const postOrder = order => async dispatch => {
     dispatch(error(result.response.data || result));
   }
 };
-const getHistory = (page, perPage, userId) => async dispatch => {
-  const result = await freedoAPI.getOldOrders(page, perPage, userId);
+const getHistory = (page, perPage) => async dispatch => {
+  const result = await freedoAPI.getOldOrders(page, perPage);
   console.log('getHistories', result);
 
   if (result.status === 200) {

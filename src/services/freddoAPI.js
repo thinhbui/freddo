@@ -72,6 +72,7 @@ const getOrderById = async id => {
   }
 };
 const getOldOrders = async (page, perPage, userId) => {
+  console.log(userId);
   console.log('getHistories', url.getHistory(page, perPage, userId));
 
   try {

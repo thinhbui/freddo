@@ -13,8 +13,8 @@ import BillItem from '../../components/BillItems';
 import styles from './styles';
 import { postOrder, updateTable, updateOrder } from '../../actions';
 import { COLOR } from '../../ultils/constants/color';
-import { STATUS_TABLE, SOCKET_EVENT } from '../../ultils/constants/String';
-import socket from '../../services/socket';
+import { STATUS_TABLE } from '../../ultils/constants/String';
+
 /* eslint no-underscore-dangle: 0 */
 class Detail extends PureComponent {
   constructor(props) {

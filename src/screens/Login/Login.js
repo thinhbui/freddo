@@ -9,8 +9,8 @@ import {
   Alert,
   StatusBar,
   AsyncStorage,
-  TextInput,
-  Dimensions
+  TextInput
+  // Dimensions
 } from 'react-native';
 import { NavigationActions } from 'react-navigation';
 
@@ -19,7 +19,7 @@ import { connect } from 'react-redux';
 import Icon from 'react-native-vector-icons/Ionicons';
 import moment from 'moment';
 import styles from './styles';
-import { CustomTextInput } from '../../components';
+// import { CustomTextInput } from '../../components';
 import { login, loginSuccess, getOrders, getTable } from '../../actions';
 import { STORAGE } from '../../ultils/constants/String';
 // import { width } from 'window-size';
@@ -28,8 +28,8 @@ import { STORAGE } from '../../ultils/constants/String';
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const backgroundImage = require('../../ultils/images/cafe.png');
 // const senderID = '711529978568';
-const { width, height } = Dimensions.get('window');
-
+// const { width, height } = Dimensions.get('window');
+/* eslint no-underscore-dangle: 0 */
 class Login extends PureComponent {
   constructor(props) {
     super(props);
@@ -80,7 +80,7 @@ class Login extends PureComponent {
     }
   }
   componentDidUpdate() {
-    const { iconAnimations, animations } = this.state;
+    const { iconAnimations } = this.state;
     if (this.state.isFocus) {
       Animated.timing(iconAnimations, {
         toValue: 0,
@@ -151,11 +151,7 @@ class Login extends PureComponent {
     this.props.navigation.dispatch(resetAction);
   };
   render() {
-    const { animations, iconAnimations, username, password } = this.state;
-    const heightIcon = iconAnimations.interpolate({
-      inputRange: [0, 1],
-      outputRange: [0, 100]
-    });
+    const { animations, iconAnimations } = this.state;
     return (
       <View style={styles.container}>
         <StatusBar barStyle="light-content" />
@@ -224,10 +220,8 @@ const mapDispatchToProps = dispatch => ({
   getTable: () => dispatch(getTable())
 });
 
-const mapStateToProps = state => {
-  console.log(state);
-  return {
-    user: state.LoginReducer
-  };
-};
+const mapStateToProps = state => ({
+  user: state.LoginReducer
+});
+
 export default connect(mapStateToProps, mapDispatchToProps)(Login);
