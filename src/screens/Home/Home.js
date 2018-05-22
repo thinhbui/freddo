@@ -97,8 +97,7 @@ class Home extends Component {
       this.props.navigation.navigate('Detail', {
         table,
         orderItem: order,
-        refresh: this.refresh,
-        socket: this.props.navigation.state.params.socket
+        refresh: this.refresh
       });
     } else if (table === rootTable) this.setState({ rootTable: {} });
     else if (order !== undefined && rootOrder !== undefined) {
@@ -124,9 +123,10 @@ class Home extends Component {
               this.props.updateOrder(order);
 
               table.status =
-                rootTable.status === STATUS_TABLE.WAITING
-                  ? STATUS_TABLE.WAITING
+                rootTable.status > table.status
+                  ? rootTable.status
                   : table.status;
+
               this.props.updateTable(table);
               // update status root table
               rootTable.status = STATUS_TABLE.EMPTY;

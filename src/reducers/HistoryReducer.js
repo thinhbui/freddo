@@ -18,8 +18,15 @@ export default (state = initialState, action) => {
     case types.ADD_HISTORY: {
       console.log('ADD_HISTORY', action.payload);
       return {
-        personal: [action.payload, ...state.personal],
+        ...state,
         history: [action.payload, ...state.history]
+      };
+    }
+    case types.ADD_HISTORY_PERSONAL: {
+      console.log('ADD_HISTORY_PERSONAL', action.payload);
+      return {
+        ...state,
+        personal: [action.payload, ...state.personal]
       };
     }
     case types.GET_HISTORY_PERSONAL:

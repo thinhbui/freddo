@@ -16,6 +16,10 @@ const deleteOrderSuccess = item => ({
   payload: item
 });
 const addHistory = item => ({ type: types.ADD_HISTORY, payload: item });
+const addHistoryPersonal = item => ({
+  type: types.ADD_HISTORY_PERSONAL,
+  payload: item
+});
 const getHistorySuccess = item => ({ type: types.GET_HISTORY, payload: item });
 const getHistoryPersonal = item => ({
   type: types.GET_HISTORY_PERSONAL,
@@ -62,7 +66,11 @@ const getHistory = (page, perPage) => async dispatch => {
   console.log('getHistories', result);
 
   if (result.status === 200) {
-    dispatch(getHistorySuccess(result.data));
+    dispatch(
+      getHistorySuccess(
+        result.data.sort((a, b) => (a.billdate > b.billdate ? -1 : 1))
+      )
+    );
   } else {
     dispatch(error(result.response.data || result));
   }
@@ -72,7 +80,11 @@ const getHistoryByUser = (page, perPage, userId) => async dispatch => {
   console.log('getHistories', result);
 
   if (result.status === 200) {
-    dispatch(getHistoryPersonal(result.data));
+    dispatch(
+      getHistoryPersonal(
+        result.data.sort((a, b) => (a.billdate > b.billdate ? -1 : 1))
+      )
+    );
   } else {
     dispatch(error(result.response.data || result));
   }
@@ -135,5 +147,6 @@ export {
   deleteOrder,
   addHistory,
   updateSuccess,
-  getHistoryByUser
+  getHistoryByUser,
+  addHistoryPersonal
 };

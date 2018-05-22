@@ -19,13 +19,14 @@ class HistoryScreen extends Component {
   };
   constructor(props) {
     super(props);
+    this.page = Math.round(
+      (this.props.user === undefined
+        ? this.props.history.history.length
+        : this.props.history.personal.length) / 15
+    );
     this.state = {
       data: [],
-      page: Math.round(
-        (this.props.user === undefined
-          ? this.props.history.history.length
-          : this.props.history.personal.length) / 15
-      ),
+      page: this.page,
       refresh: false,
       isload: true
     };
@@ -35,10 +36,13 @@ class HistoryScreen extends Component {
     const { user } = this.props.navigation.state.params;
     const { history } = this.props;
 
-    console.log('user', user);
-    if (user && history.personal.length === 0) {
+    console.log('user', this.state.page);
+    if (user) {
       this.props.getHistoryByUser(this.state.page, 15, user.id);
-    } else this.props.getHistory(this.state.page, 15);
+    }
+    if (!user && history.history.length === 0) {
+      this.props.getHistory(this.state.page, 15);
+    }
   }
   componentDidMount() {
     const { history } = this.props;

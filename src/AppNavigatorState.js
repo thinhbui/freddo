@@ -15,7 +15,8 @@ import {
   getTable,
   getItemSuccess,
   deleteOrderSuccess,
-  addHistory
+  addHistory,
+  addHistoryPersonal
 } from './actions';
 
 class AppNavigatorState extends Component {
@@ -47,7 +48,9 @@ class AppNavigatorState extends Component {
     });
     // listen invoice complele
     socket.on(SOCKET_EVENT.INVOICE_COMPLETE_DESK, data => {
-      const { orders, tables } = this.props;
+      console.log('INVOICE_COMPLETE_DESK', data);
+
+      const { orders, tables, users } = this.props;
       const table = tables.findIndex(item => data._id === item._id);
       if (table !== undefined) dispatch(updateTableSuccess(data));
       else dispatch(getTable());
@@ -62,8 +65,14 @@ class AppNavigatorState extends Component {
       console.log(index, orders[index]);
 
       if (index !== -1) {
+        const order = { ...orders[index], status: true };
         dispatch(deleteOrderSuccess(orders[index]));
-        dispatch(addHistory({ ...orders[index], status: true }));
+        dispatch(addHistory(order));
+        console.log(order.user._id, users.id);
+
+        if (order.user._id === users.id) {
+          dispatch(addHistoryPersonal(order));
+        }
       }
       // dispatch(updateSuccess(data));
     });
@@ -151,6 +160,7 @@ class AppNavigatorState extends Component {
 const mapStateToProps = state => ({
   nav: state.nav,
   orders: state.OrderReducer,
-  tables: state.TableReducer
+  tables: state.TableReducer,
+  users: state.LoginReducer
 });
 export default connect(mapStateToProps)(AppNavigatorState);

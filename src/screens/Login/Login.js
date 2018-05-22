@@ -63,10 +63,11 @@ class Login extends PureComponent {
           }
           this.props.setUser(user);
         }
-        this.startAnimation(user);
       }
     });
-    // this.startAnimation(user);
+    this.startAnimation();
+
+    // this.startAnimation();
   }
   componentWillReceiveProps(newProps) {
     const { user } = newProps;
@@ -113,8 +114,6 @@ class Login extends PureComponent {
     this.setState({ password });
   };
   onChangeUsername = username => {
-    console.log(username);
-
     this.setState({ username });
   };
   startAnimation = user => {
@@ -132,7 +131,9 @@ class Login extends PureComponent {
       useNativeDriver: Platform.OS !== 'ios'
     }).start();
     Animated.stagger(50, [...animationsArr]).start(() => {
-      if (user.id !== undefined) this.navigationToMain();
+      if (user && user.exp && user.exp > moment().unix()) {
+        this.navigationToMain();
+      }
     });
   };
 
@@ -146,7 +147,7 @@ class Login extends PureComponent {
         })
       ]
     });
-    console.log(this.props.navigation);
+    // console.log(this.props.navigation);
 
     this.props.navigation.dispatch(resetAction);
   };
